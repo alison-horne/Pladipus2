@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    <configuration>
+	
+		<property resource="application.properties" />
+		<property name="defaultPattern" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" />
+
+    	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    	    <encoder>
+            	<pattern>${defaultPattern}</pattern>
+            </encoder>
+    	</appender>
+
+      	<appender name="dailyRollingFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    		<file>${LOG_FOLDER}/pladipus.log</file>
+    		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+    			<FileNamePattern>${LOG_FOLDER}/pladipus.%d{yyyy-MM-dd}.log</FileNamePattern>
+    			<maxHistory>${LOG_HISTORY_DAYS}</maxHistory>			
+    		</rollingPolicy>    
+    		
+    		<encoder>
+            	<pattern>${defaultPattern}</pattern>
+        	</encoder>
+      	</appender>
+
+    	<logger name="com.compomics.pladipus" additivity="false">
+    	    <level value="INFO" />
+    		<appender-ref ref="STDOUT"/>
+    	</logger>
+
+    	<root>
+    		<level value="WARN" />
+    		<appender-ref ref="STDOUT" />
+    	</root>
+    </configuration>
