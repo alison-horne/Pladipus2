@@ -2,8 +2,10 @@ package com.compomics.pladipus.tools.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;
 
+import com.compomics.pladipus.model.config.ModelConfiguration;
 import com.compomics.pladipus.tools.core.ToolFactory;
 import com.compomics.pladipus.tools.core.ToolInfoProvider;
 import com.compomics.pladipus.tools.core.ToolScanner;
@@ -15,6 +17,7 @@ import com.compomics.pladipus.tools.core.impl.PladipusToolScanner;
  * Spring bean definitions for tool package
  */
 @Configuration
+@Import(ModelConfiguration.class)
 public class ToolsConfiguration {
 	
 	/**

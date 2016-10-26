@@ -10,6 +10,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 
+import com.compomics.pladipus.model.exceptions.PladipusLogExceptionMessages;
 import com.compomics.pladipus.model.exceptions.PladipusReportableException;
 import com.compomics.pladipus.tools.annotations.PladipusTool;
 import com.compomics.pladipus.tools.core.Tool;
@@ -25,6 +26,9 @@ public class PladipusToolScanner implements ToolScanner {
 	@Autowired
 	private String pladipusScanPackage;
 	private ImmutableSet<BeanDefinition> toolBeanDefs;
+	
+	@Autowired
+	private PladipusLogExceptionMessages logExceptionMessages;
 	
 	static final Logger LOGGER = LoggerFactory.getLogger(PladipusToolScanner.class);
 	
@@ -56,11 +60,7 @@ public class PladipusToolScanner implements ToolScanner {
     	}
   
         if (candidates.isEmpty()) {
-        	// TODO Temporary error message.  Move to common properties, along with other things such as logging info, db setup...
-            String NO_TOOLS_MESSAGE = "No tools were found in the package " + getPladipusScanPackage() + ". \n" +
-            		"Please ensure that Pladipus tool classes are in the correct location, and restart the application.";
-        	LOGGER.error(NO_TOOLS_MESSAGE);
-        	throw new PladipusReportableException(NO_TOOLS_MESSAGE);
+        	throw new PladipusReportableException(logExceptionMessages.getMessage("tools.noTools", getPladipusScanPackage()));
         }
         toolBeanDefs = ImmutableSet.copyOf(candidates);
     }
