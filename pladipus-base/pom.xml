@@ -30,6 +30,11 @@
         </dependency>
 		
 		<dependency>
+            <groupId>com.compomics.pladipus</groupId>
+            <artifactId>pladipus-model</artifactId>
+        </dependency>
+		
+		<dependency>
 			<groupId>com.compomics.pladipus</groupId>
 			<artifactId>pladipus-repository</artifactId>
 		</dependency>
