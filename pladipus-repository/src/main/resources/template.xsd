@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:element name="template">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="global" type="global" minOccurs='0' />
+<xs:element name="steps" type="steps" />
+</xs:sequence>
+<xs:attribute name="name" type="xs:string" use="required"/>
+</xs:complexType>
+</xs:element>
+
+<xs:complexType name="step">
+<xs:sequence>
+<xs:element name="id" type="xs:ID" />
+<xs:element name="name" type="xs:string" />
+<xs:element name="parameters" type="parameters" minOccurs='0' />
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="steps">
+<xs:sequence>
+<xs:element name="step" type="step" minOccurs='1' maxOccurs='unbounded' />
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="global">
+<xs:sequence>
+<xs:element name="parameters" type="parameters" minOccurs='0' />
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="parameters">
+<xs:sequence>
+<xs:element name="parameter" type="parameter" minOccurs='0' maxOccurs='unbounded' />
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="parameter">
+<xs:sequence>
+<xs:element name="name" type="xs:string"/>
+<xs:element name="value" type="xs:string" minOccurs='0' />
+</xs:sequence>
+</xs:complexType>
+</xs:schema>
