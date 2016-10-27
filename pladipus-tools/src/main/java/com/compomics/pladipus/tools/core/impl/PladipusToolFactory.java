@@ -6,7 +6,7 @@ import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 
-import com.compomics.pladipus.model.exceptions.PladipusLogExceptionMessages;
+import com.compomics.pladipus.model.exceptions.PladipusMessages;
 import com.compomics.pladipus.model.exceptions.PladipusReportableException;
 import com.compomics.pladipus.tools.annotations.PladipusTool;
 import com.compomics.pladipus.tools.core.ToolFactory;
@@ -18,7 +18,7 @@ public class PladipusToolFactory extends ToolFactory {
 	private ToolScanner pladipusToolScanner;
 	
 	@Autowired
-	private PladipusLogExceptionMessages logExceptionMessages;
+	private PladipusMessages exceptionMessages;
 	
 	static final Logger LOGGER = LoggerFactory.getLogger(PladipusToolFactory.class);
 
@@ -39,7 +39,7 @@ public class PladipusToolFactory extends ToolFactory {
 			}
 			
 			if (getBeanDefinitionCount() == 0) {
-				throw new PladipusReportableException(logExceptionMessages.getMessage("tools.noBeansRegistered"));
+				throw new PladipusReportableException(exceptionMessages.getMessage("tools.noBeansRegistered"));
 			}
 		}		
 	}

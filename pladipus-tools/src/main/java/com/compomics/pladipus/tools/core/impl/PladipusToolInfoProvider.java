@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 
-import com.compomics.pladipus.model.exceptions.PladipusLogExceptionMessages;
+import com.compomics.pladipus.model.exceptions.PladipusMessages;
 import com.compomics.pladipus.model.exceptions.PladipusReportableException;
 import com.compomics.pladipus.tools.annotations.PladipusTool;
 import com.compomics.pladipus.tools.core.Tool;
@@ -22,7 +22,7 @@ public class PladipusToolInfoProvider implements ToolInfoProvider {
 	private ToolScanner pladipusToolScanner;
 	
 	@Autowired
-	private PladipusLogExceptionMessages logExceptionMessages;
+	private PladipusMessages exceptionMessages;
 	
 	static final Logger LOGGER = LoggerFactory.getLogger(PladipusToolInfoProvider.class);
 
@@ -45,7 +45,7 @@ public class PladipusToolInfoProvider implements ToolInfoProvider {
 		}
 		allToolInfo = builder.build();
 		if (allToolInfo.isEmpty()) {
-			throw new PladipusReportableException(logExceptionMessages.getMessage("tool.noToolInfo"));
+			throw new PladipusReportableException(exceptionMessages.getMessage("tool.noToolInfo"));
 		}
     }
 	

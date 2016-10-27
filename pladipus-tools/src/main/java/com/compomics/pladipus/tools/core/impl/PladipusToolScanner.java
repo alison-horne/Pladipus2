@@ -10,7 +10,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 
-import com.compomics.pladipus.model.exceptions.PladipusLogExceptionMessages;
+import com.compomics.pladipus.model.exceptions.PladipusMessages;
 import com.compomics.pladipus.model.exceptions.PladipusReportableException;
 import com.compomics.pladipus.tools.annotations.PladipusTool;
 import com.compomics.pladipus.tools.core.Tool;
@@ -28,7 +28,7 @@ public class PladipusToolScanner implements ToolScanner {
 	private ImmutableSet<BeanDefinition> toolBeanDefs;
 	
 	@Autowired
-	private PladipusLogExceptionMessages logExceptionMessages;
+	private PladipusMessages exceptionMessages;
 	
 	static final Logger LOGGER = LoggerFactory.getLogger(PladipusToolScanner.class);
 	
@@ -60,7 +60,7 @@ public class PladipusToolScanner implements ToolScanner {
     	}
   
         if (candidates.isEmpty()) {
-        	throw new PladipusReportableException(logExceptionMessages.getMessage("tools.noTools", getPladipusScanPackage()));
+        	throw new PladipusReportableException(exceptionMessages.getMessage("tools.noTools", getPladipusScanPackage()));
         }
         toolBeanDefs = ImmutableSet.copyOf(candidates);
     }

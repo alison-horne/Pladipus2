@@ -3,7 +3,7 @@ package com.compomics.pladipus.model.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.compomics.pladipus.model.exceptions.PladipusLogExceptionMessages;
+import com.compomics.pladipus.model.exceptions.PladipusMessages;
 
 
 /**
@@ -14,7 +14,9 @@ import com.compomics.pladipus.model.exceptions.PladipusLogExceptionMessages;
 public class ModelConfiguration {
 
 	@Bean 
-	public PladipusLogExceptionMessages logExceptionMessages() {
-		return new PladipusLogExceptionMessages();
+	public PladipusMessages exceptionMessages() {
+		return new PladipusMessages("exception", DEFAULT_ERROR_MESSAGE);
 	}
+	
+	private static final String DEFAULT_ERROR_MESSAGE = "An error has occurred.  See logs for more details.";
 }
