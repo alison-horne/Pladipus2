@@ -36,7 +36,7 @@ public class Workflow extends UpdateTracked {
 	}
 	public void setActive(boolean active) {
 		this.active = active;
-		trackColumn(WorkflowsColumn.ACTIVE.toString());
+		trackColumn(WorkflowsColumn.ACTIVE.name());
 	}
 	public int getId() {
 		return id;

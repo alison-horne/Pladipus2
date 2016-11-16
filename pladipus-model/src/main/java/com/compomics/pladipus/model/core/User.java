@@ -25,14 +25,14 @@ public class User extends UpdateTracked {
 	}
 	public void setEmail(String email) {
 		this.email = email;
-		trackColumn(UsersColumn.EMAIL.toString());
+		trackColumn(UsersColumn.EMAIL.name());
 	}
 	public boolean isActive() {
 		return active;
 	}
 	public void setActive(boolean active) {
 		this.active = active;
-		trackColumn(UsersColumn.ACTIVE.toString());
+		trackColumn(UsersColumn.ACTIVE.name());
 	}
 	public UserRole getUserRole() {
 		if (userRole == null) {
@@ -60,6 +60,6 @@ public class User extends UpdateTracked {
 	}
 	public void setPasswordEncrypted(String passwordEncrypted) {
 		this.passwordEncrypted = passwordEncrypted;
-		trackColumn(UsersColumn.PASSWORD.toString());
+		trackColumn(UsersColumn.PASSWORD.name());
 	}
 }
