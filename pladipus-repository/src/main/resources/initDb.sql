@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS user_roles (
 
 CREATE TABLE IF NOT EXISTS workflows (
 	workflow_id		INTEGER NOT NULL AUTO_INCREMENT,
-    workflow_name	VARCHAR(50) NOT NULL UNIQUE,
+    workflow_name	VARCHAR(50) NOT NULL,
     template		TEXT,	
     user_id			INTEGER,
     active			BOOLEAN NOT NULL DEFAULT 1,
