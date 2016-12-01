@@ -41,6 +41,12 @@
 		
 		<dependency>
 			<groupId>com.compomics.pladipus</groupId>
+			<artifactId>pladipus-repository</artifactId>
+			<type>test-jar</type>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.compomics.pladipus</groupId>
 			<artifactId>pladipus-tools</artifactId>
 			<type>test-jar</type>
 		</dependency>

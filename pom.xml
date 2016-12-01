@@ -96,6 +96,14 @@
 			
 			<dependency>
 				<groupId>com.compomics.pladipus</groupId>
+				<artifactId>pladipus-repository</artifactId>
+				<version>${pladipus.version}</version>
+				<type>test-jar</type>
+				<scope>test</scope>
+			</dependency>
+			
+			<dependency>
+				<groupId>com.compomics.pladipus</groupId>
 				<artifactId>pladipus-tools</artifactId>
 				<version>${pladipus.version}</version>
 				<type>test-jar</type>
