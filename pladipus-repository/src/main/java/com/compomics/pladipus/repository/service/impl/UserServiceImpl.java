@@ -56,7 +56,11 @@ public class UserServiceImpl implements UserService {
 		User user = getUserByName(username);
 		if (user != null) {
 			if (basicEncryptor.checkPassword(password, user.getPasswordEncrypted())) {
-				return user;
+				if (user.isActive()) {
+					return user;
+				} else {
+					throw new PladipusReportableException(exceptionMessages.getMessage("db.userInactive"));
+				}
 			} else {
 				throw new PladipusReportableException(exceptionMessages.getMessage("db.wrongPassword"));
 			}

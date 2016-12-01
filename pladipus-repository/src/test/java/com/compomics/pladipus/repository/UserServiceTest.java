@@ -93,6 +93,16 @@ public class UserServiceTest {
 	}
 	
 	@Test
+	public void testLoginInactiveUserThrowsException() {
+		try {
+			userService.login("test_user2", "Password2");
+			fail("Login should throw exception if user inactive");
+		} catch (PladipusReportableException e) {
+			assertTrue(e.getMessage().equals(exceptionMessages.getMessage("db.userInactive")));
+		}
+	}
+	
+	@Test
 	public void testCorrectLogin() {
 		try {
 			User user1 = userService.login("test_user1", "Password1");
