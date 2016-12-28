@@ -16,14 +16,16 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.compomics.pladipus.model.config.ModelConfiguration;
 import com.compomics.pladipus.model.core.User;
+import com.compomics.pladipus.model.core.Workflow;
 import com.compomics.pladipus.repository.dao.BaseDAO;
 import com.compomics.pladipus.repository.dao.impl.UserDAOImpl;
 import com.compomics.pladipus.repository.dao.impl.UserRoleDAOImpl;
-import com.compomics.pladipus.repository.helpers.XMLValidator;
+import com.compomics.pladipus.repository.dao.impl.WorkflowDAOImpl;
 import com.compomics.pladipus.repository.helpers.impl.BasicEncryptor;
-import com.compomics.pladipus.repository.helpers.impl.TemplateValidator;
 import com.compomics.pladipus.repository.service.UserService;
+import com.compomics.pladipus.repository.service.WorkflowService;
 import com.compomics.pladipus.repository.service.impl.UserServiceImpl;
+import com.compomics.pladipus.repository.service.impl.WorkflowServiceImpl;
 
 @Configuration
 @EnableTransactionManagement
@@ -45,11 +47,6 @@ public class RepositoryConfiguration {
     @Bean
 	public BasicEncryptor basicEncryptor() {
 		return new BasicEncryptor();
-	}
-	
-	@Bean
-	public XMLValidator templateValidator() {
-		return new TemplateValidator();
 	}
     
 	@Lazy
@@ -87,6 +84,12 @@ public class RepositoryConfiguration {
 	
 	@Lazy
 	@Bean
+	public WorkflowService workflowService() {
+		return new WorkflowServiceImpl();
+	}
+	
+	@Lazy
+	@Bean
 	public BaseDAO<User> userDAO() {
 		return new UserDAOImpl(dataSource());
 	}
@@ -95,5 +98,11 @@ public class RepositoryConfiguration {
 	@Bean
 	public BaseDAO<User> userRoleDAO() {
 		return new UserRoleDAOImpl(dataSource());
+	}
+	
+	@Lazy
+	@Bean
+	public BaseDAO<Workflow> workflowDAO() {
+		return new WorkflowDAOImpl(dataSource());
 	}
 }

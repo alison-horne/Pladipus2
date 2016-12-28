@@ -41,7 +41,8 @@ public class TestRepositoryConfiguration {
                     @Override
                     public void setUrl(String url) {
                         dataSource.setUrl("jdbc:h2:mem:testdb;DATABASE_TO_UPPER=false;MODE=mysql;"
-                        		+ "INIT=RUNSCRIPT FROM 'classpath:initDb.sql'\\;RUNSCRIPT FROM 'classpath:insertTestUsers.sql'\\;SET SCHEMA pladipus2");
+                        		+ "INIT=RUNSCRIPT FROM 'classpath:initDb.sql'\\;RUNSCRIPT FROM 'classpath:insertTestUsers.sql'\\" 
+                        		+ ";RUNSCRIPT FROM 'classpath:insertTestWorkflows.sql'\\;SET SCHEMA pladipus2");
                     }
                     
 					@Override

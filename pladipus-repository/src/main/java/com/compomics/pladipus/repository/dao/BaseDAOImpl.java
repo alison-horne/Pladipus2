@@ -145,7 +145,6 @@ public abstract class BaseDAOImpl<T extends UpdateTracked> extends NamedParamete
 		if (updatedColumns == null || updatedColumns.isEmpty()) {
 			throw new PladipusReportableException(getMessage("db.invalidUpdate", getType()));
 		}
-		
 		Map<String, Object> columnMap = mapDbColumns(t);
 		Query query = constructUpdateWhereClause(columnMap);
 		columnMap.keySet().retainAll(updatedColumns);
