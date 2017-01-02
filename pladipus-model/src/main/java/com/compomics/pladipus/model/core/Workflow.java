@@ -1,7 +1,7 @@
 package com.compomics.pladipus.model.core;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.compomics.pladipus.model.db.WorkflowsColumn;
 
@@ -15,8 +15,8 @@ public class Workflow extends UpdateTracked {
 	private String template;
 	private int userId = -1;
 	private boolean active = true;
-	private Set<Parameter> globalParams = new HashSet<Parameter>();
-	private Set<Step> steps = new HashSet<Step>();
+	private List<Parameter> globalParams = new ArrayList<Parameter>();
+	private List<Step> steps = new ArrayList<Step>();
 	
 	public String getWorkflowName() {
 		return workflowName;
@@ -49,13 +49,16 @@ public class Workflow extends UpdateTracked {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public Set<Parameter> getGlobalParameters() {
+	public List<Parameter> getGlobalParameters() {
 		return globalParams;
 	}
-	public void addGlobalParameters(Set<Parameter> params) {
+	public void addGlobalParameters(List<Parameter> params) {
 		globalParams.addAll(params);
 	}
 	public void addStep(Step step) {
 		steps.add(step);
+	}
+	public List<Step> getSteps() {
+		return steps;
 	}
 }

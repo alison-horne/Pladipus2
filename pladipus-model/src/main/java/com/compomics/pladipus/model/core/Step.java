@@ -1,7 +1,7 @@
 package com.compomics.pladipus.model.core;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Workflow step from workflow template
@@ -12,7 +12,7 @@ public class Step extends UpdateTracked {
 	private int workflowId = -1;
 	private String stepIdentifier;
 	private String toolType;
-	private Set<Parameter> stepParameters = new HashSet<Parameter>();
+	private List<Parameter> stepParameters = new ArrayList<Parameter>();
 	
 	public void setId(int id) {
 		this.id = id;
@@ -46,11 +46,11 @@ public class Step extends UpdateTracked {
 		return toolType;
 	}
 	
-	public void addParameters(Set<Parameter> params) {
+	public void addParameters(List<Parameter> params) {
 		stepParameters.addAll(params);
 	}
 	
-	public Set<Parameter> getStepParameters() {
+	public List<Parameter> getStepParameters() {
 		return stepParameters;
 	}
 }

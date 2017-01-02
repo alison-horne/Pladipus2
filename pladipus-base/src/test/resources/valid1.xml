@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<template name="valid1">
+<steps>
+<step>
+  <id>s1</id>
+  <name>Four</name>
+</step>
+</steps>
+</template>

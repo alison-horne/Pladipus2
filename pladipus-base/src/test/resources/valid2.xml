@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<template name="valid2">
+<global>
+<parameters>
+<parameter>
+<name>GlobalParam1</name>
+<value>Value1</value>
+</parameter>
+</parameters>
+</global>
+<steps>
+<step>
+<id>s1</id>
+<name>Four</name>
+</step>
+<step>
+<id>s2</id>
+<name>One</name>
+<parameters>
+<parameter>
+<name>input_one</name>
+</parameter>
+<parameter>
+<name>input_no_type</name>
+<value>Value1</value>
+<value>Value2</value>
+</parameter>
+</parameters>
+</step>
+</steps>
+</template>

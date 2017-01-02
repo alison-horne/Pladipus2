@@ -1,14 +1,14 @@
 package com.compomics.pladipus.model.core;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Parameter as provided in workflow template.
  */
 public class Parameter {
 	private String name;
-	private Set<String> values;
+	private List<String> values;
 	
 	//TODO validation, check parameter names, checks for defaults, globals, step outputs etc.
 	private static final String SUBSTITUTE_PREFIX = "{$";
@@ -17,7 +17,7 @@ public class Parameter {
 	
 	public Parameter(String name) {
 		this.name = name;
-		values = new HashSet<String>();
+		values = new ArrayList<String>();
 	}
 	
 	public String getName() {
@@ -26,5 +26,9 @@ public class Parameter {
 	
 	public void addValue(String value) {
 		values.add(value);
+	}
+	
+	public List<String> getValues() {
+		return values;
 	}
 }

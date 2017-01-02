@@ -1,4 +1,4 @@
-package com.compomics.pladipus.base.test;
+package com.compomics.pladipus.base.test.database;
 
 import static org.junit.Assert.*;
 
@@ -21,15 +21,14 @@ import com.compomics.pladipus.model.exceptions.PladipusReportableException;
 import com.compomics.pladipus.repository.config.TestRepositoryConfiguration;
 
 /**
- * Tests for class which retrieves and stores user information.  Uses in-memory database.
- * Login cases already unit tested in repository module.
+ * Tests for class which retrieves and stores user information, with database interaction.  Uses in-memory database.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes={BaseConfiguration.class, TestRepositoryConfiguration.class}, loader=AnnotationConfigContextLoader.class)
 @Transactional
 @TestExecutionListeners({ DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class,
 						  TransactionalTestExecutionListener.class })
-public class UserControlTest {
+public class UserControlTestDb {
 
 	@Autowired
 	private UserControl userControl;
@@ -43,29 +42,17 @@ public class UserControlTest {
 			userControl.login("bad_user", "password");
 			fail("Login should fail for invalid user");
 		} catch (PladipusReportableException e) {
-			assertTrue(e.getMessage().equals(exceptionMessages.getMessage("db.userNotFound")));
+			assertEquals(exceptionMessages.getMessage("db.userNotFound"), e.getMessage());
 		}
 	}
 	
 	@Test
-	public void testGetUserId() {
+	public void testValidUserLogin() {
 		try {
 			userControl.login("test_user1", "Password1");
-			assertEquals(userControl.getUserId(), 1);
+			assertEquals(1, userControl.getUserId());
 		} catch (PladipusReportableException e) {
-			fail("Failed to login valid user");
-		}
-	}
-	
-	@Test
-	public void testGetUserIdNoLogin() {
-		try {
-			// Make sure no user logged in
-			userControl.logout();
-			userControl.getUserId();
-			fail("Should not return ID if no user logged in");
-		} catch (PladipusReportableException e) {
-			assertTrue(e.getMessage().equals(exceptionMessages.getMessage("base.noLogin")));
+			fail("Failed to login valid user: " + e.getMessage());
 		}
 	}
 }
