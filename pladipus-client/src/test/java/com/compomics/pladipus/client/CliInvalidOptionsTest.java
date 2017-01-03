@@ -70,31 +70,40 @@ public class CliInvalidOptionsTest {
 	@Test
 	@DirtiesContext
 	public void testErrorBatchNoWorkflow() {
-		runAndCheckErrorHelp("--batch filename");
+		runAndCheckErrorHelp("--batch filename -u username");
 	}
 	
 	@Test
 	@DirtiesContext
 	public void testErrorGenerateNoWorkflow() {
-		runAndCheckErrorHelp("--generate filename");
+		runAndCheckErrorHelp("--generate filename -u username");
 	}
 	
 	@Test
 	@DirtiesContext
 	public void testErrorDefaultNoValue() {
-		runAndCheckErrorHelp("-d name");
+		runAndCheckErrorHelp("-d name -u username");
+	}
+	
+	@Test
+	@DirtiesContext
+	public void testErrorDefaultForce() {
+		runAndCheckErrorHelp("-d name -v value --force -u username");
 	}
 	
 	@Test
 	@DirtiesContext
 	public void testErrorNoPasswordWithoutConsole() {
 		Mockito.when(cmdLineIO.getPassword()).thenReturn(null);
-		runAndCheckErrorHelp("-w -u username");
+		cli.cliMain("-w -u username".split(" "));
+		Mockito.verify(cmdLineIO).printHelp(Matchers.any(Options.class), Matchers.anyString());
 		Mockito.verify(cmdLineIO).getPassword();
 	}
 	
 	private void runAndCheckErrorHelp(String argString) {
 		cli.cliMain(argString.split(" "));
+		// Check that it never made it as far as login by checking password was not requested
+		Mockito.verify(cmdLineIO, Mockito.never()).getPassword();
 		Mockito.verify(cmdLineIO).printHelp(Matchers.any(Options.class), Matchers.anyString());
 	}
 }

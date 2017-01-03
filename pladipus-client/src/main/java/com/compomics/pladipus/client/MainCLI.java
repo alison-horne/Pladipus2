@@ -157,6 +157,10 @@ public class MainCLI implements Alert {
 		if ((defaultName != null) && (defaultValue == null)) {
 			throw new ParseException(cmdLine.getString("error.defaultvalue"));
 		}
+		
+		if ((defaultName != null) && force) {
+			throw new ParseException(cmdLine.getString("error.defaultforce"));
+		}
 	}
 	
 	private void initOptions() {
@@ -257,7 +261,7 @@ public class MainCLI implements Alert {
 	}
 	
 	private void doDefaultTask() throws PladipusReportableException {
-		defaultsControl.addDefault(defaultName, defaultValue, defaultType, userControl.getUserId(), force);
+		defaultsControl.addDefault(defaultName, defaultValue, defaultType, userControl.getUserId());
 		cmdLineIO.printOutput(MessageFormat.format(cmdLine.getString("default.success"), defaultName));
 	}
 	

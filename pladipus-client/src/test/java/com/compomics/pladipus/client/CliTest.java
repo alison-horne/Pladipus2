@@ -184,20 +184,10 @@ public class CliTest {
 	}
 	
 	@Test
-	public void testModifyDefaultNoType() {
-		try {
-			runCliWithUser("--default name --value val -f");
-			Mockito.verify(defaultsControl).addDefault("name", "val", null, USERID, true);
-		} catch (PladipusReportableException e) {
-			Assert.fail("Failed default modify: " + e.getMessage());
-		}
-	}
-	
-	@Test
 	public void testAddDefaultWithType() {
 		try {
 			runCliWithUser("--default name --value val -T type");
-			Mockito.verify(defaultsControl).addDefault("name", "val", "type", USERID, false);
+			Mockito.verify(defaultsControl).addDefault("name", "val", "type", USERID);
 		} catch (PladipusReportableException e) {
 			Assert.fail("Failed default add: " + e.getMessage());
 		}

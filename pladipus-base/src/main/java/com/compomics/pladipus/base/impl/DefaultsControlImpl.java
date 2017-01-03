@@ -6,7 +6,7 @@ import com.compomics.pladipus.model.exceptions.PladipusReportableException;
 public class DefaultsControlImpl implements DefaultsControl {
 
 	@Override
-	public void addDefault(String name, String value, String type, int userId, boolean force) throws PladipusReportableException {
+	public void addDefault(String name, String value, String type, int userId) throws PladipusReportableException {
 		// TODO Auto-generated method stub		
 	}
 }
