@@ -1,11 +1,13 @@
 package com.compomics.pladipus.repository.service.impl;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.compomics.pladipus.model.core.Step;
 import com.compomics.pladipus.model.core.Workflow;
 import com.compomics.pladipus.model.db.WorkflowsColumn;
 import com.compomics.pladipus.model.exceptions.PladipusMessages;
@@ -21,6 +23,9 @@ public class WorkflowServiceImpl implements WorkflowService {
 	
 	@Autowired
 	private BaseDAO<Workflow> workflowDAO;
+	
+	@Autowired
+	private BaseDAO<Step> workflowStepDAO;
 
 	@Transactional(rollbackFor={Exception.class})
 	@Override
@@ -28,8 +33,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 		if (getActiveWorkflowByName(workflow.getWorkflowName(), workflow.getUserId()) != null) {
 			throw new PladipusReportableException(exceptionMessages.getMessage("db.workflowExists", workflow.getWorkflowName()));
 		}
-		workflow.setId(workflowDAO.insert(workflow));
-		//TODO insert into other tables - steps, params etc.
+		insertWholeWorkflow(workflow);
 		return workflow;
 	}
 	
@@ -37,7 +41,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 	@Override
 	public Workflow replaceWorkflow(Workflow workflow) throws PladipusReportableException {
 		endOldWorkflow(workflow);
-		workflow.setId(workflowDAO.insert(workflow));
+		insertWholeWorkflow(workflow);
 		return workflow;
 	}
 
@@ -59,7 +63,6 @@ public class WorkflowServiceImpl implements WorkflowService {
 		return workflowDAO.get(query);
 	}
 
-	
 	private void endOldWorkflow(Workflow workflow) throws PladipusReportableException {
 		Workflow oldWorkflow = getActiveWorkflowByName(workflow.getWorkflowName(), workflow.getUserId());
 		if (oldWorkflow != null) {
@@ -71,5 +74,21 @@ public class WorkflowServiceImpl implements WorkflowService {
 	public void deactivateWorkflow(Workflow workflow) throws PladipusReportableException {
 		workflow.setActive(false);
 		workflowDAO.update(workflow);
+	}
+	
+	private void insertWholeWorkflow(Workflow workflow) throws PladipusReportableException {
+		workflow.setId(workflowDAO.insert(workflow));
+		insertSteps(workflow);
+		//TODO insert into other tables - params etc.
+	}
+	
+	private void insertSteps(Workflow workflow) throws PladipusReportableException {
+		List<Step> steps = workflow.getSteps();
+		Iterator<Step> iter = steps.iterator();
+		while (iter.hasNext()) {
+			Step step = iter.next();
+			step.setWorkflowId(workflow.getId()); 
+			step.setId(workflowStepDAO.insert(step));
+		}
 	}
 }

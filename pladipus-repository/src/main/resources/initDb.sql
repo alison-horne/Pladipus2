@@ -37,10 +37,30 @@ CREATE TABLE IF NOT EXISTS user_roles (
 CREATE TABLE IF NOT EXISTS workflows (
 	workflow_id		INTEGER NOT NULL AUTO_INCREMENT,
     workflow_name	VARCHAR(50) NOT NULL,
-    template		TEXT,	
+    template		TEXT NOT NULL,	
     user_id			INTEGER,
     active			BOOLEAN NOT NULL DEFAULT 1,
     PRIMARY KEY (workflow_id),
 	INDEX (user_id),
 	FOREIGN KEY (user_id) REFERENCES users (user_id)
+);
+
+CREATE TABLE IF NOT EXISTS common_defaults (
+	default_id		INTEGER NOT NULL AUTO_INCREMENT,
+	user_id			INTEGER,
+	default_type	VARCHAR(50),
+	default_value	TEXT NOT NULL,
+	default_name	VARCHAR(50) NOT NULL,
+	PRIMARY KEY (default_id),
+	INDEX (user_id),
+	FOREIGN KEY (user_id) REFERENCES users (user_id)
+);
+
+CREATE TABLE IF NOT EXISTS workflow_steps (
+	workflow_step_id		INTEGER NOT NULL AUTO_INCREMENT,
+	workflow_id				INTEGER NOT NULL,
+	step_identifier			VARCHAR(5) NOT NULL,
+	tool_type				VARCHAR(100) NOT NULL,
+	PRIMARY KEY (workflow_step_id),
+    UNIQUE KEY (workflow_id, step_identifier)
 );

@@ -15,12 +15,14 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.compomics.pladipus.model.config.ModelConfiguration;
+import com.compomics.pladipus.model.core.Step;
 import com.compomics.pladipus.model.core.User;
 import com.compomics.pladipus.model.core.Workflow;
 import com.compomics.pladipus.repository.dao.BaseDAO;
 import com.compomics.pladipus.repository.dao.impl.UserDAOImpl;
 import com.compomics.pladipus.repository.dao.impl.UserRoleDAOImpl;
 import com.compomics.pladipus.repository.dao.impl.WorkflowDAOImpl;
+import com.compomics.pladipus.repository.dao.impl.WorkflowStepDAOImpl;
 import com.compomics.pladipus.repository.helpers.impl.BasicEncryptor;
 import com.compomics.pladipus.repository.service.UserService;
 import com.compomics.pladipus.repository.service.WorkflowService;
@@ -104,5 +106,11 @@ public class RepositoryConfiguration {
 	@Bean
 	public BaseDAO<Workflow> workflowDAO() {
 		return new WorkflowDAOImpl(dataSource());
+	}
+	
+	@Lazy
+	@Bean
+	public BaseDAO<Step> workflowStepDAO() {
+		return new WorkflowStepDAOImpl(dataSource());
 	}
 }

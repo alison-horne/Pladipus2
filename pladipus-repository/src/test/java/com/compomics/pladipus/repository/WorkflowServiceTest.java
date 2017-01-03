@@ -32,7 +32,6 @@ import com.compomics.pladipus.repository.service.WorkflowService;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes={RepositoryConfiguration.class, TestRepositoryConfiguration.class}, loader=AnnotationConfigContextLoader.class)
-@Transactional
 @TestExecutionListeners({ DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class,
 						  TransactionalTestExecutionListener.class })
 public class WorkflowServiceTest {
@@ -57,6 +56,7 @@ public class WorkflowServiceTest {
 	private static final String TEMPLATE = "template_xml"; // Valid formatted xml not required for this test set
 	private static final String TEMPLATE1 = "template1";
 
+	@Transactional
 	@Test
 	public void testInsertFailIfAlreadyExists() {
 		try {
@@ -71,6 +71,7 @@ public class WorkflowServiceTest {
 		}
 	}
 	
+	@Transactional
 	@Test
 	public void testInsertSuccessIfNoActiveExists() {
 		try {
@@ -86,6 +87,7 @@ public class WorkflowServiceTest {
 		}
 	}
 	
+	@Transactional
 	@Test
 	public void testInsertFailIfNoTemplate() {
 		try {
@@ -99,6 +101,7 @@ public class WorkflowServiceTest {
 		}
 	}
 	
+	@Transactional
 	@Test
 	public void testReplaceEndsOldWorkflow() {
 		try {
@@ -116,6 +119,7 @@ public class WorkflowServiceTest {
 		}
 	}
 	
+	@Transactional
 	@Test
 	public void testReplaceInsertsWhenNoExisting() {
 		try {
@@ -133,6 +137,23 @@ public class WorkflowServiceTest {
 	}
 	
 	@Test
+	public void testReplaceNotEndOldWorkflowIfNewHasError() throws PladipusReportableException {
+		Workflow workflow = new Workflow();
+		workflow.setUserId(USER1);
+		workflow.setWorkflowName(WF1);
+		try {
+			assertTrue(isWorkflowActive(1));
+			workflow = workflowService.replaceWorkflow(workflow);
+			fail("Replace should not have worked with workflow without template");
+		} catch (PladipusReportableException e) {
+			assertTrue(isWorkflowActive(1));
+			assertEquals(-1, workflow.getId());
+			assertEquals(exceptionMessages.getMessage("db.invalidInsert", "workflow"), e.getMessage());
+		}
+	}
+	
+	@Transactional
+	@Test
 	public void testDeactivateWorkflow() {
 		try {
 			Workflow workflow = getWorkflow(1);
@@ -144,6 +165,7 @@ public class WorkflowServiceTest {
 		}
 	}
 	
+	@Transactional
 	@Test
 	public void testDeactivateErrorIfNoId() {
 		try {
