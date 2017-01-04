@@ -4,6 +4,7 @@ import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.compomics.pladipus.repository.service.DefaultService;
 import com.compomics.pladipus.repository.service.UserService;
 import com.compomics.pladipus.repository.service.WorkflowService;
 
@@ -18,5 +19,10 @@ public class MockRepositoryConfiguration {
 	@Bean
 	public WorkflowService workflowService() {
 		return Mockito.mock(WorkflowService.class);
+	}
+	
+	@Bean
+	public DefaultService defaultService() {
+		return Mockito.mock(DefaultService.class);
 	}
 }

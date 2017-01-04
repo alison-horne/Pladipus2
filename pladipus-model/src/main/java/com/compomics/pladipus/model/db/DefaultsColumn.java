@@ -9,7 +9,7 @@ public enum DefaultsColumn {
 	USER_ID,
 	DEFAULT_TYPE,
 	DEFAULT_VALUE,
-	NAME;
+	DEFAULT_NAME;
 	
 	private static final String TABLE = DbTable.COMMON_DEFAULTS.name();
 	

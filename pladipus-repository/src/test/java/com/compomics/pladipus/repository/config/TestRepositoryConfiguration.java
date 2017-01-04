@@ -18,6 +18,14 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
  */
 @Configuration
 public class TestRepositoryConfiguration {
+	
+	private String[] initScripts = new String[] {
+			"initDb.sql",
+			"insertTestUsers.sql",
+			"insertTestWorkflows.sql",
+			"insertTestDefaults.sql"
+	};
+	
 	@Bean
 	public DataSource dataSource() {
 
@@ -40,9 +48,20 @@ public class TestRepositoryConfiguration {
 
                     @Override
                     public void setUrl(String url) {
-                        dataSource.setUrl("jdbc:h2:mem:testdb;DATABASE_TO_UPPER=false;MODE=mysql;"
-                        		+ "INIT=RUNSCRIPT FROM 'classpath:initDb.sql'\\;RUNSCRIPT FROM 'classpath:insertTestUsers.sql'\\" 
-                        		+ ";RUNSCRIPT FROM 'classpath:insertTestWorkflows.sql'\\;SET SCHEMA pladipus2");
+                        dataSource.setUrl(getUrlString());
+                    }
+                    
+                    private String getUrlString() {
+                    	StringBuilder builder = new StringBuilder();
+                    	builder.append("jdbc:h2:mem:testdb;DATABASE_TO_UPPER=false;MODE=mysql;");
+                    	builder.append("INIT=");
+                    	for (int i = 0; i < initScripts.length; i++) {
+                    		builder.append("RUNSCRIPT FROM 'classpath:");
+                    		builder.append(initScripts[i]);
+                    		builder.append("'\\;");
+                    	}
+                    	builder.append("SET SCHEMA pladipus2");
+                    	return builder.toString();
                     }
                     
 					@Override

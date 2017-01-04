@@ -17,7 +17,7 @@ public class WorkflowStepMapper implements RowMapper<Step> {
 		Step step = new Step();
 		step.setId(rs.getInt(WorkflowStepsColumn.WORKFLOW_STEP_ID.toString()));
 		step.setStepIdentifier(rs.getString(WorkflowStepsColumn.STEP_IDENTIFIER.toString()));
-		step.setToolType(WorkflowStepsColumn.TOOL_TYPE.toString());
+		step.setToolType(rs.getString(WorkflowStepsColumn.TOOL_TYPE.toString()));
 		step.setWorkflowId(rs.getInt(WorkflowStepsColumn.WORKFLOW_ID.toString()));
 		step.clearTrackedChanges();
 		return step;
