@@ -1,7 +1,8 @@
 package com.compomics.pladipus.model.core;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import com.compomics.pladipus.model.db.WorkflowsColumn;
 
@@ -15,8 +16,8 @@ public class Workflow extends UpdateTracked {
 	private String template;
 	private int userId = -1;
 	private boolean active = true;
-	private List<Parameter> globalParams = new ArrayList<Parameter>();
-	private List<Step> steps = new ArrayList<Step>();
+	private Map<String, Set<String>> globalParams = new HashMap<String, Set<String>>();
+	private Map<String, Step> steps = new HashMap<String, Step>();
 	
 	public String getWorkflowName() {
 		return workflowName;
@@ -49,16 +50,22 @@ public class Workflow extends UpdateTracked {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public List<Parameter> getGlobalParameters() {
+	public Map<String, Set<String>> getGlobalParameters() {
 		return globalParams;
 	}
-	public void addGlobalParameters(List<Parameter> params) {
-		globalParams.addAll(params);
+	public void addParameterValues(String paramName, Set<String> values) {
+		Set<String> existingVals = globalParams.get(paramName);
+		if (existingVals == null) {
+			globalParams.put(paramName, values);
+		} else {
+			existingVals.addAll(values);
+			globalParams.put(paramName, existingVals);
+		}
 	}
 	public void addStep(Step step) {
-		steps.add(step);
+		steps.put(step.getStepIdentifier(), step);
 	}
-	public List<Step> getSteps() {
+	public Map<String, Step> getSteps() {
 		return steps;
 	}
 }

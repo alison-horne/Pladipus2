@@ -1,5 +1,6 @@
 package com.compomics.pladipus.repository.service.impl;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -83,7 +84,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 	}
 	
 	private void insertSteps(Workflow workflow) throws PladipusReportableException {
-		List<Step> steps = workflow.getSteps();
+		Collection<Step> steps = workflow.getSteps().values();
 		Iterator<Step> iter = steps.iterator();
 		while (iter.hasNext()) {
 			Step step = iter.next();

@@ -1,5 +1,7 @@
 package com.compomics.pladipus.base.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.compomics.pladipus.base.DefaultsControl;
@@ -20,5 +22,10 @@ public class DefaultsControlImpl implements DefaultsControl {
 		def.setType(type);
 		def.setUserId(userId);
 		defaultService.insertDefault(def);
+	}
+
+	@Override
+	public List<Default> getDefaults(int userId) throws PladipusReportableException {
+		return defaultService.getDefaultsForUser(userId);
 	}
 }

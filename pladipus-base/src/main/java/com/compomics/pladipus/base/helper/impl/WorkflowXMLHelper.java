@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -30,7 +30,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.compomics.pladipus.base.helper.XMLHelper;
-import com.compomics.pladipus.model.core.Parameter;
 import com.compomics.pladipus.model.core.Step;
 import com.compomics.pladipus.model.core.Workflow;
 import com.compomics.pladipus.model.exceptions.PladipusMessages;
@@ -71,7 +70,7 @@ public class WorkflowXMLHelper implements XMLHelper<Workflow> {
 		Workflow workflow = new Workflow();
 		workflow.setWorkflowName(document.getDocumentElement().getAttribute(NAME));
 		Element global = (Element) document.getDocumentElement().getElementsByTagName(GLOBAL).item(0);
-		workflow.addGlobalParameters(parseParameters(global));
+		parseGlobalParameters(workflow, global);
 		NodeList steplist = document.getDocumentElement().getElementsByTagName(STEP);
 		
 		for (int i = 0; i < steplist.getLength(); i++) {
@@ -86,28 +85,43 @@ public class WorkflowXMLHelper implements XMLHelper<Workflow> {
 		Step step = new Step();
 		step.setStepIdentifier(stepElem.getElementsByTagName(ID).item(0).getTextContent());
 		step.setToolType(stepElem.getElementsByTagName(NAME).item(0).getTextContent());
-		step.addParameters(parseParameters(stepElem));
+		parseStepParameters(step, stepElem);
 		return step;
 	}
 	
-	private List<Parameter> parseParameters(Element element) {
-		List<Parameter> parameters = new ArrayList<Parameter>();
-		if (element != null) {
-			NodeList params = element.getElementsByTagName(PARAM);
+	private void parseStepParameters(Step step, Element stepElement) {
+		if (stepElement != null) {
+			NodeList params = stepElement.getElementsByTagName(PARAM);
 			for (int i = 0; i < params.getLength(); i++) {
-				parameters.add(parseParameter((Element) params.item(i)));
+				Element parameter = (Element)params.item(i);
+				step.addParameterValues(parseParameterName(parameter), parseParameterValues(parameter));
 			}
-		}		
-		return parameters;
+		}
 	}
 	
-	private Parameter parseParameter(Element parameter) {
-		Parameter param = new Parameter(parameter.getElementsByTagName(NAME).item(0).getTextContent());
-		NodeList values = parameter.getElementsByTagName(VALUE);
-		for (int j=0; j < values.getLength(); j++) {
-			param.addValue(values.item(j).getTextContent());
+	private void parseGlobalParameters(Workflow workflow, Element global) {
+		if (global != null) {
+			NodeList params = global.getElementsByTagName(PARAM);
+			for (int i = 0; i < params.getLength(); i++) {
+				Element parameter = (Element)params.item(i);
+				workflow.addParameterValues(parseParameterName(parameter), parseParameterValues(parameter));
+			}
 		}
-		return param;
+	}
+	
+	private String parseParameterName(Element parameter) {
+		return parameter.getElementsByTagName(NAME).item(0).getTextContent();
+	}
+	
+	private Set<String> parseParameterValues(Element parameter) {
+		NodeList values = parameter.getElementsByTagName(VALUE);
+		Set<String> valueSet = new HashSet<String>();
+		for (int j=0; j < values.getLength(); j++) {
+			if (!values.item(j).getTextContent().isEmpty()) {
+				valueSet.add(values.item(j).getTextContent());
+			}
+		}
+		return valueSet;
 	}
 	
 	@Override

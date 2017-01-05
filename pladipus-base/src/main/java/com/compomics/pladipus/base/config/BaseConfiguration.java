@@ -22,7 +22,9 @@ import com.compomics.pladipus.base.impl.WorkflowControlImpl;
 import com.compomics.pladipus.model.config.ModelConfiguration;
 import com.compomics.pladipus.model.core.Workflow;
 import com.compomics.pladipus.repository.config.RepositoryConfiguration;
+import com.compomics.pladipus.base.helper.impl.WorkflowValidator;
 import com.compomics.pladipus.base.helper.impl.WorkflowXMLHelper;
+import com.compomics.pladipus.base.helper.ValidationChecker;
 import com.compomics.pladipus.base.helper.XMLHelper;
 import com.compomics.pladipus.tools.config.ToolsConfiguration;
 
@@ -31,7 +33,7 @@ import com.compomics.pladipus.tools.config.ToolsConfiguration;
 public class BaseConfiguration {
 
 	@Bean 
-	public ToolControl pladipusToolControl() {
+	public ToolControl toolControl() {
 		return new PladipusToolControl();
 	}
 	
@@ -74,5 +76,10 @@ public class BaseConfiguration {
 	@Bean
 	public XMLHelper<Workflow> workflowXMLHelper() {
 		return new WorkflowXMLHelper();
+	}
+	
+	@Bean
+	public ValidationChecker<Workflow> workflowValidator() {
+		return new WorkflowValidator();
 	}
 }

@@ -3,7 +3,8 @@ package com.compomics.pladipus.base.test.mocks;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -30,20 +31,20 @@ import org.w3c.dom.Element;
 
 import com.compomics.pladipus.base.WorkflowControl;
 import com.compomics.pladipus.base.config.BaseConfiguration;
-import com.compomics.pladipus.model.core.Parameter;
 import com.compomics.pladipus.model.core.Step;
 import com.compomics.pladipus.model.core.Workflow;
 import com.compomics.pladipus.model.exceptions.PladipusMessages;
 import com.compomics.pladipus.model.exceptions.PladipusReportableException;
 import com.compomics.pladipus.repository.config.MockRepositoryConfiguration;
 import com.compomics.pladipus.repository.service.WorkflowService;
+import com.compomics.pladipus.test.tools.config.TestToolsConfiguration;
 
 /**
  * Tests to check workflowControl function without calling database.
  * These tests will check validation and parsing of XML template to Workflow object.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={BaseConfiguration.class, MockRepositoryConfiguration.class}, loader=AnnotationConfigContextLoader.class)
+@ContextConfiguration(classes={BaseConfiguration.class, TestToolsConfiguration.class, MockRepositoryConfiguration.class}, loader=AnnotationConfigContextLoader.class)
 @TestExecutionListeners({ DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class,
 						  TransactionalTestExecutionListener.class })
 @DirtiesContext(classMode=ClassMode.AFTER_CLASS)
@@ -106,37 +107,30 @@ public class WorkflowControlTestMock {
 		try {
 			Workflow workflow = workflowControl.createWorkflow(getXMLFilePath(VALID2_FILE), USER_ID);
 			assertEquals("valid2", workflow.getWorkflowName());
-			List<Parameter> globals = workflow.getGlobalParameters();
+			
+			Map<String, Set<String>> globals = workflow.getGlobalParameters();
 			assertEquals(1, globals.size());
-			Parameter globalParam = globals.get(0);
-			assertEquals("GlobalParam1", globalParam.getName());
-			assertEquals(1, globalParam.getValues().size());
-			assertEquals("Value1", globalParam.getValues().get(0));
-			List<Step> steps = workflow.getSteps();
+			assertTrue(globals.containsKey("GlobalParam1"));
+			assertEquals(1, globals.get("GlobalParam1").size());
+			assertTrue(globals.get("GlobalParam1").contains("Value1"));
+			
+			Map<String, Step> steps = workflow.getSteps();
 			assertEquals(2, steps.size());
-			for (int i = 0; i < steps.size(); i++) {
-				Step step = steps.get(i);
-				if (step.getStepIdentifier().equals("s1")) {
-					assertEquals(0, step.getStepParameters().size());
-					assertEquals("Four", step.getToolType());
-				} else if (step.getStepIdentifier().equals("s2")) {
-					List<Parameter> stepParams = step.getStepParameters();
-					assertEquals(2, stepParams.size());
-					assertEquals("One", step.getToolType());
-					for (int j = 0; j < stepParams.size(); j++) {
-						Parameter param = stepParams.get(j);
-						if (param.getName().equals("input_one")) {
-							assertEquals(0, param.getValues().size());
-						} else if (param.getName().equals("input_no_type")) {
-							assertEquals(2, param.getValues().size());
-						} else {
-							fail("Unknown parameter: " + param.getName());
-						}
-					}
-				} else {
-					fail("Unknown step found, ID: " + step.getStepIdentifier());
-				}
-			}
+			
+			Step s1 = steps.get("s1");
+			assertNotNull(s1);
+			assertEquals(0, s1.getStepParameters().size());
+			assertEquals("Four", s1.getToolType());
+			
+			Step s2 = steps.get("s2");
+			assertNotNull(s2);
+			assertEquals("One", s2.getToolType());
+			Map<String, Set<String>> stepParams = s2.getStepParameters();
+			assertEquals(2, stepParams.size());
+			assertTrue(stepParams.containsKey("input_one"));
+			assertTrue(stepParams.containsKey("input_no_type"));
+			assertEquals(0, stepParams.get("input_one").size());
+			assertEquals(2, stepParams.get("input_no_type").size());
 		} catch (PladipusReportableException e) {
 			fail("Failed parsing: " + e.getMessage());
 		}

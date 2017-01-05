@@ -47,22 +47,24 @@ public class PladipusToolControl implements ToolControl {
 	}
 
 	@Override
-	public ImmutableSet<InputParameter> getMandatoryParameters(String toolName) throws PladipusReportableException {
+	public ImmutableSet<String> getMandatoryParameters(String toolName) throws PladipusReportableException {
 		Predicate<InputParameter> pred = ip -> ip.isMandatory();
 		return filterParameters(getInfoForTool(toolName).getInputParams(), pred);
 	}
 
 	@Override
-	public ImmutableSet<InputParameter> getOptionalParameters(String toolName) throws PladipusReportableException {
+	public ImmutableSet<String> getOptionalParameters(String toolName) throws PladipusReportableException {
 		Predicate<InputParameter> pred = ip -> !ip.isMandatory();
 		return filterParameters(getInfoForTool(toolName).getInputParams(), pred);
 	}
 	
-	private ImmutableSet<InputParameter> filterParameters(ImmutableSet<InputParameter> allParameters, Predicate<InputParameter> pred) {
-		Builder<InputParameter> builder = ImmutableSet.builder();
-		for (InputParameter param: allParameters) {
-			if (pred.test(param)) {
-				builder.add(param);
+	private ImmutableSet<String> filterParameters(ImmutableSet<InputParameter> allParameters, Predicate<InputParameter> pred) {
+		Builder<String> builder = ImmutableSet.builder();
+		if (allParameters != null) {
+			for (InputParameter param: allParameters) {
+				if (pred.test(param)) {
+					builder.add(param.getParamName());
+				}
 			}
 		}
 		return builder.build();

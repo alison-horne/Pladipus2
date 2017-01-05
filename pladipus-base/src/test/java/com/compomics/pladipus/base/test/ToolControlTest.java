@@ -19,7 +19,6 @@ import org.springframework.test.context.support.DirtiesContextTestExecutionListe
 import com.compomics.pladipus.base.ToolControl;
 import com.compomics.pladipus.base.config.BaseConfiguration;
 import com.compomics.pladipus.model.exceptions.PladipusReportableException;
-import com.compomics.pladipus.model.parameters.InputParameter;
 import com.compomics.pladipus.test.tools.config.TestToolsConfiguration;
 import com.compomics.pladipus.tools.core.ToolInfo;
 import com.google.common.collect.ImmutableMap;
@@ -35,12 +34,12 @@ import com.google.common.collect.ImmutableSet;
 public class ToolControlTest {
 
 	@Autowired
-	private ToolControl pladipusToolControl;
+	private ToolControl toolControl;
 	
 	@Test
 	public void testGetAllToolInfo() {
 		try {
-			ImmutableMap<String, ToolInfo> toolInfo = pladipusToolControl.getAllToolInfo();
+			ImmutableMap<String, ToolInfo> toolInfo = toolControl.getAllToolInfo();
 			assertEquals(toolInfo.size(), 4);
 			assertTrue(toolInfo.containsKey("One"));
 			assertTrue(toolInfo.containsKey("Two"));
@@ -54,7 +53,7 @@ public class ToolControlTest {
 	@Test
 	public void testToolsInAlphabeticalOrder() {
 		try {
-			ImmutableMap<String, ToolInfo> toolInfo = pladipusToolControl.getAllToolInfo();
+			ImmutableMap<String, ToolInfo> toolInfo = toolControl.getAllToolInfo();
 			Iterator<String> iter = toolInfo.keySet().iterator();
 			String previous = "";
 			String next;
@@ -71,7 +70,7 @@ public class ToolControlTest {
 	@Test
 	public void testGetToolNames() {
 		try {
-			ImmutableSet<String> toolNames = pladipusToolControl.getToolNames();
+			ImmutableSet<String> toolNames = toolControl.getToolNames();
 			assertEquals(toolNames.size(), 4);
 			for (String toolName: toolNames) {
 				assertTrue(toolName.equals("One") ||
@@ -87,7 +86,7 @@ public class ToolControlTest {
 	@Test
 	public void testExceptionForBadToolname() {
 		try {
-			pladipusToolControl.getInfoForTool("Does not exist tool");
+			toolControl.getInfoForTool("Does not exist tool");
 			fail("Should throw exception if trying to get information about tool which does not exist.");
 		} catch (PladipusReportableException e) {
 			assertTrue(e.getMessage().contains("Does not exist tool"));
@@ -97,12 +96,12 @@ public class ToolControlTest {
 	@Test
 	public void testGetMandatoryParameters() {
 		try {
-			ImmutableSet<InputParameter> mandatory = pladipusToolControl.getMandatoryParameters("One");
+			ImmutableSet<String> mandatory = toolControl.getMandatoryParameters("One");
 			assertEquals(mandatory.size(), 3);
-			for (InputParameter param: mandatory) {
-				assertTrue(param.getParamName().equals("input_one") ||
-						   param.getParamName().equals("input_no_default_mandatory") ||
-						   param.getParamName().equals("input_no_type"));
+			for (String param: mandatory) {
+				assertTrue(param.equals("input_one") ||
+						   param.equals("input_no_default_mandatory") ||
+						   param.equals("input_no_type"));
 			}
 		} catch (PladipusReportableException e) {
 			fail(e.getMessage());
@@ -112,12 +111,12 @@ public class ToolControlTest {
 	@Test
 	public void testGetOptionalParameters() {
 		try {
-			ImmutableSet<InputParameter> optional = pladipusToolControl.getOptionalParameters("One");
+			ImmutableSet<String> optional = toolControl.getOptionalParameters("One");
 			assertEquals(optional.size(), 3);
-			for (InputParameter param: optional) {
-				assertTrue(param.getParamName().equals("input_two") ||
-						   param.getParamName().equals("input_no_default") ||
-						   param.getParamName().equals("input_no_default_or_type"));
+			for (String param: optional) {
+				assertTrue(param.equals("input_two") ||
+						   param.equals("input_no_default") ||
+						   param.equals("input_no_default_or_type"));
 			}
 		} catch (PladipusReportableException e) {
 			fail(e.getMessage());
@@ -127,7 +126,7 @@ public class ToolControlTest {
 	@Test
 	public void testGetInfoReturnsWithNoInputParams() {
 		try {
-			ToolInfo twoInfo = pladipusToolControl.getInfoForTool("Two");
+			ToolInfo twoInfo = toolControl.getInfoForTool("Two");
 			assertNull(twoInfo.getInputParams());
 		} catch (PladipusReportableException e) {
 			fail(e.getMessage());

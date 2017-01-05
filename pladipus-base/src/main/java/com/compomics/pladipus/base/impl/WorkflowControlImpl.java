@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 
 import com.compomics.pladipus.base.WorkflowControl;
+import com.compomics.pladipus.base.helper.ValidationChecker;
 import com.compomics.pladipus.base.helper.XMLHelper;
 import com.compomics.pladipus.model.core.Workflow;
 import com.compomics.pladipus.model.exceptions.PladipusReportableException;
@@ -13,6 +14,9 @@ public class WorkflowControlImpl implements WorkflowControl {
 	
 	@Autowired
 	private WorkflowService workflowService;
+	
+	@Autowired
+	private ValidationChecker<Workflow> workflowValidator;
 	
 	@Autowired
 	private XMLHelper<Workflow> workflowXMLHelper;
@@ -43,9 +47,7 @@ public class WorkflowControlImpl implements WorkflowControl {
 		workflowXMLHelper.validateDocument(document);
 		Workflow workflow = workflowXMLHelper.parseDocument(document);
 		workflow.setUserId(userId);
-		//TODO Extra validation - check tool names valid, and parameters are as in tools
-		// Workflow check for valid parameters - no circular step dependencies, defaults exist, etc.
-		// Add mandatory params that haven't already been mentioned, with defaults if they exist.
+		workflowValidator.validate(workflow);
 		return workflow;
 	}
 }
