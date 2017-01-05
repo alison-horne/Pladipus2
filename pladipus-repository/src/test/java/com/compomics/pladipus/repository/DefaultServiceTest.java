@@ -75,7 +75,7 @@ public class DefaultServiceTest {
 			defaultService.insertDefault(def);
 			fail("Should not insert default with same name");
 		} catch (PladipusReportableException e) {
-			assertEquals(exceptionMessages.getMessage("db.defaultExists", NAME1), e.getMessage());
+			assertEquals(exceptionMessages.getMessage("db.defaultExists", NAME2), e.getMessage());
 		}
 	}
 	
