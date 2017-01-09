@@ -1,6 +1,7 @@
 package com.compomics.pladipus.model.core;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,6 +15,7 @@ public class Step extends UpdateTracked {
 	private String stepIdentifier;
 	private String toolType;
 	private Map<String, Set<String>> stepParameters = new HashMap<String, Set<String>>();
+	private Set<String> stepDependencies = new HashSet<String>();
 	
 	public void setId(int id) {
 		this.id = id;
@@ -59,5 +61,13 @@ public class Step extends UpdateTracked {
 	
 	public Map<String, Set<String>> getStepParameters() {
 		return stepParameters;
+	}
+	
+	public void addDependency(String step) {
+		stepDependencies.add(step);
+	}
+	
+	public Set<String> getDependencies() {
+		return stepDependencies;
 	}
 }

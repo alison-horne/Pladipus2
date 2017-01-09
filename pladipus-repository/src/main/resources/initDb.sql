@@ -64,3 +64,71 @@ CREATE TABLE IF NOT EXISTS workflow_steps (
 	PRIMARY KEY (workflow_step_id),
     UNIQUE KEY (workflow_id, step_identifier)
 );
+
+CREATE TABLE IF NOT EXISTS workflow_global_params (
+	workflow_global_id		INTEGER NOT NULL AUTO_INCREMENT,
+	workflow_id				INTEGER NOT NULL,
+	parameter_name			VARCHAR(50) NOT NULL,
+    PRIMARY KEY (workflow_global_id),
+	INDEX (workflow_id),
+	FOREIGN KEY (workflow_id) REFERENCES workflows (workflow_id)
+);
+
+CREATE TABLE IF NOT EXISTS workflow_step_params (
+	wkf_step_param_id		INTEGER NOT NULL AUTO_INCREMENT,
+	workflow_step_id		INTEGER NOT NULL,
+	parameter_name			VARCHAR(50) NOT NULL,
+    PRIMARY KEY (wkf_step_param_id),
+	INDEX (workflow_step_id),
+	FOREIGN KEY (workflow_step_id) REFERENCES workflow_steps (workflow_step_id)
+);
+
+CREATE TABLE IF NOT EXISTS step_prerequisites (
+	workflow_step_id		INTEGER NOT NULL,
+	prerequisite_step_id	INTEGER NOT NULL,
+	INDEX (workflow_step_id),
+	FOREIGN KEY (workflow_step_id) REFERENCES workflow_steps (workflow_step_id),
+	FOREIGN KEY (prerequisite_step_id) REFERENCES workflow_steps (workflow_step_id)
+);
+
+CREATE TABLE IF NOT EXISTS workflow_global_values (
+	workflow_global_id		INTEGER NOT NULL,
+    parameter_value			VARCHAR(200) NOT NULL,
+    INDEX (workflow_global_id),
+    FOREIGN KEY (workflow_global_id) REFERENCES workflow_global_params (workflow_global_id)
+);
+
+CREATE TABLE IF NOT EXISTS workflow_step_values (
+	wkf_step_param_id		INTEGER NOT NULL,
+    parameter_value			VARCHAR(200) NOT NULL,
+    INDEX (wkf_step_param_id),
+    FOREIGN KEY (wkf_step_param_id) REFERENCES workflow_step_params (wkf_step_param_id)
+);
+
+/*
+CREATE TABLE IF NOT EXISTS batches (
+);
+
+CREATE TABLE IF NOT EXISTS runs (
+);
+
+CREATE TABLE IF NOT EXISTS run_global_params (
+);
+
+CREATE TABLE IF NOT EXISTS run_step_params (
+);
+
+CREATE TABLE IF NOT EXISTS step_status (
+);
+
+CREATE TABLE IF NOT EXISTS run_steps (
+);
+
+CREATE TABLE IF NOT EXISTS workers (
+);
+
+CREATE TABLE IF NOT EXISTS worker_steps (
+);
+
+CREATE TABLE IF NOT EXISTS step_errors (
+);

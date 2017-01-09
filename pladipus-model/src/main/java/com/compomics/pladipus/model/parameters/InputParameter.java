@@ -78,4 +78,9 @@ public class InputParameter {
 	public boolean isMandatory() {
 		return mandatory;
 	}
+	
+	public boolean isTypeValid(String value) {
+		//TODO - validation of supplied value against InputType
+		return true;
+	}
 }

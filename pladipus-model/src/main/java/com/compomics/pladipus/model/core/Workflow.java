@@ -18,6 +18,7 @@ public class Workflow extends UpdateTracked {
 	private boolean active = true;
 	private Map<String, Set<String>> globalParams = new HashMap<String, Set<String>>();
 	private Map<String, Step> steps = new HashMap<String, Step>();
+	private Map<String, Integer> defaultMappings = new HashMap<String, Integer>();
 	
 	public String getWorkflowName() {
 		return workflowName;
@@ -58,8 +59,10 @@ public class Workflow extends UpdateTracked {
 		if (existingVals == null) {
 			globalParams.put(paramName, values);
 		} else {
-			existingVals.addAll(values);
-			globalParams.put(paramName, existingVals);
+			if (values != null) {
+				existingVals.addAll(values);
+				globalParams.put(paramName, existingVals);
+			}
 		}
 	}
 	public void addStep(Step step) {
@@ -67,5 +70,9 @@ public class Workflow extends UpdateTracked {
 	}
 	public Map<String, Step> getSteps() {
 		return steps;
+	}
+	
+	public void addDefaultSub(String defName, int defId) {
+		defaultMappings.put(defName, defId);
 	}
 }
