@@ -16,6 +16,7 @@ public class Step extends UpdateTracked {
 	private String toolType;
 	private Map<String, Set<String>> stepParameters = new HashMap<String, Set<String>>();
 	private Set<String> stepDependencies = new HashSet<String>();
+	private boolean visited = false;
 	
 	public void setId(int id) {
 		this.id = id;
@@ -51,6 +52,9 @@ public class Step extends UpdateTracked {
 	
 	public void addParameterValues(String paramName, Set<String> values) {
 		Set<String> existingVals = stepParameters.get(paramName);
+		if (values == null) {
+			values = new HashSet<String>();
+		}
 		if (existingVals == null) {
 			stepParameters.put(paramName, values);
 		} else {
@@ -69,5 +73,13 @@ public class Step extends UpdateTracked {
 	
 	public Set<String> getDependencies() {
 		return stepDependencies;
+	}
+	
+	public void setVisited() {
+		visited = true;
+	}
+	
+	public boolean isVisited() {
+		return visited;
 	}
 }

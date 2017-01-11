@@ -45,25 +45,37 @@ public class PladipusToolControl implements ToolControl {
 		}
 		return toolInfo;
 	}
+	
+	@Override
+	public ImmutableMap<String, InputParameter> getParameterMap(String toolName) throws PladipusReportableException {
+		ImmutableSet<InputParameter> params = getInfoForTool(toolName).getInputParams();
+		ImmutableMap.Builder<String, InputParameter> builder = ImmutableMap.builder();
+		if (params != null) {
+			for (InputParameter param: params) {
+				builder.put(param.getParamName(), param);
+			}
+		}
+		return builder.build();
+	}
 
 	@Override
-	public ImmutableSet<String> getMandatoryParameters(String toolName) throws PladipusReportableException {
+	public ImmutableSet<InputParameter> getMandatoryParameters(String toolName) throws PladipusReportableException {
 		Predicate<InputParameter> pred = ip -> ip.isMandatory();
 		return filterParameters(getInfoForTool(toolName).getInputParams(), pred);
 	}
 
 	@Override
-	public ImmutableSet<String> getOptionalParameters(String toolName) throws PladipusReportableException {
+	public ImmutableSet<InputParameter> getOptionalParameters(String toolName) throws PladipusReportableException {
 		Predicate<InputParameter> pred = ip -> !ip.isMandatory();
 		return filterParameters(getInfoForTool(toolName).getInputParams(), pred);
 	}
 	
-	private ImmutableSet<String> filterParameters(ImmutableSet<InputParameter> allParameters, Predicate<InputParameter> pred) {
-		Builder<String> builder = ImmutableSet.builder();
+	private ImmutableSet<InputParameter> filterParameters(ImmutableSet<InputParameter> allParameters, Predicate<InputParameter> pred) {
+		Builder<InputParameter> builder = ImmutableSet.builder();
 		if (allParameters != null) {
 			for (InputParameter param: allParameters) {
 				if (pred.test(param)) {
-					builder.add(param.getParamName());
+					builder.add(param);
 				}
 			}
 		}

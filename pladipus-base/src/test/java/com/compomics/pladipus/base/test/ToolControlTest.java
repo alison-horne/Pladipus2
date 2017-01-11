@@ -19,6 +19,7 @@ import org.springframework.test.context.support.DirtiesContextTestExecutionListe
 import com.compomics.pladipus.base.ToolControl;
 import com.compomics.pladipus.base.config.BaseConfiguration;
 import com.compomics.pladipus.model.exceptions.PladipusReportableException;
+import com.compomics.pladipus.model.parameters.InputParameter;
 import com.compomics.pladipus.test.tools.config.TestToolsConfiguration;
 import com.compomics.pladipus.tools.core.ToolInfo;
 import com.google.common.collect.ImmutableMap;
@@ -72,12 +73,10 @@ public class ToolControlTest {
 		try {
 			ImmutableSet<String> toolNames = toolControl.getToolNames();
 			assertEquals(toolNames.size(), 4);
-			for (String toolName: toolNames) {
-				assertTrue(toolName.equals("One") ||
-						   toolName.equals("Two") ||
-						   toolName.equals("Three") ||
-						   toolName.equals("Four"));
-			}
+			assertTrue(toolNames.contains("One"));
+			assertTrue(toolNames.contains("Two"));
+			assertTrue(toolNames.contains("Three"));
+			assertTrue(toolNames.contains("Four"));
 		} catch (PladipusReportableException e) {
 			fail(e.getMessage());
 		}
@@ -94,14 +93,41 @@ public class ToolControlTest {
 	}
 	
 	@Test
+	public void testGetParamMapReturnsEmptyIfNone() {
+		try {
+			ImmutableMap<String, InputParameter> params = toolControl.getParameterMap("Four");
+			assertNotNull(params);
+			assertEquals(0, params.size());
+		} catch (PladipusReportableException e) {
+			fail(e.getMessage());
+		}
+	}
+	
+	@Test
+	public void testGetParamMapReturnsAll() {
+		try {
+			ImmutableMap<String, InputParameter> params = toolControl.getParameterMap("One");
+			assertEquals(6, params.size());
+			assertTrue(params.containsKey("input_one"));
+			assertTrue(params.containsKey("input_no_default_mandatory"));
+			assertTrue(params.containsKey("input_no_type"));
+			assertTrue(params.containsKey("input_two"));
+			assertTrue(params.containsKey("input_no_default"));
+			assertTrue(params.containsKey("input_no_default_or_type"));
+		} catch (PladipusReportableException e) {
+			fail(e.getMessage());
+		}
+	}
+	
+	@Test
 	public void testGetMandatoryParameters() {
 		try {
-			ImmutableSet<String> mandatory = toolControl.getMandatoryParameters("One");
+			ImmutableSet<InputParameter> mandatory = toolControl.getMandatoryParameters("One");
 			assertEquals(mandatory.size(), 3);
-			for (String param: mandatory) {
-				assertTrue(param.equals("input_one") ||
-						   param.equals("input_no_default_mandatory") ||
-						   param.equals("input_no_type"));
+			for (InputParameter param: mandatory) {
+				assertTrue(param.getParamName().equals("input_one") ||
+						   param.getParamName().equals("input_no_default_mandatory") ||
+						   param.getParamName().equals("input_no_type"));
 			}
 		} catch (PladipusReportableException e) {
 			fail(e.getMessage());
@@ -111,12 +137,12 @@ public class ToolControlTest {
 	@Test
 	public void testGetOptionalParameters() {
 		try {
-			ImmutableSet<String> optional = toolControl.getOptionalParameters("One");
+			ImmutableSet<InputParameter> optional = toolControl.getOptionalParameters("One");
 			assertEquals(optional.size(), 3);
-			for (String param: optional) {
-				assertTrue(param.equals("input_two") ||
-						   param.equals("input_no_default") ||
-						   param.equals("input_no_default_or_type"));
+			for (InputParameter param: optional) {
+				assertTrue(param.getParamName().equals("input_two") ||
+						   param.getParamName().equals("input_no_default") ||
+						   param.getParamName().equals("input_no_default_or_type"));
 			}
 		} catch (PladipusReportableException e) {
 			fail(e.getMessage());

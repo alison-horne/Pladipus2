@@ -26,6 +26,10 @@
 <value>Value1</value>
 <value>Value2</value>
 </parameter>
+<parameter>
+<name>input_no_default_mandatory</name>
+<value>Value1</value>
+</parameter>
 </parameters>
 </step>
 </steps>

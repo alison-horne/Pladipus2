@@ -1,6 +1,7 @@
 package com.compomics.pladipus.model.core;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -56,13 +57,14 @@ public class Workflow extends UpdateTracked {
 	}
 	public void addParameterValues(String paramName, Set<String> values) {
 		Set<String> existingVals = globalParams.get(paramName);
+		if (values == null) {
+			values = new HashSet<String>();
+		}
 		if (existingVals == null) {
 			globalParams.put(paramName, values);
 		} else {
-			if (values != null) {
-				existingVals.addAll(values);
-				globalParams.put(paramName, existingVals);
-			}
+			existingVals.addAll(values);
+			globalParams.put(paramName, existingVals);
 		}
 	}
 	public void addStep(Step step) {
@@ -74,5 +76,9 @@ public class Workflow extends UpdateTracked {
 	
 	public void addDefaultSub(String defName, int defId) {
 		defaultMappings.put(defName, defId);
+	}
+	
+	public Map<String, Integer> getDefaultSubs() {
+		return defaultMappings;
 	}
 }

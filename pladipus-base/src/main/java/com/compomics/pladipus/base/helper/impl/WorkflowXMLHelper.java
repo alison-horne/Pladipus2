@@ -55,7 +55,7 @@ public class WorkflowXMLHelper implements XMLHelper<Workflow> {
 	public void validateDocument(Document doc) throws PladipusReportableException {
 		try {
 			SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-			Source schemaFile = new StreamSource(templateXsd.getFile());
+			Source schemaFile = new StreamSource(templateXsd.getInputStream());
 			Schema schema = factory.newSchema(schemaFile);
 			Validator validator = schema.newValidator();
 			validator.validate(new DOMSource(doc));

@@ -132,3 +132,4 @@ CREATE TABLE IF NOT EXISTS worker_steps (
 
 CREATE TABLE IF NOT EXISTS step_errors (
 );
+*/

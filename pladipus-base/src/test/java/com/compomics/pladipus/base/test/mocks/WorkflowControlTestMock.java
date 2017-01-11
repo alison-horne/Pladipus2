@@ -41,7 +41,8 @@ import com.compomics.pladipus.test.tools.config.TestToolsConfiguration;
 
 /**
  * Tests to check workflowControl function without calling database.
- * These tests will check validation and parsing of XML template to Workflow object.
+ * These tests will check validation and parsing of XML template to Workflow object.  Extra validation in 
+ * WorkflowValidator checked in separate test class.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes={BaseConfiguration.class, TestToolsConfiguration.class, MockRepositoryConfiguration.class}, loader=AnnotationConfigContextLoader.class)
@@ -126,11 +127,13 @@ public class WorkflowControlTestMock {
 			assertNotNull(s2);
 			assertEquals("One", s2.getToolType());
 			Map<String, Set<String>> stepParams = s2.getStepParameters();
-			assertEquals(2, stepParams.size());
+			assertEquals(3, stepParams.size());
 			assertTrue(stepParams.containsKey("input_one"));
 			assertTrue(stepParams.containsKey("input_no_type"));
+			assertTrue(stepParams.containsKey("input_no_default_mandatory"));
 			assertEquals(0, stepParams.get("input_one").size());
 			assertEquals(2, stepParams.get("input_no_type").size());
+			assertEquals(1, stepParams.get("input_no_default_mandatory").size());
 		} catch (PladipusReportableException e) {
 			fail("Failed parsing: " + e.getMessage());
 		}
