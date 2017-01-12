@@ -8,12 +8,12 @@ import java.util.Set;
  */
 public class Parameter extends UpdateTracked {
 	
-	private int id;
-	private int enclosingId;
+	private int id = -1;
+	private int enclosingId = -1;
 	private String parameterName;
 	private Set<String> values = new HashSet<String>();
 	
-	Parameter(int enclosingId) {
+	public Parameter(int enclosingId) {
 		this.enclosingId = enclosingId;
 	}
 	

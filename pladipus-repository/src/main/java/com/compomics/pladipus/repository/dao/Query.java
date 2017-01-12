@@ -1,5 +1,8 @@
 package com.compomics.pladipus.repository.dao;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
 /**
@@ -10,6 +13,7 @@ public class Query {
 	private String sql;
 	private MapSqlParameterSource namedParameters;
 	private String whereClause;
+	private List<MapSqlParameterSource> batchNamedParameters = new ArrayList<MapSqlParameterSource>();
 	
 	public void setSql(String sql) {
 		this.sql = sql;
@@ -38,5 +42,13 @@ public class Query {
 	
 	public String getWhereClause() {
 		return (whereClause == null) ? "" : whereClause;
+	}
+	
+	public MapSqlParameterSource[] getBatchNamedParameters() {
+		return batchNamedParameters.toArray(new MapSqlParameterSource[0]);
+	}
+	
+	public void addBatchParameter(MapSqlParameterSource source) {
+		batchNamedParameters.add(source);
 	}
 }

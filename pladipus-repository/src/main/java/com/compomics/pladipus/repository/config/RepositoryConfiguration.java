@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.compomics.pladipus.model.config.ModelConfiguration;
 import com.compomics.pladipus.model.core.Default;
+import com.compomics.pladipus.model.core.Parameter;
 import com.compomics.pladipus.model.core.Step;
 import com.compomics.pladipus.model.core.User;
 import com.compomics.pladipus.model.core.Workflow;
@@ -24,6 +25,7 @@ import com.compomics.pladipus.repository.dao.impl.DefaultDAOImpl;
 import com.compomics.pladipus.repository.dao.impl.UserDAOImpl;
 import com.compomics.pladipus.repository.dao.impl.UserRoleDAOImpl;
 import com.compomics.pladipus.repository.dao.impl.WorkflowDAOImpl;
+import com.compomics.pladipus.repository.dao.impl.WorkflowGlobalParamDAOImpl;
 import com.compomics.pladipus.repository.dao.impl.WorkflowStepDAOImpl;
 import com.compomics.pladipus.repository.helpers.impl.BasicEncryptor;
 import com.compomics.pladipus.repository.service.DefaultService;
@@ -128,5 +130,11 @@ public class RepositoryConfiguration {
 	@Bean
 	public BaseDAO<Default> defaultDAO() {
 		return new DefaultDAOImpl(dataSource());
+	}
+	
+	@Lazy
+	@Bean
+	public BaseDAO<Parameter> workflowGlobalParamDAO() {
+		return new WorkflowGlobalParamDAOImpl(dataSource());
 	}
 }

@@ -18,7 +18,6 @@ public interface BaseDAO<T extends UpdateTracked> {
 	 * @throws PladipusReportableException
 	 */
 	int insert(T t) throws PladipusReportableException;
-	int batchInsert(List<T> list) throws PladipusReportableException;
 	
 	/**
 	 * Get a single object from the database.  Returns null if not found.
@@ -44,4 +43,6 @@ public interface BaseDAO<T extends UpdateTracked> {
 	 */
 	void update(T t) throws PladipusReportableException;
 	int update(Query query) throws PladipusReportableException;
+	int insert(Query query) throws PladipusReportableException;
+	int batchInsert(T t) throws PladipusReportableException;
 }

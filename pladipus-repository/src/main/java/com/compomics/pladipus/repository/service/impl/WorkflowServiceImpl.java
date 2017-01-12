@@ -3,11 +3,14 @@ package com.compomics.pladipus.repository.service.impl;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.compomics.pladipus.model.core.Parameter;
 import com.compomics.pladipus.model.core.Step;
 import com.compomics.pladipus.model.core.Workflow;
 import com.compomics.pladipus.model.db.WorkflowsColumn;
@@ -27,6 +30,9 @@ public class WorkflowServiceImpl implements WorkflowService {
 	
 	@Autowired
 	private BaseDAO<Step> workflowStepDAO;
+	
+	@Autowired
+	private BaseDAO<Parameter> workflowGlobalParamDAO;
 
 	@Transactional(rollbackFor={Exception.class})
 	@Override
@@ -80,7 +86,9 @@ public class WorkflowServiceImpl implements WorkflowService {
 	private void insertWholeWorkflow(Workflow workflow) throws PladipusReportableException {
 		workflow.setId(workflowDAO.insert(workflow));
 		insertSteps(workflow);
-		//TODO insert into other tables - params etc.
+		insertGlobalParameters(workflow);
+		insertStepParameters(workflow);
+		insertStepDependencies(workflow);
 	}
 	
 	private void insertSteps(Workflow workflow) throws PladipusReportableException {
@@ -91,5 +99,21 @@ public class WorkflowServiceImpl implements WorkflowService {
 			step.setWorkflowId(workflow.getId()); 
 			step.setId(workflowStepDAO.insert(step));
 		}
+	}
+	
+	private void insertGlobalParameters(Workflow workflow) throws PladipusReportableException {
+		for (Entry<String, Set<String>> global : workflow.getGlobalParameters().entrySet()) {
+			Parameter param = workflow.getParameter(workflow.getId(), global.getKey(), global.getValue());
+			param.setId(workflowGlobalParamDAO.insert(param));
+			workflowGlobalParamDAO.batchInsert(param);
+		}
+	}
+	
+	private void insertStepParameters(Workflow workflow) throws PladipusReportableException {
+		
+	}
+	
+	private void insertStepDependencies(Workflow workflow) throws PladipusReportableException {
+		
 	}
 }

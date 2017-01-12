@@ -38,22 +38,39 @@ public abstract class BaseDAOImpl<T extends UpdateTracked> extends NamedParamete
 	@Override
 	public int insert(T t) throws PladipusReportableException {
 		Query query = constructInsertQuery(t);
+		int inserted = insert(query);
+		clearTrackedColumns(t);
+		return inserted;
+	}
+	
+	@Override
+	public int insert(Query query) throws PladipusReportableException {
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 		int inserted;
 		try {
 			if ((inserted = update(query.getSql(), query.getParameters(), keyHolder)) != 1) {
 			    throw new PladipusReportableException(getMessage("db.nonUniqueInsert", getType(), inserted));
 			}
-			clearTrackedColumns(t);
 			return keyHolder.getKey() == null? 0 : keyHolder.getKey().intValue();
 		} catch (DataAccessException e) {
-			throw new PladipusReportableException(getMessage("db.insertError", getType(), e.getCause().getMessage()));
+			throw new PladipusReportableException(getMessage("db.insertError", getType(), getExceptionCause(e)));
 		}
 	}
 	
 	@Override
-	public int batchInsert(List<T> list) throws PladipusReportableException {
-		return 0; //TODO
+	public int batchInsert(T t) throws PladipusReportableException {
+		Query query = getBatchInsertQuery(t);
+		if (query == null) return 0;
+		return batchQueryInsert(query);
+	}
+
+	protected int batchQueryInsert(Query query) throws PladipusReportableException {
+		try {
+			int[] inserts = batchUpdate(query.getSql(), query.getBatchNamedParameters());
+			return inserts.length;
+		} catch (Exception e) {
+			throw new PladipusReportableException(getMessage("db.insertError", getType(), getExceptionCause(e)));
+		}
 	}
 	
 	@Override
@@ -66,7 +83,7 @@ public abstract class BaseDAOImpl<T extends UpdateTracked> extends NamedParamete
 		} catch (IncorrectResultSizeDataAccessException e) {
 			throw new PladipusReportableException(getMessage("db.nonUniqueGet", getType()));
 		} catch (DataAccessException e) {
-			throw new PladipusReportableException(getMessage("db.invalidGetQuery", e.getMessage()));
+			throw new PladipusReportableException(getMessage("db.invalidGetQuery", getExceptionCause(e)));
 		}
 	}
 
@@ -76,7 +93,7 @@ public abstract class BaseDAOImpl<T extends UpdateTracked> extends NamedParamete
 		try {
 			return query(query.getSql(), query.getParameters(), getRowMapper());
 		} catch (DataAccessException e) {
-			throw new PladipusReportableException(getMessage("db.invalidGetQuery", e.getMessage()));
+			throw new PladipusReportableException(getMessage("db.invalidGetQuery", getExceptionCause(e)));
 		}
 	}
 	
@@ -95,7 +112,7 @@ public abstract class BaseDAOImpl<T extends UpdateTracked> extends NamedParamete
 		try {
 			return update(query.getSql(), query.getParameters());
 		} catch (DataAccessException e) {
-			throw new PladipusReportableException(getMessage("db.updateError", e.getMessage()));
+			throw new PladipusReportableException(getMessage("db.updateError", getExceptionCause(e)));
 		}
 	}
 	
@@ -215,10 +232,17 @@ public abstract class BaseDAOImpl<T extends UpdateTracked> extends NamedParamete
 		return exceptionMessages.getMessage(msg, params);
 	}
 	
+	protected String getExceptionCause(Exception e) {
+		return (e.getCause() != null) ? e.getCause().getMessage() : e.getMessage();
+	}
+	
 	protected abstract Map<String, Object> mapDbColumns(T t);
 	protected abstract String getTableName();
 	protected abstract String getType();
 	protected abstract RowMapper<T> getRowMapper();
 	protected abstract boolean isInsertValid(List<String> insertColumns);
 	protected abstract List<String> getUniqueIdentifier();
+	protected Query getBatchInsertQuery(T t) {
+		return null;
+	}
 }
