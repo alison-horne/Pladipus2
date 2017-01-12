@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.compomics.pladipus.model.db.WorkflowsColumn;
 
@@ -19,7 +22,7 @@ public class Workflow extends UpdateTracked {
 	private boolean active = true;
 	private Map<String, Set<String>> globalParams = new HashMap<String, Set<String>>();
 	private Map<String, Step> steps = new HashMap<String, Step>();
-	private Map<String, Integer> defaultMappings = new HashMap<String, Integer>();
+	private Map<String, String> substitutions = new HashMap<String, String>();
 	
 	public String getWorkflowName() {
 		return workflowName;
@@ -74,11 +77,25 @@ public class Workflow extends UpdateTracked {
 		return steps;
 	}
 	
-	public void addDefaultSub(String defName, int defId) {
-		defaultMappings.put(defName, defId);
+	public void addSubstitution(String rawValue, String subValue) {
+		substitutions.put(rawValue, subValue);
 	}
 	
-	public Map<String, Integer> getDefaultSubs() {
-		return defaultMappings;
+	public Map<String, String> getSubstitutions() {
+		return substitutions;
+	}
+	
+	public Parameter getParameter(int enclosingId, String paramName, Set<String> rawValues) {
+		Parameter param = new Parameter(enclosingId);
+		param.setParameterName(paramName);
+		if (rawValues != null) {
+			for (String rawVal: rawValues) {
+				for (Entry<String, String> entry : substitutions.entrySet()) {
+					rawVal = rawVal.replaceAll(Pattern.quote(entry.getKey()), Matcher.quoteReplacement(entry.getValue()));				
+				}
+				param.addValue(rawVal);
+			}
+		}
+		return param;
 	}
 }

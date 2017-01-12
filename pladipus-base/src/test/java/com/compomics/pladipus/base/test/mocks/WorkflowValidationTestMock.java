@@ -127,6 +127,7 @@ public class WorkflowValidationTestMock {
 			initMocks(true, true, true, false);
 			workflow.getSteps().get(STEP3).addParameterValues(PARAM1, Sets.newSet(BAD_PARAM));
 			workflowValidator.validate(workflow);
+			fail("Should not allow invalid substitution");
 		} catch (PladipusReportableException e) {
 			assertEquals(exceptionMessages.getMessage("template.subFormat", BAD_PARAM), e.getMessage());
 			Mockito.verify(pladipusToolInfoProvider).getAllToolInfo();
@@ -141,6 +142,7 @@ public class WorkflowValidationTestMock {
 			initMocks(true, true, true, false);			
 			workflow.getSteps().get(STEP3).addParameterValues(PARAM1, Sets.newSet(BAD_PARAM));
 			workflowValidator.validate(workflow);
+			fail("Should not allow invalid substitution");
 		} catch (PladipusReportableException e) {
 			assertEquals(exceptionMessages.getMessage("template.subFormat", BAD_PARAM), e.getMessage());
 			Mockito.verify(pladipusToolInfoProvider).getAllToolInfo();
@@ -153,6 +155,7 @@ public class WorkflowValidationTestMock {
 		try {
 			initMocks(false, true, true, false);
 			workflowValidator.validate(workflow);
+			fail("Should not allow invalid default");
 		} catch (PladipusReportableException e) {
 			assertEquals(exceptionMessages.getMessage("template.invalidDefault", "DEFAULT." + DEF1), e.getMessage());
 			Mockito.verify(pladipusToolInfoProvider).getAllToolInfo();
@@ -165,6 +168,7 @@ public class WorkflowValidationTestMock {
 		try {
 			initMocks(true, true, true, true);
 			workflowValidator.validate(workflow);
+			fail("Should not allow missing mandatory parameter");
 		} catch (PladipusReportableException e) {
 			assertTrue(e.getMessage().contains("mandatory"));
 			assertTrue(e.getMessage().contains(PARAM3));
@@ -180,6 +184,7 @@ public class WorkflowValidationTestMock {
 			// s2 -> s3 -> s2
 			workflow.getSteps().get(STEP3).addParameterValues(PARAM1, Sets.newSet("{$" + STEP2 + ".out}"));
 			workflowValidator.validate(workflow);
+			fail("Should not allow step dependency");
 		} catch (PladipusReportableException e) {
 			assertTrue(e.getMessage().contains("Circular dependency"));
 			Mockito.verify(pladipusToolInfoProvider).getAllToolInfo();
@@ -199,10 +204,25 @@ public class WorkflowValidationTestMock {
 			step4.addParameterValues(PARAM1, Sets.newSet("{$" + STEP1 + ".out}"));
 			workflow.addStep(step4);
 			workflowValidator.validate(workflow);
+			fail("Should not allow step dependency");
 		} catch (PladipusReportableException e) {
 			assertTrue(e.getMessage().contains("Circular dependency"));
 			Mockito.verify(pladipusToolInfoProvider).getAllToolInfo();
 			Mockito.verify(defaultService).getDefaultsForUser(USER1);
+		}
+	}
+	
+	@Test
+	public void testInvalidGlobalSubstitution() throws PladipusReportableException {
+		try {
+			initMocks(true, true, true, false);
+			workflow.addParameterValues(GLOBAL1, Sets.newSet("{$invalid.input}"));
+			workflowValidator.validate(workflow);
+			fail("Should not allow invalid global substitution");
+		} catch (PladipusReportableException e) {
+			assertEquals(exceptionMessages.getMessage("template.invalidGlobalSubstitution", "invalid.input"), e.getMessage());
+			Mockito.verify(pladipusToolInfoProvider).getAllToolInfo();
+			Mockito.verify(defaultService, Mockito.times(2)).getDefaultsForUser(USER1);
 		}
 	}
 	
@@ -212,7 +232,7 @@ public class WorkflowValidationTestMock {
 			initMocks(true, true, true, false);
 			workflowValidator.validate(workflow);
 			Mockito.verify(pladipusToolInfoProvider).getAllToolInfo();
-			Mockito.verify(defaultService).getDefaultsForUser(USER1);
+			Mockito.verify(defaultService, Mockito.times(2)).getDefaultsForUser(USER1);
 			verifyWorkflowUpdates();
 		} catch (PladipusReportableException e) {
 			fail("Validation should have succeeded: " + e.getMessage());
@@ -312,11 +332,12 @@ public class WorkflowValidationTestMock {
 	
 	private void checkDefaults() {
 		// Expect default 1 to have been added to map
-		Map<String, Integer> defaults = workflow.getDefaultSubs();
+		Map<String, String> defaults = workflow.getSubstitutions();
 		assertNotNull(defaults);
 		assertEquals(1, defaults.size());
-		assertNotNull(defaults.get(DEF1));
-		assertTrue(DEF1_ID == defaults.get(DEF1));
+		String def = defaults.get("{$DEFAULT." + DEF1 + "}");
+		assertNotNull(def);
+		assertTrue(def.equals("{$DEFAULT." + DEF1_ID + "}"));
 	}
 	
 	private void checkGlobals() {

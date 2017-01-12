@@ -87,8 +87,37 @@ public class WorkflowValidator implements ValidationChecker<Workflow> {
 		}
 	}
 	
-	private void checkGlobalParameters(Workflow workflow) {
-		// TODO
+	private void checkGlobalParameters(Workflow workflow) throws PladipusReportableException {
+		// TODO check value types, standard mappings?  Tidy this up, no duplication etc.
+		Map<String, Integer> defaults = defaultsControl.getDefaultMap(workflow.getUserId());
+		for (Entry<String, Set<String>> param: workflow.getGlobalParameters().entrySet()) {
+			Iterator<String> iter = param.getValue().iterator();
+			while (iter.hasNext()) {
+				String value = iter.next();
+				if (isSubstitution(value)) {
+					int start = value.indexOf(SUBSTITUTE_PREFIX);
+					while (start > -1) {
+						int end = value.indexOf(SUBSTITUTE_END, start);
+						String subValue = value.substring(start + SUBSTITUTE_PREFIX.length(), end);
+						start = value.indexOf(SUBSTITUTE_PREFIX, end);
+						String[] split = subValue.split("\\.", 2);
+						if (split.length != 2) {
+							throw new PladipusReportableException(exceptionMessages.getMessage("template.subFormat", value));
+						}
+						if (split[0].equalsIgnoreCase(DEFAULT_PREFIX)) {
+							if (defaults.get(split[1].toUpperCase()) != null) {
+								workflow.addSubstitution(SUBSTITUTE_PREFIX + DEFAULT_PREFIX + "." + split[1] + SUBSTITUTE_END, 
+										SUBSTITUTE_PREFIX + DEFAULT_PREFIX + "." + defaults.get(split[1].toUpperCase()) + SUBSTITUTE_END);
+							} else {
+								throw new PladipusReportableException(exceptionMessages.getMessage("template.invalidDefault", subValue));
+							}
+						} else {
+							throw new PladipusReportableException(exceptionMessages.getMessage("template.invalidGlobalSubstitution", subValue));
+						}
+					}
+				}
+			}
+		}
 	}
 	
 	private void checkStepParameters(Workflow workflow) throws PladipusReportableException {
@@ -154,7 +183,7 @@ public class WorkflowValidator implements ValidationChecker<Workflow> {
 					if (isSubstitution(value)) {
 						int start = value.indexOf(SUBSTITUTE_PREFIX);
 						while (start > -1) {
-							int end = value.indexOf("}", start);
+							int end = value.indexOf(SUBSTITUTE_END, start);
 							String subValue = value.substring(start + SUBSTITUTE_PREFIX.length(), end);
 							start = value.indexOf(SUBSTITUTE_PREFIX, end);
 							String[] split = subValue.split("\\.", 2);
@@ -163,7 +192,8 @@ public class WorkflowValidator implements ValidationChecker<Workflow> {
 							}
 							if (split[0].equalsIgnoreCase(DEFAULT_PREFIX)) {
 								if (defaults.get(split[1].toUpperCase()) != null) {
-									workflow.addDefaultSub(split[1], defaults.get(split[1].toUpperCase()));
+									workflow.addSubstitution(SUBSTITUTE_PREFIX + DEFAULT_PREFIX + "." + split[1] + SUBSTITUTE_END, 
+											SUBSTITUTE_PREFIX + DEFAULT_PREFIX + "." + defaults.get(split[1].toUpperCase()) + SUBSTITUTE_END);
 								} else {
 									throw new PladipusReportableException(exceptionMessages.getMessage("template.invalidDefault", subValue));
 								}
