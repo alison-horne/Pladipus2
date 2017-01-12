@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS workflow_step_params (
 	FOREIGN KEY (workflow_step_id) REFERENCES workflow_steps (workflow_step_id)
 );
 
-CREATE TABLE IF NOT EXISTS step_prerequisites (
+CREATE TABLE IF NOT EXISTS step_dependencies (
 	workflow_step_id		INTEGER NOT NULL,
 	prerequisite_step_id	INTEGER NOT NULL,
 	INDEX (workflow_step_id),
