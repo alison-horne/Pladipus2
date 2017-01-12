@@ -33,6 +33,9 @@ public class WorkflowServiceImpl implements WorkflowService {
 	
 	@Autowired
 	private BaseDAO<Parameter> workflowGlobalParamDAO;
+	
+	@Autowired
+	private BaseDAO<Parameter> workflowStepParamDAO;
 
 	@Transactional(rollbackFor={Exception.class})
 	@Override
@@ -99,6 +102,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 			step.setWorkflowId(workflow.getId()); 
 			step.setId(workflowStepDAO.insert(step));
 		}
+		workflow.addStepSubstitutions();
 	}
 	
 	private void insertGlobalParameters(Workflow workflow) throws PladipusReportableException {
@@ -106,11 +110,21 @@ public class WorkflowServiceImpl implements WorkflowService {
 			Parameter param = workflow.getParameter(workflow.getId(), global.getKey(), global.getValue());
 			param.setId(workflowGlobalParamDAO.insert(param));
 			workflowGlobalParamDAO.batchInsert(param);
+			workflow.addGlobalSubstitution(param.getParameterName(), param.getId());
 		}
 	}
 	
 	private void insertStepParameters(Workflow workflow) throws PladipusReportableException {
-		
+		Collection<Step> steps = workflow.getSteps().values();
+		Iterator<Step> iter = steps.iterator();
+		while (iter.hasNext()) {
+			Step step = iter.next();
+			for (Entry<String, Set<String>> stepParam : step.getStepParameters().entrySet()) {
+				Parameter param = workflow.getParameter(step.getId(), stepParam.getKey(), stepParam.getValue());
+				param.setId(workflowStepParamDAO.insert(param));
+				workflowStepParamDAO.batchInsert(param);
+			}
+		}
 	}
 	
 	private void insertStepDependencies(Workflow workflow) throws PladipusReportableException {

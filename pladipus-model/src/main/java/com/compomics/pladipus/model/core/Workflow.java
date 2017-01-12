@@ -85,6 +85,16 @@ public class Workflow extends UpdateTracked {
 		return substitutions;
 	}
 	
+	public void addStepSubstitutions() {
+		for (Entry<String, Step> step: steps.entrySet()) {
+			substitutions.put("{$" + step.getKey(), "{$" + step.getValue().getId());
+		}
+	}
+	
+	public void addGlobalSubstitution(String name, int id) {
+		substitutions.put("{$GLOBAL." + name, "{$GLOBAL." + id);
+	}
+	
 	public Parameter getParameter(int enclosingId, String paramName, Set<String> rawValues) {
 		Parameter param = new Parameter(enclosingId);
 		param.setParameterName(paramName);

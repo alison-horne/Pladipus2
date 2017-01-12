@@ -27,6 +27,7 @@ import com.compomics.pladipus.repository.dao.impl.UserRoleDAOImpl;
 import com.compomics.pladipus.repository.dao.impl.WorkflowDAOImpl;
 import com.compomics.pladipus.repository.dao.impl.WorkflowGlobalParamDAOImpl;
 import com.compomics.pladipus.repository.dao.impl.WorkflowStepDAOImpl;
+import com.compomics.pladipus.repository.dao.impl.WorkflowStepParamDAOImpl;
 import com.compomics.pladipus.repository.helpers.impl.BasicEncryptor;
 import com.compomics.pladipus.repository.service.DefaultService;
 import com.compomics.pladipus.repository.service.UserService;
@@ -136,5 +137,11 @@ public class RepositoryConfiguration {
 	@Bean
 	public BaseDAO<Parameter> workflowGlobalParamDAO() {
 		return new WorkflowGlobalParamDAOImpl(dataSource());
+	}
+	
+	@Lazy
+	@Bean
+	public BaseDAO<Parameter> workflowStepParamDAO() {
+		return new WorkflowStepParamDAOImpl(dataSource());
 	}
 }
