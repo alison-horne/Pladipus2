@@ -17,8 +17,27 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 	
-	<dependencies>
-		
-	</dependencies>
-
+	<build>
+	    <plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jaxb2-maven-plugin</artifactId>
+				<version>2.3</version>
+				<executions>
+					<execution>
+						<id>xjc</id>
+						<goals>
+							<goal>xjc</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<packageName>com.compomics.model.xml</packageName>
+					<sources>
+						<source>src/main/resources</source>
+					</sources>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
