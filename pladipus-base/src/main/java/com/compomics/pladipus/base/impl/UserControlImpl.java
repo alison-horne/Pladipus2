@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.compomics.pladipus.base.UserControl;
 import com.compomics.pladipus.model.core.User;
-import com.compomics.pladipus.model.exceptions.PladipusMessages;
-import com.compomics.pladipus.model.exceptions.PladipusReportableException;
+import com.compomics.pladipus.shared.PladipusMessages;
+import com.compomics.pladipus.shared.PladipusReportableException;
 import com.compomics.pladipus.repository.service.UserService;
 
 public class UserControlImpl implements UserControl {

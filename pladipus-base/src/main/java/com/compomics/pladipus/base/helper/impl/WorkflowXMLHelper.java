@@ -32,8 +32,8 @@ import org.xml.sax.SAXException;
 import com.compomics.pladipus.base.helper.XMLHelper;
 import com.compomics.pladipus.model.core.Step;
 import com.compomics.pladipus.model.core.Workflow;
-import com.compomics.pladipus.model.exceptions.PladipusMessages;
-import com.compomics.pladipus.model.exceptions.PladipusReportableException;
+import com.compomics.pladipus.shared.PladipusMessages;
+import com.compomics.pladipus.shared.PladipusReportableException;
 
 public class WorkflowXMLHelper implements XMLHelper<Workflow> {
 	

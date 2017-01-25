@@ -30,7 +30,7 @@ import com.compomics.pladipus.base.test.config.MockBaseConfiguration;
 import com.compomics.pladipus.client.config.ClientConfiguration;
 import com.compomics.pladipus.client.config.MockClientConfiguration;
 import com.compomics.pladipus.model.core.TaskStatus;
-import com.compomics.pladipus.model.exceptions.PladipusReportableException;
+import com.compomics.pladipus.shared.PladipusReportableException;
 
 /**
  * Tests to check that the correct services are called when command line commands are issued.

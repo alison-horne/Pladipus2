@@ -16,8 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.compomics.pladipus.base.UserControl;
 import com.compomics.pladipus.base.config.BaseConfiguration;
-import com.compomics.pladipus.model.exceptions.PladipusMessages;
-import com.compomics.pladipus.model.exceptions.PladipusReportableException;
+import com.compomics.pladipus.shared.PladipusMessages;
+import com.compomics.pladipus.shared.PladipusReportableException;
 import com.compomics.pladipus.repository.config.TestRepositoryConfiguration;
 
 /**

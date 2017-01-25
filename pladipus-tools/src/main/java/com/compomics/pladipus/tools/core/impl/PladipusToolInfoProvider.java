@@ -5,8 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 
-import com.compomics.pladipus.model.exceptions.PladipusMessages;
-import com.compomics.pladipus.model.exceptions.PladipusReportableException;
+import com.compomics.pladipus.shared.PladipusMessages;
+import com.compomics.pladipus.shared.PladipusReportableException;
 import com.compomics.pladipus.tools.annotations.PladipusTool;
 import com.compomics.pladipus.tools.core.Tool;
 import com.compomics.pladipus.tools.core.ToolInfo;

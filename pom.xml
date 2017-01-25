@@ -9,6 +9,7 @@
     <packaging>pom</packaging>
 
     <modules>
+		<module>pladipus-shared</module>
 		<module>pladipus-model</module>
 		<module>pladipus-tools</module>
 		<module>pladipus-repository</module>
@@ -72,6 +73,12 @@
 	<dependencyManagement>
         <dependencies>
 		
+			<dependency>
+                <groupId>com.compomics.pladipus</groupId>
+                <artifactId>pladipus-shared</artifactId>
+                <version>${pladipus.version}</version>
+            </dependency>
+			
             <dependency>
                 <groupId>com.compomics.pladipus</groupId>
                 <artifactId>pladipus-base</artifactId>

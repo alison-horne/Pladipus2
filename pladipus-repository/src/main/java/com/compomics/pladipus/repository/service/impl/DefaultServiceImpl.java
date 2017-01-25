@@ -8,8 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.compomics.pladipus.model.core.Default;
 import com.compomics.pladipus.model.db.DefaultsColumn;
-import com.compomics.pladipus.model.exceptions.PladipusMessages;
-import com.compomics.pladipus.model.exceptions.PladipusReportableException;
+import com.compomics.pladipus.shared.PladipusMessages;
+import com.compomics.pladipus.shared.PladipusReportableException;
 import com.compomics.pladipus.repository.dao.BaseDAO;
 import com.compomics.pladipus.repository.dao.Query;
 import com.compomics.pladipus.repository.service.DefaultService;

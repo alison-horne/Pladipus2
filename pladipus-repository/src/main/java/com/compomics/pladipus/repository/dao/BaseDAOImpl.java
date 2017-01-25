@@ -22,8 +22,8 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import com.compomics.pladipus.model.core.UpdateTracked;
-import com.compomics.pladipus.model.exceptions.PladipusMessages;
-import com.compomics.pladipus.model.exceptions.PladipusReportableException;
+import com.compomics.pladipus.shared.PladipusMessages;
+import com.compomics.pladipus.shared.PladipusReportableException;
 
 public abstract class BaseDAOImpl<T extends UpdateTracked> extends NamedParameterJdbcTemplate implements BaseDAO<T> {
 	

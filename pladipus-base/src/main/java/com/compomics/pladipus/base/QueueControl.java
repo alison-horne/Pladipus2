@@ -1,7 +1,7 @@
 package com.compomics.pladipus.base;
 
 import com.compomics.pladipus.model.core.TaskStatus;
-import com.compomics.pladipus.model.exceptions.PladipusReportableException;
+import com.compomics.pladipus.shared.PladipusReportableException;
 
 public interface QueueControl {
 	public void process(String batchName, int userId) throws PladipusReportableException;

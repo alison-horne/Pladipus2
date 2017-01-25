@@ -2,7 +2,7 @@ package com.compomics.pladipus.tools.core;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 
-import com.compomics.pladipus.model.exceptions.PladipusReportableException;
+import com.compomics.pladipus.shared.PladipusReportableException;
 import com.google.common.collect.ImmutableSet;
 
 /**

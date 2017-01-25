@@ -1,13 +1,9 @@
-package com.compomics.pladipus.model.exceptions;
+package com.compomics.pladipus.shared;
 
 import java.text.MessageFormat;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-/**
- * TODO Move out of model
- *
- */
 public class PladipusMessages {
 	
 	private ResourceBundle bundle;

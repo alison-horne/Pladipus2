@@ -1,4 +1,4 @@
-package com.compomics.pladipus.model.exceptions;
+package com.compomics.pladipus.shared;
 
 /**
  * Exceptions which should be reported back to the user.

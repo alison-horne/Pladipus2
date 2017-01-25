@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.compomics.pladipus.base.DefaultsControl;
 import com.compomics.pladipus.model.core.Default;
-import com.compomics.pladipus.model.exceptions.PladipusReportableException;
+import com.compomics.pladipus.shared.PladipusReportableException;
 import com.compomics.pladipus.repository.service.DefaultService;
 
 public class DefaultsControlImpl implements DefaultsControl {

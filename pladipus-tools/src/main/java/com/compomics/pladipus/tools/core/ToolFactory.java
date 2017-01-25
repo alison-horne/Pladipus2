@@ -3,7 +3,7 @@ package com.compomics.pladipus.tools.core;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
-import com.compomics.pladipus.model.exceptions.PladipusReportableException;
+import com.compomics.pladipus.shared.PladipusReportableException;
 
 /**
  * Factory to register and provide tool beans.

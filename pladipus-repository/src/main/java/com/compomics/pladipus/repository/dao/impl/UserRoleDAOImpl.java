@@ -8,7 +8,7 @@ import com.compomics.pladipus.model.core.User;
 import com.compomics.pladipus.model.db.DbTable;
 import com.compomics.pladipus.model.db.RolesColumn;
 import com.compomics.pladipus.model.db.UserRolesColumn;
-import com.compomics.pladipus.model.exceptions.PladipusReportableException;
+import com.compomics.pladipus.shared.PladipusReportableException;
 import com.compomics.pladipus.repository.dao.Query;
 
 /**

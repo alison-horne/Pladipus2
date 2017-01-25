@@ -1,6 +1,6 @@
 package com.compomics.pladipus.base;
 
-import com.compomics.pladipus.model.exceptions.PladipusReportableException;
+import com.compomics.pladipus.shared.PladipusReportableException;
 import com.compomics.pladipus.model.parameters.InputParameter;
 import com.compomics.pladipus.tools.core.ToolInfo;
 import com.google.common.collect.ImmutableMap;

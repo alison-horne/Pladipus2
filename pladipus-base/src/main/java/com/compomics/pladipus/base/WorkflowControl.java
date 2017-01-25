@@ -3,7 +3,7 @@ package com.compomics.pladipus.base;
 import org.w3c.dom.Document;
 
 import com.compomics.pladipus.model.core.Workflow;
-import com.compomics.pladipus.model.exceptions.PladipusReportableException;
+import com.compomics.pladipus.shared.PladipusReportableException;
 
 /**
  * Creation, validation, and retrieval of user workflows.

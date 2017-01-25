@@ -7,7 +7,7 @@ import com.compomics.pladipus.base.WorkflowControl;
 import com.compomics.pladipus.base.helper.ValidationChecker;
 import com.compomics.pladipus.base.helper.XMLHelper;
 import com.compomics.pladipus.model.core.Workflow;
-import com.compomics.pladipus.model.exceptions.PladipusReportableException;
+import com.compomics.pladipus.shared.PladipusReportableException;
 import com.compomics.pladipus.repository.service.WorkflowService;
 
 public class WorkflowControlImpl implements WorkflowControl {

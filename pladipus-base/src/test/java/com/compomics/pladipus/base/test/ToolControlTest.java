@@ -18,7 +18,7 @@ import org.springframework.test.context.support.DirtiesContextTestExecutionListe
 
 import com.compomics.pladipus.base.ToolControl;
 import com.compomics.pladipus.base.config.BaseConfiguration;
-import com.compomics.pladipus.model.exceptions.PladipusReportableException;
+import com.compomics.pladipus.shared.PladipusReportableException;
 import com.compomics.pladipus.model.parameters.InputParameter;
 import com.compomics.pladipus.test.tools.config.TestToolsConfiguration;
 import com.compomics.pladipus.tools.core.ToolInfo;

@@ -14,7 +14,6 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import com.compomics.pladipus.model.config.ModelConfiguration;
 import com.compomics.pladipus.model.core.Default;
 import com.compomics.pladipus.model.core.Parameter;
 import com.compomics.pladipus.model.core.Step;
@@ -35,11 +34,12 @@ import com.compomics.pladipus.repository.service.WorkflowService;
 import com.compomics.pladipus.repository.service.impl.DefaultServiceImpl;
 import com.compomics.pladipus.repository.service.impl.UserServiceImpl;
 import com.compomics.pladipus.repository.service.impl.WorkflowServiceImpl;
+import com.compomics.pladipus.shared.config.SharedConfiguration;
 
 @Configuration
 @EnableTransactionManagement
 @PropertySource("classpath:database.properties")
-@Import(ModelConfiguration.class)
+@Import(SharedConfiguration.class)
 public class RepositoryConfiguration {
 	
 	@Autowired
@@ -67,7 +67,7 @@ public class RepositoryConfiguration {
         dataSource.setUrl(constructDbUrl());
         dataSource.setUsername(env.getRequiredProperty(DB_USER));       
         dataSource.setPassword(basicEncryptor().decryptString(env.getRequiredProperty(DB_PASSWORD)));
-             
+     
         return dataSource;
     }
 	

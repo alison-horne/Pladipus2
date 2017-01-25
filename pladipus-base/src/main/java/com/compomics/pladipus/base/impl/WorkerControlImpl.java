@@ -1,7 +1,7 @@
 package com.compomics.pladipus.base.impl;
 
 import com.compomics.pladipus.base.WorkerControl;
-import com.compomics.pladipus.model.exceptions.PladipusReportableException;
+import com.compomics.pladipus.shared.PladipusReportableException;
 
 public class WorkerControlImpl implements WorkerControl {
 

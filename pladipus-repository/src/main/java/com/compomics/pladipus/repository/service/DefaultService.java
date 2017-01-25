@@ -3,7 +3,7 @@ package com.compomics.pladipus.repository.service;
 import java.util.List;
 
 import com.compomics.pladipus.model.core.Default;
-import com.compomics.pladipus.model.exceptions.PladipusReportableException;
+import com.compomics.pladipus.shared.PladipusReportableException;
 
 /**
  * Service to be used by the front end for dealing with defaults in the database.  

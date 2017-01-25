@@ -5,8 +5,8 @@ import java.util.function.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.compomics.pladipus.base.ToolControl;
-import com.compomics.pladipus.model.exceptions.PladipusMessages;
-import com.compomics.pladipus.model.exceptions.PladipusReportableException;
+import com.compomics.pladipus.shared.PladipusMessages;
+import com.compomics.pladipus.shared.PladipusReportableException;
 import com.compomics.pladipus.model.parameters.InputParameter;
 import com.compomics.pladipus.tools.core.ToolInfo;
 import com.compomics.pladipus.tools.core.ToolInfoProvider;

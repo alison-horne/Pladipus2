@@ -41,6 +41,11 @@
 		
 		<dependency>
 			<groupId>com.compomics.pladipus</groupId>
+			<artifactId>pladipus-shared</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.compomics.pladipus</groupId>
 			<artifactId>pladipus-repository</artifactId>
 		</dependency>
 		

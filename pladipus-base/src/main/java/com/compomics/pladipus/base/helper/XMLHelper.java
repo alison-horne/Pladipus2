@@ -2,7 +2,7 @@ package com.compomics.pladipus.base.helper;
 
 import org.w3c.dom.Document;
 
-import com.compomics.pladipus.model.exceptions.PladipusReportableException;
+import com.compomics.pladipus.shared.PladipusReportableException;
 
 /**
  * Helper class to convert XML to object

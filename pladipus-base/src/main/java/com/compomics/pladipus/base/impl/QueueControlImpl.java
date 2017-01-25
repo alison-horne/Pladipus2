@@ -2,7 +2,7 @@ package com.compomics.pladipus.base.impl;
 
 import com.compomics.pladipus.base.QueueControl;
 import com.compomics.pladipus.model.core.TaskStatus;
-import com.compomics.pladipus.model.exceptions.PladipusReportableException;
+import com.compomics.pladipus.shared.PladipusReportableException;
 
 public class QueueControlImpl implements QueueControl {
 

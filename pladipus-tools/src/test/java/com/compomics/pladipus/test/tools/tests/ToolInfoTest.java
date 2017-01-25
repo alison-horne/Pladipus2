@@ -17,7 +17,7 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener; 
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 
-import com.compomics.pladipus.model.exceptions.PladipusReportableException;
+import com.compomics.pladipus.shared.PladipusReportableException;
 import com.compomics.pladipus.test.tools.config.TestToolsConfiguration;
 import com.compomics.pladipus.tools.config.ToolsConfiguration;
 import com.compomics.pladipus.tools.core.ToolInfo;

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.compomics.pladipus.model.core.Default;
-import com.compomics.pladipus.model.exceptions.PladipusReportableException;
+import com.compomics.pladipus.shared.PladipusReportableException;
 
 public interface DefaultsControl {
 	public void addDefault(String name, String value, String type, int userId) throws PladipusReportableException;

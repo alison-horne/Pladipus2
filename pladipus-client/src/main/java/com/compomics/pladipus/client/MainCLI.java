@@ -22,7 +22,7 @@ import com.compomics.pladipus.base.UserControl;
 import com.compomics.pladipus.base.WorkerControl;
 import com.compomics.pladipus.base.WorkflowControl;
 import com.compomics.pladipus.model.core.TaskStatus;
-import com.compomics.pladipus.model.exceptions.PladipusReportableException;
+import com.compomics.pladipus.shared.PladipusReportableException;
 
 public class MainCLI implements Alert {
 	

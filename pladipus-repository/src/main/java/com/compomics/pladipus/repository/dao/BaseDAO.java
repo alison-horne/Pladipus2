@@ -3,7 +3,7 @@ package com.compomics.pladipus.repository.dao;
 import java.util.List;
 
 import com.compomics.pladipus.model.core.UpdateTracked;
-import com.compomics.pladipus.model.exceptions.PladipusReportableException;
+import com.compomics.pladipus.shared.PladipusReportableException;
 
 /**
  * Database Access methods

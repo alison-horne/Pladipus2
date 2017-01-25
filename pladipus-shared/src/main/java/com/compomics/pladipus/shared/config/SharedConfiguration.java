@@ -1,17 +1,13 @@
-package com.compomics.pladipus.model.config;
+package com.compomics.pladipus.shared.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.compomics.pladipus.model.exceptions.PladipusMessages;
+import com.compomics.pladipus.shared.PladipusMessages;
 
 
-/**
- * TODO Move this out of model
- *
- */
 @Configuration
-public class ModelConfiguration {
+public class SharedConfiguration {
 
 	@Bean 
 	public PladipusMessages exceptionMessages() {

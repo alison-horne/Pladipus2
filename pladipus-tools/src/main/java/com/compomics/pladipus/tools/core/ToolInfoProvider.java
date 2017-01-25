@@ -1,6 +1,6 @@
 package com.compomics.pladipus.tools.core;
 
-import com.compomics.pladipus.model.exceptions.PladipusReportableException;
+import com.compomics.pladipus.shared.PladipusReportableException;
 import com.google.common.collect.ImmutableMap;
 
 /**
