@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
@@ -29,6 +28,7 @@ import com.compomics.pladipus.model.core.User;
 import com.compomics.pladipus.model.core.Workflow;
 import com.compomics.pladipus.repository.dao.BaseDAO;
 import com.compomics.pladipus.repository.dao.impl.DefaultDAOImpl;
+import com.compomics.pladipus.repository.dao.impl.UserDAO;
 import com.compomics.pladipus.repository.dao.impl.UserDAOImpl;
 import com.compomics.pladipus.repository.dao.impl.UserRoleDAOImpl;
 import com.compomics.pladipus.repository.dao.impl.WorkflowDAOImpl;
@@ -46,7 +46,7 @@ import com.compomics.pladipus.shared.config.SharedConfiguration;
 
 @Configuration
 @EnableTransactionManagement
-@PropertySource({"classpath:application.properties", "classpath.hibernate.properties"})
+@PropertySource({"classpath:application.properties", "classpath:hibernate.properties"})
 @Import(SharedConfiguration.class)
 public class RepositoryConfiguration {
 	
@@ -92,7 +92,7 @@ public class RepositoryConfiguration {
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
 	   LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
 	   em.setDataSource(dataSource());
-	   em.setPackagesToScan(new String[] { "com.compomics.pladipus.model.xml" });
+	   em.setPackagesToScan(new String[] { "com.compomics.pladipus.model.hibernate" });
 	   JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
 	   em.setJpaVendorAdapter(vendorAdapter);
 	   em.setJpaProperties(hibernateProperties());
@@ -127,10 +127,10 @@ public class RepositoryConfiguration {
 	} 
 	
 	@Lazy
-    @Bean
-    public PlatformTransactionManager txManager() {
-        return new DataSourceTransactionManager(dataSource());
-    }
+	@Bean
+	public UserDAO hibuserDAO() {
+		return new UserDAO();
+	}
 	
 	@Lazy
 	@Bean
