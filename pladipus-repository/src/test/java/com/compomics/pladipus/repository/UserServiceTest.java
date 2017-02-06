@@ -16,9 +16,9 @@ import org.springframework.test.context.support.DirtiesContextTestExecutionListe
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.compomics.pladipus.model.core.User;
 import com.compomics.pladipus.shared.PladipusMessages;
 import com.compomics.pladipus.shared.PladipusReportableException;
+import com.compomics.pladipus.model.hibernate.User;
 import com.compomics.pladipus.repository.config.RepositoryConfiguration;
 import com.compomics.pladipus.repository.config.TestRepositoryConfiguration;
 import com.compomics.pladipus.repository.service.UserService;
@@ -107,7 +107,7 @@ public class UserServiceTest {
 		try {
 			User user1 = userService.login("test_user1", "Password1");
 			assertNotNull(user1);
-			assertEquals(1, user1.getId());
+			assertTrue(user1.getUserId().equals(1L));
 		} catch (PladipusReportableException e) {
 			fail(e.getMessage());
 		}
@@ -163,15 +163,16 @@ public class UserServiceTest {
 	public void testCreateUser() {
 		try {
 			User user = new User();
-			user.setUsername("test_user3");
+			user.setUserName("test_user3");
 			user.setEmail("test@user.three");
-			User createdUser = userService.createUser(user, "Password3");
+			userService.createUser(user, "Password3");
 			// Test that password was encrypted before saving in db
-			assertNotEquals(createdUser.getPasswordEncrypted(), "Password3");
+			assertNotNull(user.getPassword());
+			assertNotEquals(user.getPassword(), "Password3");
 			// Test that defaults set correctly
-			assertTrue(createdUser.isActive());
-			assertFalse(createdUser.isAdmin());
-			assertTrue(createdUser.getId() > 2);
+			assertTrue(user.isActive());
+			assertFalse(user.isAdmin());
+			assertTrue(user.getUserId() > 2L);
 		} catch (PladipusReportableException e) {
 			fail(e.getMessage());
 		}
@@ -182,8 +183,9 @@ public class UserServiceTest {
 		try {
 			User user = new User();
 			userService.createUser(user, "Password4");
+			fail("Should not create user without username");
 		} catch (PladipusReportableException e) {
-			assertTrue(e.getMessage().equals(exceptionMessages.getMessage("db.invalidInsert", "user")));
+			assertTrue(e.getMessage().contains("userName"));
 		}
 	}
 	
@@ -193,11 +195,11 @@ public class UserServiceTest {
 			String oldPasswordEncrypted = "e1STQoRCV9yok7U+mHMVo3oZTHo51VpL";
 			String newPassword = "Password5";
 			User user = userService.getUserByName("test_user1");
-			assertEquals(user.getPasswordEncrypted(), oldPasswordEncrypted);
+			assertEquals(user.getPassword(), oldPasswordEncrypted);
 			userService.changePassword(user, newPassword);
 			// Check that password updated in object, and encrypted
-			assertNotEquals(user.getPasswordEncrypted(), oldPasswordEncrypted);
-			assertNotEquals(user.getPasswordEncrypted(), newPassword);
+			assertNotEquals(user.getPassword(), oldPasswordEncrypted);
+			assertNotEquals(user.getPassword(), newPassword);
 			// Check that user can now login with new password - db updated correctly
 			assertNotNull(userService.login("test_user1", newPassword));
 		} catch (PladipusReportableException e) {

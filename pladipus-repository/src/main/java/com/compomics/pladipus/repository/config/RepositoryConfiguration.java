@@ -21,27 +21,11 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import com.compomics.pladipus.model.core.Default;
-import com.compomics.pladipus.model.core.Parameter;
-import com.compomics.pladipus.model.core.Step;
-import com.compomics.pladipus.model.core.User;
-import com.compomics.pladipus.model.core.Workflow;
-import com.compomics.pladipus.repository.dao.BaseDAO;
-import com.compomics.pladipus.repository.dao.impl.DefaultDAOImpl;
-import com.compomics.pladipus.repository.dao.impl.UserDAO;
-import com.compomics.pladipus.repository.dao.impl.UserDAOImpl;
-import com.compomics.pladipus.repository.dao.impl.UserRoleDAOImpl;
-import com.compomics.pladipus.repository.dao.impl.WorkflowDAOImpl;
-import com.compomics.pladipus.repository.dao.impl.WorkflowGlobalParamDAOImpl;
-import com.compomics.pladipus.repository.dao.impl.WorkflowStepDAOImpl;
-import com.compomics.pladipus.repository.dao.impl.WorkflowStepParamDAOImpl;
 import com.compomics.pladipus.repository.helpers.impl.BasicEncryptor;
-import com.compomics.pladipus.repository.service.DefaultService;
+import com.compomics.pladipus.repository.hibernate.UserRepository;
+import com.compomics.pladipus.repository.hibernate.impl.UserRepositoryImpl;
 import com.compomics.pladipus.repository.service.UserService;
-import com.compomics.pladipus.repository.service.WorkflowService;
-import com.compomics.pladipus.repository.service.impl.DefaultServiceImpl;
 import com.compomics.pladipus.repository.service.impl.UserServiceImpl;
-import com.compomics.pladipus.repository.service.impl.WorkflowServiceImpl;
 import com.compomics.pladipus.shared.config.SharedConfiguration;
 
 @Configuration
@@ -113,10 +97,11 @@ public class RepositoryConfiguration {
 		return new PersistenceExceptionTranslationPostProcessor();
 	}
 	
+	@Bean
 	Properties hibernateProperties() {  
 		return new Properties() {  
 
-			private static final long serialVersionUID = 1L;
+			private static final long serialVersionUID = -1311982616224454610L;
 
 			{  
 				setProperty("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));  
@@ -128,67 +113,13 @@ public class RepositoryConfiguration {
 	
 	@Lazy
 	@Bean
-	public UserDAO hibuserDAO() {
-		return new UserDAO();
+	public UserRepository userRepo() {
+		return new UserRepositoryImpl();
 	}
 	
 	@Lazy
 	@Bean
 	public UserService userService() {
 		return new UserServiceImpl();
-	}
-	
-	@Lazy
-	@Bean
-	public WorkflowService workflowService() {
-		return new WorkflowServiceImpl();
-	}
-	
-	@Lazy
-	@Bean
-	public DefaultService defaultService() {
-		return new DefaultServiceImpl();
-	}
-	
-	@Lazy
-	@Bean
-	public BaseDAO<User> userDAO() {
-		return new UserDAOImpl(dataSource());
-	}
-	
-	@Lazy
-	@Bean
-	public BaseDAO<User> userRoleDAO() {
-		return new UserRoleDAOImpl(dataSource());
-	}
-	
-	@Lazy
-	@Bean
-	public BaseDAO<Workflow> workflowDAO() {
-		return new WorkflowDAOImpl(dataSource());
-	}
-	
-	@Lazy
-	@Bean
-	public BaseDAO<Step> workflowStepDAO() {
-		return new WorkflowStepDAOImpl(dataSource());
-	}
-	
-	@Lazy
-	@Bean
-	public BaseDAO<Default> defaultDAO() {
-		return new DefaultDAOImpl(dataSource());
-	}
-	
-	@Lazy
-	@Bean
-	public BaseDAO<Parameter> workflowGlobalParamDAO() {
-		return new WorkflowGlobalParamDAOImpl(dataSource());
-	}
-	
-	@Lazy
-	@Bean
-	public BaseDAO<Parameter> workflowStepParamDAO() {
-		return new WorkflowStepParamDAOImpl(dataSource());
 	}
 }

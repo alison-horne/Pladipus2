@@ -7,8 +7,11 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
+@NamedQuery(name="User.findByName", query="SELECT t FROM users t WHERE t.userName = :name")
 @Table(name="users")  
 @Entity(name="users")
 public class User {
@@ -17,7 +20,7 @@ public class User {
 	private String email;
 	private String password;
 	private boolean active = true;
-	private Role role;
+	private Role role = Role.USER;
     
     @Id  
     @GeneratedValue(strategy=GenerationType.IDENTITY) 
@@ -56,19 +59,30 @@ public class User {
     }
     
     @Column(name="active", nullable=false)
-    public boolean getActive() {
+    public boolean isActive() {
     	return active;
     }
     public void setActive(boolean active) {
     	this.active = active;
     }
     
-    @Column(name="user_role")
+    @Column(name="user_role", nullable=false)
     @Enumerated(EnumType.STRING)
     public Role getRole() {
         return role;
     }
     public void setRole(Role role) {
     	this.role = role;
+    }
+    public void setAdmin(boolean admin) {
+    	if (admin) {
+    		setRole(Role.ADMIN);
+    	} else {
+    		setRole(Role.USER);
+    	}
+    }
+    @Transient
+    public boolean isAdmin() {
+    	return getRole().equals(Role.ADMIN);
     }
 }

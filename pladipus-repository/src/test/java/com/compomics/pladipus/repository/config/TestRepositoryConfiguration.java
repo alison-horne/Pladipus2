@@ -1,6 +1,7 @@
 package com.compomics.pladipus.repository.config;
 
 import java.sql.Driver;
+import java.util.Properties;
 
 import javax.sql.DataSource;
 
@@ -9,7 +10,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.jdbc.datasource.embedded.ConnectionProperties;
 import org.springframework.jdbc.datasource.embedded.DataSourceFactory;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
@@ -19,20 +19,9 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 @Configuration
 public class TestRepositoryConfiguration {
 	
-	private String[] initScripts = new String[] {
-			"initDb.sql",
-			"insertTestUsers.sql",
-			"insertTestWorkflows.sql",
-			"insertTestDefaults.sql"
-	};
-	
 	@Bean
 	public DataSource dataSource() {
-
-		EmbeddedDatabase source = getEmbeddedDatabaseBuilder()
-			.setType(EmbeddedDatabaseType.H2)
-			.build();
-		return source;
+		return getEmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).build();
 	}
 	
 	private EmbeddedDatabaseBuilder getEmbeddedDatabaseBuilder() {
@@ -52,16 +41,7 @@ public class TestRepositoryConfiguration {
                     }
                     
                     private String getUrlString() {
-                    	StringBuilder builder = new StringBuilder();
-                    	builder.append("jdbc:h2:mem:testdb;DATABASE_TO_UPPER=false;MODE=mysql;");
-                    	builder.append("INIT=");
-                    	for (int i = 0; i < initScripts.length; i++) {
-                    		builder.append("RUNSCRIPT FROM 'classpath:");
-                    		builder.append(initScripts[i]);
-                    		builder.append("'\\;");
-                    	}
-                    	builder.append("SET SCHEMA pladipus2");
-                    	return builder.toString();
+                    	return "jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false";
                     }
                     
 					@Override
@@ -82,4 +62,19 @@ public class TestRepositoryConfiguration {
             }
         });
     }
+
+	@Bean
+	Properties hibernateProperties() {  
+		return new Properties() {  
+			
+			static final long serialVersionUID = 4456554488993955458L;
+
+			{  
+				setProperty("hibernate.hbm2ddl.auto", "create");
+				setProperty("hibernate.hbm2ddl.import_files", "insertTestUsers.sql");
+				setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");  
+				setProperty("hibernate.globally_quoted_identifiers", "true");
+		    }  
+		};  
+	} 
 }

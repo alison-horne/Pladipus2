@@ -2,7 +2,7 @@ package com.compomics.pladipus.repository.service;
 
 import java.util.List;
 
-import com.compomics.pladipus.model.core.User;
+import com.compomics.pladipus.model.hibernate.User;
 import com.compomics.pladipus.shared.PladipusReportableException;
 
 /**
@@ -15,10 +15,9 @@ public interface UserService {
 	 * 
 	 * @param user, a User object with all fields set as necessary except for ID and password
 	 * @param password - unencrypted, will be encrypted before committing to database
-	 * @return created user, with ID set
 	 * @throws PladipusReportableException if user is invalid, or there is an error inserting data in database
 	 */
-	public User createUser(User user, String password) throws PladipusReportableException;
+	public void createUser(User user, String password) throws PladipusReportableException;
 		
 	/**
 	 * Look up database for user with given username
