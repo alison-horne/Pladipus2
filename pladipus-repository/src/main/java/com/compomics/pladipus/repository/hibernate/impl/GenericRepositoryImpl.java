@@ -34,7 +34,7 @@ public abstract class GenericRepositoryImpl<T> implements GenericRepository<T> {
     	try {
     		entityManager.persist(t);
     	} catch (Exception e) {
-    		throw new PladipusReportableException(exceptionMessages.getMessage("db.insertError", entityClass.getSimpleName(), getExceptionCause(e)));
+    		throw new PladipusReportableException(exceptionMessages.getMessage("db.insertError", entityClass.getSimpleName(), e.getMessage()));
     	}
 	}
 	
@@ -43,19 +43,27 @@ public abstract class GenericRepositoryImpl<T> implements GenericRepository<T> {
 		try {
 			entityManager.merge(t);
 		} catch (Exception e) {
-			throw new PladipusReportableException(exceptionMessages.getMessage("db.updateError", getExceptionCause(e)));
+			throw new PladipusReportableException(exceptionMessages.getMessage("db.updateError", e.getMessage()));
 		}
 	}
     
     @Override
-    public List<T> findAll() {
+    public List<T> findAll() throws PladipusReportableException {
     	String q = "SELECT t FROM " + entityClass.getName() + " t";
-    	return entityManager.createQuery(q, entityClass).getResultList();
+    	try {
+    		return entityManager.createQuery(q, entityClass).getResultList();
+    	} catch (Exception e) {
+    		throw new PladipusReportableException(exceptionMessages.getMessage("db.errorGetQuery", e.getMessage()));
+    	}
     }
     
     @Override
-    public T findById(final Long id) {
-        return entityManager.find(entityClass, id);
+    public T findById(final Long id) throws PladipusReportableException {
+    	try {
+    		return entityManager.find(entityClass, id);
+    	} catch (Exception e) {
+    		throw new PladipusReportableException(exceptionMessages.getMessage("db.errorGetQuery", e.getMessage()));
+    	}
     }
     
     protected TypedQuery<T> getNamedQuery(final String queryName) {
@@ -70,11 +78,15 @@ public abstract class GenericRepositoryImpl<T> implements GenericRepository<T> {
     	} catch (NonUniqueResultException e) {
 			throw new PladipusReportableException(exceptionMessages.getMessage("db.nonUniqueGet", entityClass.getSimpleName()));
 		} catch (Exception e) {
-			throw new PladipusReportableException(exceptionMessages.getMessage("db.invalidGetQuery", getExceptionCause(e)));
+			throw new PladipusReportableException(exceptionMessages.getMessage("db.errorGetQuery", e.getMessage()));
 		}
     }
     
-	protected String getExceptionCause(Exception e) {
-		return (e.getCause() != null) ? e.getCause().getMessage() : e.getMessage();
-	}
+    protected List<T> getResultsList(TypedQuery<T> query) throws PladipusReportableException {
+    	try {
+    		return query.getResultList();
+    	} catch (Exception e) {
+    		throw new PladipusReportableException(exceptionMessages.getMessage("db.errorGetQuery", e.getMessage()));
+    	}
+    }
 }

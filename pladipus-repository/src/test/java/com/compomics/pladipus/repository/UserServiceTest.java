@@ -38,6 +38,9 @@ public class UserServiceTest {
 	
 	@Autowired
 	private PladipusMessages exceptionMessages;
+	
+	private static final String USER1 = "test_user1";
+	private static final String USER2 = "test_user2";
 
 	@Test
 	public void testGetAllUsers() {
@@ -61,7 +64,7 @@ public class UserServiceTest {
 	@Test
 	public void testGetUserByName() {
 		try {
-			User user1 = userService.getUserByName("test_user1");
+			User user1 = userService.getUserByName(USER1);
 			assertNotNull(user1);
 			// Check some user variables to make sure it's the correct user
 			assertEquals("test@user.one", user1.getEmail());
@@ -85,7 +88,7 @@ public class UserServiceTest {
 	@Test
 	public void testLoginWrongPasswordThrowsException() {
 		try {
-			userService.login("test_user1", "wrongpassword");
+			userService.login(USER1, "wrongpassword");
 			fail("Login should throw exception if invalid password");
 		} catch (PladipusReportableException e) {
 			assertTrue(e.getMessage().equals(exceptionMessages.getMessage("db.wrongPassword")));
@@ -95,7 +98,7 @@ public class UserServiceTest {
 	@Test
 	public void testLoginInactiveUserThrowsException() {
 		try {
-			userService.login("test_user2", "Password2");
+			userService.login(USER2, "Password2");
 			fail("Login should throw exception if user inactive");
 		} catch (PladipusReportableException e) {
 			assertTrue(e.getMessage().equals(exceptionMessages.getMessage("db.userInactive")));
@@ -105,7 +108,7 @@ public class UserServiceTest {
 	@Test
 	public void testCorrectLogin() {
 		try {
-			User user1 = userService.login("test_user1", "Password1");
+			User user1 = userService.login(USER1, "Password1");
 			assertNotNull(user1);
 			assertTrue(user1.getUserId().equals(1L));
 		} catch (PladipusReportableException e) {
@@ -117,8 +120,8 @@ public class UserServiceTest {
 	public void testSetActive() {
 		try {
 			// test_user1 is initially setup as active, test_user2 inactive
-			User user1 = userService.getUserByName("test_user1");
-			User user2 = userService.getUserByName("test_user2");
+			User user1 = userService.getUserByName(USER1);
+			User user2 = userService.getUserByName(USER2);
 			assertTrue(user1.isActive());
 			assertFalse(user2.isActive());
 			userService.setActive(user1, false);
@@ -127,8 +130,8 @@ public class UserServiceTest {
 			assertFalse(user1.isActive());
 			assertTrue(user2.isActive());
 			// Get objects from database again to check db updated
-			user1 = userService.getUserByName("test_user1");
-			user2 = userService.getUserByName("test_user2");
+			user1 = userService.getUserByName(USER1);
+			user2 = userService.getUserByName(USER2);
 			assertFalse(user1.isActive());
 			assertTrue(user2.isActive());
 		} catch (PladipusReportableException e) {
@@ -140,8 +143,8 @@ public class UserServiceTest {
 	public void testSetAdmin() {
 		try {
 			// test_user1 is initially setup as an admin, test_user2 as user
-			User user1 = userService.getUserByName("test_user1");
-			User user2 = userService.getUserByName("test_user2");
+			User user1 = userService.getUserByName(USER1);
+			User user2 = userService.getUserByName(USER2);
 			assertTrue(user1.isAdmin());
 			assertFalse(user2.isAdmin());
 			userService.setAdmin(user1, false);
@@ -150,8 +153,8 @@ public class UserServiceTest {
 			assertFalse(user1.isAdmin());
 			assertTrue(user2.isAdmin());
 			// Get objects from database again to check db updated
-			user1 = userService.getUserByName("test_user1");
-			user2 = userService.getUserByName("test_user2");
+			user1 = userService.getUserByName(USER1);
+			user2 = userService.getUserByName(USER2);
 			assertFalse(user1.isAdmin());
 			assertTrue(user2.isAdmin());
 		} catch (PladipusReportableException e) {
@@ -190,18 +193,30 @@ public class UserServiceTest {
 	}
 	
 	@Test
+	public void testCreateUserSameName() {
+		try {
+			User user = new User();
+			user.setUserName(USER1);
+			userService.createUser(user, "Password5");
+			fail("Should not create user with duplicate username");
+		} catch (PladipusReportableException e) {
+			assertTrue(e.getMessage().equals(exceptionMessages.getMessage("db.userExists")));
+		}
+	}
+	
+	@Test
 	public void testChangePassword() {
 		try {
 			String oldPasswordEncrypted = "e1STQoRCV9yok7U+mHMVo3oZTHo51VpL";
 			String newPassword = "Password5";
-			User user = userService.getUserByName("test_user1");
+			User user = userService.getUserByName(USER1);
 			assertEquals(user.getPassword(), oldPasswordEncrypted);
 			userService.changePassword(user, newPassword);
 			// Check that password updated in object, and encrypted
 			assertNotEquals(user.getPassword(), oldPasswordEncrypted);
 			assertNotEquals(user.getPassword(), newPassword);
 			// Check that user can now login with new password - db updated correctly
-			assertNotNull(userService.login("test_user1", newPassword));
+			assertNotNull(userService.login(USER1, newPassword));
 		} catch (PladipusReportableException e) {
 			fail(e.getMessage());
 		}

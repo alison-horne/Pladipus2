@@ -22,9 +22,13 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.compomics.pladipus.repository.helpers.impl.BasicEncryptor;
+import com.compomics.pladipus.repository.hibernate.DefaultRepository;
 import com.compomics.pladipus.repository.hibernate.UserRepository;
+import com.compomics.pladipus.repository.hibernate.impl.DefaultRepositoryImpl;
 import com.compomics.pladipus.repository.hibernate.impl.UserRepositoryImpl;
+import com.compomics.pladipus.repository.service.DefaultService;
 import com.compomics.pladipus.repository.service.UserService;
+import com.compomics.pladipus.repository.service.impl.DefaultServiceImpl;
 import com.compomics.pladipus.repository.service.impl.UserServiceImpl;
 import com.compomics.pladipus.shared.config.SharedConfiguration;
 
@@ -121,5 +125,17 @@ public class RepositoryConfiguration {
 	@Bean
 	public UserService userService() {
 		return new UserServiceImpl();
+	}
+	
+	@Lazy
+	@Bean
+	public DefaultRepository defaultRepo() {
+		return new DefaultRepositoryImpl();
+	}
+	
+	@Lazy
+	@Bean
+	public DefaultService defaultService() {
+		return new DefaultServiceImpl();
 	}
 }

@@ -2,7 +2,8 @@ package com.compomics.pladipus.repository.service;
 
 import java.util.List;
 
-import com.compomics.pladipus.model.core.Default;
+import com.compomics.pladipus.model.hibernate.Default;
+import com.compomics.pladipus.model.hibernate.User;
 import com.compomics.pladipus.shared.PladipusReportableException;
 
 /**
@@ -14,10 +15,9 @@ public interface DefaultService {
 	 * Insert a new default into the database
 	 * 
 	 * @param def - Default object to insert into the database
-	 * @return Updated default object, with ID
 	 * @throws PladipusReportableException if default already exists, or if database insert fails.
 	 */
-	public Default insertDefault(Default def) throws PladipusReportableException;
+	public void insertDefault(Default def) throws PladipusReportableException;
 	
 	/**
 	 * Add or change a type on an existing default
@@ -31,9 +31,18 @@ public interface DefaultService {
 	/**
 	 * Get defaults for given user ID, as well as general defaults with no user ID set
 	 * 
-	 * @param userId (-1 to get general defaults only)
+	 * @param user (null to get general defaults only)
 	 * @return List of Default objects
-	 * @throws PladipusReportableException
+	 * @throws PladipusReportableException 
 	 */
-	public List<Default> getDefaultsForUser(int userId) throws PladipusReportableException;
+	public List<Default> getDefaultsForUser(User user) throws PladipusReportableException;
+
+	/**
+	 * Find default by ID.
+	 * 
+	 * @param id
+	 * @return Default object
+	 * @throws PladipusReportableException 
+	 */
+	public Default getDefaultById(Long id) throws PladipusReportableException;
 }

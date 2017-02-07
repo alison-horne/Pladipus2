@@ -26,6 +26,9 @@ public class UserServiceImpl implements UserService {
 	@Transactional(rollbackFor={Exception.class})
 	@Override
 	public void createUser(User user, String password) throws PladipusReportableException {
+		if (user.getUserName() != null && getUserByName(user.getUserName()) != null) {
+			throw new PladipusReportableException(exceptionMessages.getMessage("db.userExists"));
+		}
 		user.setPassword(basicEncryptor.encryptPassword(password));
 		userRepo.persist(user);
 	}

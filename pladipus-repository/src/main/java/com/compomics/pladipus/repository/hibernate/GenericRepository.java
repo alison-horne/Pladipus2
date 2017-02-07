@@ -8,6 +8,6 @@ public interface GenericRepository<T> {
 
 	void persist(T t) throws PladipusReportableException;
 	void merge(T t) throws PladipusReportableException;
-	List<T> findAll();
-	T findById(final Long id);
+	List<T> findAll() throws PladipusReportableException;
+	T findById(final Long id) throws PladipusReportableException;
 }

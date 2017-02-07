@@ -7,7 +7,6 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -17,14 +16,12 @@ import org.springframework.test.context.support.DirtiesContextTestExecutionListe
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.compomics.pladipus.model.core.Default;
-import com.compomics.pladipus.model.db.DefaultsColumn;
 import com.compomics.pladipus.shared.PladipusMessages;
 import com.compomics.pladipus.shared.PladipusReportableException;
+import com.compomics.pladipus.model.hibernate.Default;
+import com.compomics.pladipus.model.hibernate.User;
 import com.compomics.pladipus.repository.config.RepositoryConfiguration;
 import com.compomics.pladipus.repository.config.TestRepositoryConfiguration;
-import com.compomics.pladipus.repository.dao.BaseDAO;
-import com.compomics.pladipus.repository.dao.Query;
 import com.compomics.pladipus.repository.service.DefaultService;
 
 /**
@@ -41,23 +38,28 @@ public class DefaultServiceTest {
 	private DefaultService defaultService;
 	
 	@Autowired
-	private BaseDAO<Default> defaultDAO;
-	
-	@Autowired
 	private PladipusMessages exceptionMessages;
 	
-	private static final int USER1 = 1;
-	private static final int USER2 = 2;
+	private static User USER1;
+	private static User USER2;
+	
+	static {
+		USER1 = new User();
+		USER2 = new User();
+		USER1.setUserId(1L);
+		USER2.setUserId(2L);
+	}
+
 	private static final String NAME1 = "default1";
 	private static final String NAME2 = "default2";
 	
 	@Test
-	public void testInsertFailWithDefaultSameNameForUser() throws PladipusReportableException {
+	public void testInsertFailWithDefaultSameNameForUser() {
 		try {
 			Default def = new Default();
 			def.setName(NAME1);
 			def.setValue("value");
-			def.setUserId(USER1);
+			def.setUser(USER1);
 			defaultService.insertDefault(def);
 			fail("Should not insert default with same name");
 		} catch (PladipusReportableException e) {
@@ -66,12 +68,12 @@ public class DefaultServiceTest {
 	}
 	
 	@Test
-	public void testInsertFailWithDefaultSameNameNullUser() throws PladipusReportableException {
+	public void testInsertFailWithDefaultSameNameNullUser() {
 		try {
 			Default def = new Default();
 			def.setName(NAME2);
 			def.setValue("value");
-			def.setUserId(USER1);
+			def.setUser(USER1);
 			defaultService.insertDefault(def);
 			fail("Should not insert default with same name");
 		} catch (PladipusReportableException e) {
@@ -80,87 +82,87 @@ public class DefaultServiceTest {
 	}
 	
 	@Test
-	public void testInsertSuccessWithDefaultSameNameDifferentUser() throws PladipusReportableException {
+	public void testInsertSuccessWithDefaultSameNameDifferentUser() {
 		try {
 			Default def = new Default();
 			def.setName(NAME1);
 			def.setValue("value");
-			def.setUserId(USER2);
-			assertEquals(-1, def.getId());
+			def.setUser(USER2);
+			assertNull(def.getDefaultId());
 			defaultService.insertDefault(def);
-			assertNotEquals(-1, def.getId());
+			assertNotNull(def.getDefaultId());
+			assertTrue(def.getDefaultId() > 3);
 		} catch (PladipusReportableException e) {
 			fail("Failed to insert default: " + e.getMessage());
 		}
 	}
 	
 	@Test
-	public void testInsertSuccessWithDefaultNewName() throws PladipusReportableException {
+	public void testInsertSuccessWithDefaultNewName() {
 		try {
 			Default def = new Default();
 			def.setName("New_name");
 			def.setValue("value");
-			def.setUserId(USER1);
+			def.setUser(USER1);
 			def.setType("type");
-			assertEquals(-1, def.getId());
+			assertNull(def.getDefaultId());
 			defaultService.insertDefault(def);
-			assertNotEquals(-1, def.getId());
+			assertNotNull(def.getDefaultId());
+			assertTrue(def.getDefaultId() > 3);
 		} catch (PladipusReportableException e) {
 			fail("Failed to insert default: " + e.getMessage());
 		}
 	}
 	
 	@Test
-	public void testAddTypeNoneAlreadySet() throws PladipusReportableException {
+	public void testAddTypeNoneAlreadySet() {
 		try {
-			Default def = getDefaultFromDB(1);
+			Default def = defaultService.getDefaultById(1L);
 			assertNull(def.getType());
 			defaultService.addType(def, "type");
 			assertEquals("type", def.getType());
-			assertEquals("type", getDefaultFromDB(1).getType());
 		} catch (PladipusReportableException e) {
 			fail("Failed to add type: " + e.getMessage());
 		}
 	}
 	
 	@Test
-	public void testUpdateTypeAlreadySet() throws PladipusReportableException {
+	public void testUpdateTypeAlreadySet() {
 		try {
-			Default def = getDefaultFromDB(3);
+			Default def = defaultService.getDefaultById(3L);
 			assertEquals("type3", def.getType());
 			defaultService.addType(def, "type");
 			assertEquals("type", def.getType());
-			assertEquals("type", getDefaultFromDB(3).getType());
 		} catch (PladipusReportableException e) {
 			fail("Failed to add type: " + e.getMessage());
 		}
 	}
 	
 	@Test
-	public void testGetDefaultsReturnsNullUser() throws PladipusReportableException {
+	public void testGetDefaultsReturnsNullUser() {
 		try {
 			List<Default> defaults = defaultService.getDefaultsForUser(USER2);
 			assertEquals(1, defaults.size());
-			assertEquals(2, defaults.get(0).getId());
+			assertTrue(defaults.get(0).getDefaultId().equals(2L));
 		} catch (PladipusReportableException e) {
 			fail("Failed to get defaults: " + e.getMessage());
 		}
 	}
 	
 	@Test
-	public void testGetDefaultsReturnsUserAndNullUser() throws PladipusReportableException {
+	public void testGetDefaultsReturnsUserAndNullUser() {
 		try {
 			List<Default> defaults = defaultService.getDefaultsForUser(USER1);
 			assertEquals(3, defaults.size());
 			for (Default def: defaults) {
-				if (def.getId() == 2) {
+				if (def.getDefaultId() == 2L) {
 					// Null user
-					assertEquals(-1, def.getUserId());
-				} else if (def.getId() == 1 || def.getId() == 3) {
+					assertNull(def.getUser());
+				} else if (def.getDefaultId() == 1L || def.getDefaultId() == 3L) {
 					// User 1
-					assertEquals(1, def.getUserId());
+					assertTrue(def.getUser().getUserId().equals(1L));
 				} else {
-					fail("Unexpected default returned, id: " + def.getId());
+					fail("Unexpected default returned, id: " + def.getDefaultId());
 				}
 			}
 		} catch (PladipusReportableException e) {
@@ -168,10 +170,43 @@ public class DefaultServiceTest {
 		}
 	}
 	
-	private Default getDefaultFromDB(int defId) throws PladipusReportableException {
-		Query query = new Query();
-		query.setWhereClause("WHERE " + DefaultsColumn.DEFAULT_ID.name() + " = :defId");
-		query.setParameters(new MapSqlParameterSource().addValue("defId", defId));
-		return defaultDAO.get(query);
+	@Test
+	public void testAddGlobalDefault() {
+		try {
+			Default def = new Default();
+			def.setName("NewDefault");
+			def.setValue("NewValue");
+			assertNull(def.getDefaultId());
+			defaultService.insertDefault(def);
+			assertNotNull(def.getDefaultId());
+		} catch (PladipusReportableException e) {
+			fail("Failed to add global default: " + e.getMessage());
+		}
+	}
+	
+	@Test
+	public void testAddGlobalDefaultFailWithSameName() {
+		try {
+			Default def = new Default();
+			def.setName(NAME2);
+			def.setValue("NewValue");
+			defaultService.insertDefault(def);
+			fail("Should not be able to insert default with same name");
+		} catch (PladipusReportableException e) {
+			assertEquals(exceptionMessages.getMessage("db.defaultExists", NAME2), e.getMessage());
+		}
+	}
+	
+	@Test
+	public void testAddGlobalDefaultFailWithSameNameAsUserDefault() {
+		try {
+			Default def = new Default();
+			def.setName(NAME1);
+			def.setValue("NewValue");
+			defaultService.insertDefault(def);
+			fail("Should not be able to insert default with same name");
+		} catch (PladipusReportableException e) {
+			assertEquals(exceptionMessages.getMessage("db.defaultExists", NAME1), e.getMessage());
+		}
 	}
 }
