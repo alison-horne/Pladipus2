@@ -1,4 +1,4 @@
-package com.compomics.pladipus.model.hibernate;
+package com.compomics.pladipus.model.persist;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,7 +11,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.Table;
 
-import com.compomics.pladipus.model.hibernate.User;
+import com.compomics.pladipus.model.persist.User;
 
 @Table(name="user_defaults")  
 @Entity(name="user_defaults")

@@ -1,4 +1,4 @@
-package com.compomics.pladipus.model.hibernate;
+package com.compomics.pladipus.model.persist;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

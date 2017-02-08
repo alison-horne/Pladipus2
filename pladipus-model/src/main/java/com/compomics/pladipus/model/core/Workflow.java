@@ -8,8 +8,6 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.compomics.pladipus.model.db.WorkflowsColumn;
-
 /**
  * Workflow template
  */
@@ -47,7 +45,6 @@ public class Workflow extends UpdateTracked {
 	}
 	public void setActive(boolean active) {
 		this.active = active;
-		trackColumn(WorkflowsColumn.ACTIVE.name());
 	}
 	public int getId() {
 		return id;
