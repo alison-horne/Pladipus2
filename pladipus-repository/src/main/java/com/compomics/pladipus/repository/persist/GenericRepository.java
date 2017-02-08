@@ -1,4 +1,4 @@
-package com.compomics.pladipus.repository.hibernate;
+package com.compomics.pladipus.repository.persist;
 
 import java.util.List;
 

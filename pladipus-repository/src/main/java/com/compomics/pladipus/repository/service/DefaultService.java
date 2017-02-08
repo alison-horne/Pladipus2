@@ -2,8 +2,8 @@ package com.compomics.pladipus.repository.service;
 
 import java.util.List;
 
-import com.compomics.pladipus.model.hibernate.Default;
-import com.compomics.pladipus.model.hibernate.User;
+import com.compomics.pladipus.model.persist.Default;
+import com.compomics.pladipus.model.persist.User;
 import com.compomics.pladipus.shared.PladipusReportableException;
 
 /**

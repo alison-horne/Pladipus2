@@ -11,9 +11,9 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-@NamedQuery(name="User.findByName", query="SELECT t FROM users t WHERE t.userName = :name")
 @Table(name="users")  
 @Entity(name="users")
+@NamedQuery(name="User.findByName", query="SELECT t FROM users t WHERE t.userName = :name")
 public class User {
 	private Long userId;
 	private String userName;

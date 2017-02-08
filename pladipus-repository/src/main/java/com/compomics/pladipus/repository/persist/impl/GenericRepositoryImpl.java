@@ -1,4 +1,4 @@
-package com.compomics.pladipus.repository.hibernate.impl;
+package com.compomics.pladipus.repository.persist.impl;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ import javax.persistence.TypedQuery;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.compomics.pladipus.repository.hibernate.GenericRepository;
+import com.compomics.pladipus.repository.persist.GenericRepository;
 import com.compomics.pladipus.shared.PladipusMessages;
 import com.compomics.pladipus.shared.PladipusReportableException;
 

@@ -14,6 +14,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -55,6 +57,10 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "template")
 @Table(name="workflows")  
 @Entity(name="workflows")
+@NamedQueries({
+	@NamedQuery(name="Workflow.activeForUser", query="SELECT w FROM workflows w WHERE w.user = :user AND w.active = true"),
+	@NamedQuery(name="Workflow.namedActiveForUser", query="SELECT w FROM workflows w WHERE w.name = :name AND w.user = :user AND w.active = true")
+})
 public class Workflow {
 
     protected Global global;

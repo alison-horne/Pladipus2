@@ -7,9 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.compomics.pladipus.shared.PladipusMessages;
 import com.compomics.pladipus.shared.PladipusReportableException;
-import com.compomics.pladipus.model.hibernate.User;
+import com.compomics.pladipus.model.persist.User;
 import com.compomics.pladipus.repository.helpers.PasswordEncryptor;
-import com.compomics.pladipus.repository.hibernate.UserRepository;
+import com.compomics.pladipus.repository.persist.UserRepository;
 import com.compomics.pladipus.repository.service.UserService;
 
 public class UserServiceImpl implements UserService {

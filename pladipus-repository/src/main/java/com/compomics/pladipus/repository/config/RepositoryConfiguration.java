@@ -22,14 +22,18 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.compomics.pladipus.repository.helpers.impl.BasicEncryptor;
-import com.compomics.pladipus.repository.hibernate.DefaultRepository;
-import com.compomics.pladipus.repository.hibernate.UserRepository;
-import com.compomics.pladipus.repository.hibernate.impl.DefaultRepositoryImpl;
-import com.compomics.pladipus.repository.hibernate.impl.UserRepositoryImpl;
+import com.compomics.pladipus.repository.persist.DefaultRepository;
+import com.compomics.pladipus.repository.persist.UserRepository;
+import com.compomics.pladipus.repository.persist.WorkflowRepository;
+import com.compomics.pladipus.repository.persist.impl.DefaultRepositoryImpl;
+import com.compomics.pladipus.repository.persist.impl.UserRepositoryImpl;
+import com.compomics.pladipus.repository.persist.impl.WorkflowRepositoryImpl;
 import com.compomics.pladipus.repository.service.DefaultService;
 import com.compomics.pladipus.repository.service.UserService;
+import com.compomics.pladipus.repository.service.WorkflowService;
 import com.compomics.pladipus.repository.service.impl.DefaultServiceImpl;
 import com.compomics.pladipus.repository.service.impl.UserServiceImpl;
+import com.compomics.pladipus.repository.service.impl.WorkflowServiceImpl;
 import com.compomics.pladipus.shared.config.SharedConfiguration;
 
 @Configuration
@@ -80,7 +84,7 @@ public class RepositoryConfiguration {
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
 	   LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
 	   em.setDataSource(dataSource());
-	   em.setPackagesToScan(new String[] { "com.compomics.pladipus.model.hibernate" });
+	   em.setPackagesToScan(new String[] { "com.compomics.pladipus.model.persist" });
 	   JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
 	   em.setJpaVendorAdapter(vendorAdapter);
 	   em.setJpaProperties(hibernateProperties());
@@ -137,5 +141,17 @@ public class RepositoryConfiguration {
 	@Bean
 	public DefaultService defaultService() {
 		return new DefaultServiceImpl();
+	}
+	
+	@Lazy
+	@Bean
+	public WorkflowRepository workflowRepo() {
+		return new WorkflowRepositoryImpl();
+	}
+	
+	@Lazy
+	@Bean
+	public WorkflowService workflowService() {
+		return new WorkflowServiceImpl();
 	}
 }
