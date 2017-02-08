@@ -30,6 +30,7 @@ import com.compomics.pladipus.base.test.config.MockBaseConfiguration;
 import com.compomics.pladipus.client.config.ClientConfiguration;
 import com.compomics.pladipus.client.config.MockClientConfiguration;
 import com.compomics.pladipus.model.core.TaskStatus;
+import com.compomics.pladipus.model.persist.User;
 import com.compomics.pladipus.shared.PladipusReportableException;
 
 /**
@@ -44,7 +45,11 @@ public class CliTest {
 	
 	private static final String USER = "username";
 	private static final String PASSWORD = "password";
-	private static final int USERID = 1;
+	private static User USER1;
+	static {
+		USER1 = new User();
+		USER1.setUserId(1L);
+	}
 	
 	@Before
 	public void setUp() {
@@ -76,7 +81,7 @@ public class CliTest {
 	public void testWorker() {		
 		try {
 			runCliWithUser("-w");
-			Mockito.verify(workerControl).startWorker(USERID);
+			Mockito.verify(workerControl).startWorker(USER1);
 		} catch (PladipusReportableException e) {
 			Assert.fail("Failed to start worker: " + e.getMessage());
 		}
@@ -86,7 +91,7 @@ public class CliTest {
 	public void testTemplateCreate() {
 		try {
 			runCliWithUser("-t filename");
-			Mockito.verify(workflowControl).createWorkflow("filename", USERID);
+			Mockito.verify(workflowControl).createWorkflow("filename", USER1);
 		} catch (PladipusReportableException e) {
 			Assert.fail("Failed template create: " + e.getMessage());
 		}
@@ -96,7 +101,7 @@ public class CliTest {
 	public void testTemplateReplace() {
 		try {
 			runCliWithUser("-t filename -f");
-			Mockito.verify(workflowControl).replaceWorkflow("filename", USERID);
+			Mockito.verify(workflowControl).replaceWorkflow("filename", USER1);
 		} catch (PladipusReportableException e) {
 			Assert.fail("Failed template create: " + e.getMessage());
 		}
@@ -106,7 +111,7 @@ public class CliTest {
 	public void testBatchAdd() {
 		try {
 			runCliWithUser("-b file -W workflow");
-			Mockito.verify(batchControl).createBatch("file", "workflow", null, USERID);
+			Mockito.verify(batchControl).createBatch("file", "workflow", null, USER1);
 		} catch (PladipusReportableException e) {
 			Assert.fail("Failed batch add: " + e.getMessage());
 		}
@@ -116,7 +121,7 @@ public class CliTest {
 	public void testBatchUpdate() {
 		try {
 			runCliWithUser("-b file -W workflow -B batchname -f");
-			Mockito.verify(batchControl).replaceBatch("file", "workflow", "batchname", USERID);
+			Mockito.verify(batchControl).replaceBatch("file", "workflow", "batchname", USER1);
 		} catch (PladipusReportableException e) {
 			Assert.fail("Failed batch update: " + e.getMessage());
 		}
@@ -126,7 +131,7 @@ public class CliTest {
 	public void testGenerateHeaders() {
 		try {
 			runCliWithUser("-g file --workflow workflow");
-			Mockito.verify(batchControl).generateHeaders("file", "workflow", USERID, false);
+			Mockito.verify(batchControl).generateHeaders("file", "workflow", USER1, false);
 		} catch (PladipusReportableException e) {
 			Assert.fail("Failed header generate: " + e.getMessage());
 		}
@@ -136,7 +141,7 @@ public class CliTest {
 	public void testProcessAll() {
 		try {
 			runCliWithUser("-p");
-			Mockito.verify(queueControl).process(null, USERID);
+			Mockito.verify(queueControl).process(null, USER1);
 		} catch (PladipusReportableException e) {
 			Assert.fail("Failed process all: " + e.getMessage());
 		}
@@ -146,7 +151,7 @@ public class CliTest {
 	public void testRestartBatch() {
 		try {
 			runCliWithUser("-r batchname");
-			Mockito.verify(queueControl).restart("batchname", USERID);
+			Mockito.verify(queueControl).restart("batchname", USER1);
 		} catch (PladipusReportableException e) {
 			Assert.fail("Failed restart batch: " + e.getMessage());
 		}
@@ -155,9 +160,9 @@ public class CliTest {
 	@Test
 	public void testStatusBatch() {
 		try {
-			Mockito.when(queueControl.status("batchname", USERID)).thenReturn(new TaskStatus());
+			Mockito.when(queueControl.status("batchname", USER1)).thenReturn(new TaskStatus());
 			runCliWithUser("-s batchname");
-			Mockito.verify(queueControl).status("batchname", USERID);
+			Mockito.verify(queueControl).status("batchname", USER1);
 		} catch (PladipusReportableException e) {
 			Assert.fail("Failed status: " + e.getMessage());
 		}
@@ -167,7 +172,7 @@ public class CliTest {
 	public void testAbortBatch() {
 		try {
 			runCliWithUser("-a batchname");
-			Mockito.verify(queueControl).abort("batchname", USERID);
+			Mockito.verify(queueControl).abort("batchname", USER1);
 		} catch (PladipusReportableException e) {
 			Assert.fail("Failed batch abort: " + e.getMessage());
 		}
@@ -177,7 +182,7 @@ public class CliTest {
 	public void testAbortAll() {
 		try {
 			runCliWithUser("-a");
-			Mockito.verify(queueControl).abort(null, USERID);
+			Mockito.verify(queueControl).abort(null, USER1);
 		} catch (PladipusReportableException e) {
 			Assert.fail("Failed all abort: " + e.getMessage());
 		}
@@ -187,7 +192,7 @@ public class CliTest {
 	public void testAddDefaultWithType() {
 		try {
 			runCliWithUser("--default name --value val -T type");
-			Mockito.verify(defaultsControl).addDefault("name", "val", "type", USERID);
+			Mockito.verify(defaultsControl).addDefault("name", "val", "type", USER1);
 		} catch (PladipusReportableException e) {
 			Assert.fail("Failed default add: " + e.getMessage());
 		}
@@ -211,10 +216,10 @@ public class CliTest {
 	}
 	
 	private void runCliWithUser(String argString) throws PladipusReportableException {
-		Mockito.when(userControl.getUserId()).thenReturn(USERID);
+		Mockito.when(userControl.getLoggedInUser()).thenReturn(USER1);
 		runCli(argString + " -u " + USER + " -P " + PASSWORD);
 		checkLogin();
-		Mockito.verify(userControl).getUserId();
+		Mockito.verify(userControl).getLoggedInUser();
 		Mockito.verify(cmdLineIO).printOutput(Mockito.anyString());
 	}
 	

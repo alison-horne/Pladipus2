@@ -217,56 +217,56 @@ public class MainCLI implements Alert {
 	//TODO move tasks into separate class shared by GUI code
 	private void doWorkerTask() throws PladipusReportableException {
 		cmdLineIO.printOutput(cmdLine.getString("worker.start"));
-		workerControl.startWorker(userControl.getUserId());
+		workerControl.startWorker(userControl.getLoggedInUser());
 		//TODO output text - worker processing to update user on what it's doing.  Make sure it's kept alive, no ActiveMQ timeout hanging deaths
 	}
 	
 	private void doTemplateTask() throws PladipusReportableException {
 		if (force) {
-			workflowControl.replaceWorkflow(xmlFile, userControl.getUserId());
+			workflowControl.replaceWorkflow(xmlFile, userControl.getLoggedInUser());
 			cmdLineIO.printOutput(cmdLine.getString("workflow.updated"));
 		} else {
-			workflowControl.createWorkflow(xmlFile, userControl.getUserId());
+			workflowControl.createWorkflow(xmlFile, userControl.getLoggedInUser());
 			cmdLineIO.printOutput(cmdLine.getString("workflow.created"));
 		}
 	}
 	
 	private void doBatchTask() throws PladipusReportableException {
 		if (force) {
-			batchControl.replaceBatch(batchFile, workflowName, batchName, userControl.getUserId());
+			batchControl.replaceBatch(batchFile, workflowName, batchName, userControl.getLoggedInUser());
 			cmdLineIO.printOutput(cmdLine.getString("batch.updated"));
 		} else {
-			batchControl.createBatch(batchFile, workflowName, batchName, userControl.getUserId());
+			batchControl.createBatch(batchFile, workflowName, batchName, userControl.getLoggedInUser());
 			cmdLineIO.printOutput(cmdLine.getString("batch.created"));
 		}
 	}
 	
 	private void doProcessTask() throws PladipusReportableException {
 		if (force) {
-			queueControl.restart(batchName, userControl.getUserId());
+			queueControl.restart(batchName, userControl.getLoggedInUser());
 		} else {
-			queueControl.process(batchName, userControl.getUserId());
+			queueControl.process(batchName, userControl.getLoggedInUser());
 		}
 		cmdLineIO.printOutput(MessageFormat.format(cmdLine.getString("process.success"), (batchName != null && !batchName.isEmpty()) ? batchName : "all"));
 	}
 	
 	private void doStatusTask() throws PladipusReportableException {
-		TaskStatus taskStatus = queueControl.status(batchName, userControl.getUserId());
+		TaskStatus taskStatus = queueControl.status(batchName, userControl.getLoggedInUser());
 		cmdLineIO.printOutput(taskStatus.toString());
 	}
 	
 	private void doGenerateTask() throws PladipusReportableException {
-		batchControl.generateHeaders(generateFile, workflowName, userControl.getUserId(), force);
+		batchControl.generateHeaders(generateFile, workflowName, userControl.getLoggedInUser(), force);
 		cmdLineIO.printOutput(MessageFormat.format(cmdLine.getString("generate.success"), generateFile));
 	}
 	
 	private void doDefaultTask() throws PladipusReportableException {
-		defaultsControl.addDefault(defaultName, defaultValue, defaultType, userControl.getUserId());
+		defaultsControl.addDefault(defaultName, defaultValue, defaultType, userControl.getLoggedInUser());
 		cmdLineIO.printOutput(MessageFormat.format(cmdLine.getString("default.success"), defaultName));
 	}
 	
 	private void doAbortTask() throws PladipusReportableException {
-		queueControl.abort(batchName, userControl.getUserId());
+		queueControl.abort(batchName, userControl.getLoggedInUser());
 		cmdLineIO.printOutput(MessageFormat.format(cmdLine.getString("abort.success"), (batchName != null && !batchName.isEmpty()) ? batchName : "all"));
 	}
 	
