@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,6 +14,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -151,7 +153,7 @@ public class Workflow {
      *     {@link String }
      *     
      */
-    @Column(name="workflow_name") 
+    @Column(name="workflow_name", nullable=false) 
     public String getName() {
         return name;
     }
@@ -168,7 +170,9 @@ public class Workflow {
         this.name = value;
     }
     
-    @Column(name="template")
+    @Lob
+    @Basic(fetch=FetchType.LAZY)
+    @Column(name="template", nullable=false)
     public String getTemplateXml() {
     	return templateXml;
     }
@@ -186,7 +190,7 @@ public class Workflow {
     }
     
     @Column(name="active")
-    public boolean getActive() {
+    public boolean isActive() {
     	return active;
     }
     public void setActive(boolean active) {
@@ -196,7 +200,7 @@ public class Workflow {
     @OneToMany(cascade=CascadeType.ALL, mappedBy="workflow", fetch=FetchType.EAGER)  
     public Set<Step> getTemplateSteps()  
     {  
-    	if (templateSteps == null) {
+    	if ((templateSteps == null) && (getSteps() != null)) {
     		List<Step> stepList = getSteps().getStep();
     		Iterator<Step> iter = stepList.iterator();
     		while (iter.hasNext()) {
@@ -214,7 +218,7 @@ public class Workflow {
     @OneToMany(cascade=CascadeType.ALL, mappedBy="workflow", fetch=FetchType.EAGER)  
     public Set<WorkflowGlobalParameter> getGlobalParams()  
     {  
-    	if (globalParams.isEmpty() && (getGlobal().getParameters() != null)) {
+    	if (globalParams.isEmpty() && (getGlobal() != null) && (getGlobal().getParameters() != null)) {
     		List<Parameter> params = getGlobal().getParameters().getParameter();
     		Iterator<Parameter> iter = params.iterator();
     		while (iter.hasNext()) {

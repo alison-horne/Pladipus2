@@ -2,12 +2,13 @@ package com.compomics.pladipus.repository;
 
 import static org.junit.Assert.*;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -17,14 +18,15 @@ import org.springframework.test.context.support.DirtiesContextTestExecutionListe
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.compomics.pladipus.model.core.Workflow;
-import com.compomics.pladipus.model.db.WorkflowsColumn;
+import com.compomics.pladipus.model.persist.Step;
+import com.compomics.pladipus.model.persist.User;
+import com.compomics.pladipus.model.persist.Workflow;
+import com.compomics.pladipus.model.persist.WorkflowGlobalParameter;
+import com.compomics.pladipus.model.persist.WorkflowStepParameter;
 import com.compomics.pladipus.shared.PladipusMessages;
 import com.compomics.pladipus.shared.PladipusReportableException;
 import com.compomics.pladipus.repository.config.RepositoryConfiguration;
 import com.compomics.pladipus.repository.config.TestRepositoryConfiguration;
-import com.compomics.pladipus.repository.dao.BaseDAO;
-import com.compomics.pladipus.repository.dao.Query;
 import com.compomics.pladipus.repository.service.WorkflowService;
 
 /**
@@ -40,9 +42,6 @@ public class WorkflowServiceTest {
 	private WorkflowService workflowService;
 	
 	@Autowired
-	private BaseDAO<Workflow> workflowDAO;
-	
-	@Autowired
 	private PladipusMessages exceptionMessages;
 	
 	private static final String WF1 = "test_workflow1";
@@ -50,20 +49,28 @@ public class WorkflowServiceTest {
 	private static final String WF3 = "test_workflow3";
 	private static final String WF4 = "test_workflow4";
 	private static final String WF5 = "test_workflow5";
-	private static final int USER1 = 1;
-	private static final int USER2 = 2;
-	private static final int USER3 = 3;
+	private static User USER1;
+	private static User USER2;
+	private static User USER3;
 	private static final String TEMPLATE = "template_xml"; // Valid formatted xml not required for this test set
-	private static final String TEMPLATE1 = "template1";
+	
+	static {
+		USER1 = new User();
+		USER2 = new User();
+		USER3 = new User();
+		USER1.setUserId(1L);
+		USER2.setUserId(2L);
+		USER3.setUserId(3L);
+	}
 
 	@Transactional
 	@Test
 	public void testInsertFailIfAlreadyExists() {
 		try {
 			Workflow workflow = new Workflow();
-			workflow.setUserId(USER1);
-			workflow.setWorkflowName(WF1);
-			workflow.setTemplate(TEMPLATE);
+			workflow.setUser(USER1);
+			workflow.setName(WF1);
+			workflow.setTemplateXml(TEMPLATE);
 			workflowService.insertWorkflow(workflow);
 			fail("Should not have inserted duplicate workflow");
 		} catch (PladipusReportableException e) {
@@ -76,12 +83,12 @@ public class WorkflowServiceTest {
 	public void testInsertSuccessIfNoActiveExists() {
 		try {
 			Workflow workflow = new Workflow();
-			workflow.setUserId(USER1);
-			workflow.setWorkflowName(WF2);
-			workflow.setTemplate(TEMPLATE);
-			assertEquals(-1, workflow.getId());
-			workflow = workflowService.insertWorkflow(workflow);
-			assertNotEquals(-1, workflow.getId());
+			workflow.setUser(USER1);
+			workflow.setName(WF2);
+			workflow.setTemplateXml(TEMPLATE);
+			assertNull(workflow.getId());
+			workflowService.insertWorkflow(workflow);
+			assertNotNull(workflow.getId());
 		} catch (PladipusReportableException e) {
 			fail("Insert of workflow should have succeeded: " + e.getMessage());
 		}
@@ -92,12 +99,12 @@ public class WorkflowServiceTest {
 	public void testInsertFailIfNoTemplate() {
 		try {
 			Workflow workflow = new Workflow();
-			workflow.setUserId(USER1);
-			workflow.setWorkflowName(WF2);
+			workflow.setUser(USER1);
+			workflow.setName(WF2);
 			workflowService.insertWorkflow(workflow);
 			fail("Should not have inserted workflow with no template");
 		} catch (PladipusReportableException e) {
-			assertEquals(exceptionMessages.getMessage("db.invalidInsert", "workflow"), e.getMessage());
+			assertTrue(e.getMessage().contains("templateXml"));
 		}
 	}
 	
@@ -106,14 +113,16 @@ public class WorkflowServiceTest {
 	public void testReplaceEndsOldWorkflow() {
 		try {
 			Workflow workflow = new Workflow();
-			workflow.setUserId(USER1);
-			workflow.setWorkflowName(WF1);
-			workflow.setTemplate(TEMPLATE);
-			assertTrue(isWorkflowActive(1));
-			workflow = workflowService.replaceWorkflow(workflow);
-			assertFalse(isWorkflowActive(1));
-			assertNotEquals(1, workflow.getId());
-			assertTrue(isWorkflowActive(workflow.getId()));
+			workflow.setUser(USER1);
+			workflow.setName(WF1);
+			workflow.setTemplateXml(TEMPLATE);
+			Workflow oldWorkflow = workflowService.getActiveWorkflowByName(WF1, USER1);
+			assertNotNull(oldWorkflow);
+			assertTrue(oldWorkflow.getId().equals(1L));
+			workflowService.replaceWorkflow(workflow);
+			Workflow newWorkflow = workflowService.getActiveWorkflowByName(WF1, USER1);
+			assertNotNull(newWorkflow);
+			assertFalse(newWorkflow.getId().equals(1L));
 		} catch (PladipusReportableException e) {
 			fail("Should have replaced workflow: " + e.getMessage());
 		}
@@ -124,13 +133,12 @@ public class WorkflowServiceTest {
 	public void testReplaceInsertsWhenNoExisting() {
 		try {
 			Workflow workflow = new Workflow();
-			workflow.setUserId(USER1);
-			workflow.setWorkflowName(WF5);
-			workflow.setTemplate(TEMPLATE);
-			assertEquals(-1, workflow.getId());
-			workflow = workflowService.replaceWorkflow(workflow);
-			assertNotEquals(-1, workflow.getId());
-			assertTrue(isWorkflowActive(workflow.getId()));
+			workflow.setUser(USER1);
+			workflow.setName(WF5);
+			workflow.setTemplateXml(TEMPLATE);
+			assertNull(workflow.getId());
+			workflowService.replaceWorkflow(workflow);
+			assertNotNull(workflow.getId());
 		} catch (PladipusReportableException e) {
 			fail("Should have inserted workflow: " + e.getMessage());
 		}
@@ -139,16 +147,20 @@ public class WorkflowServiceTest {
 	@Test
 	public void testReplaceNotEndOldWorkflowIfNewHasError() throws PladipusReportableException {
 		Workflow workflow = new Workflow();
-		workflow.setUserId(USER1);
-		workflow.setWorkflowName(WF1);
+		workflow.setUser(USER1);
+		workflow.setName(WF1);
 		try {
-			assertTrue(isWorkflowActive(1));
-			workflow = workflowService.replaceWorkflow(workflow);
+			Workflow oldWorkflow = workflowService.getActiveWorkflowByName(WF1, USER1);
+			assertNotNull(oldWorkflow);
+			assertTrue(oldWorkflow.getId().equals(1L));
+			workflowService.replaceWorkflow(workflow);
 			fail("Replace should not have worked with workflow without template");
 		} catch (PladipusReportableException e) {
-			assertTrue(isWorkflowActive(1));
-			assertEquals(-1, workflow.getId());
-			assertEquals(exceptionMessages.getMessage("db.invalidInsert", "workflow"), e.getMessage());
+			Workflow oldWorkflow = workflowService.getActiveWorkflowByName(WF1, USER1);
+			assertNotNull(oldWorkflow);
+			assertTrue(oldWorkflow.getId().equals(1L));
+			assertNull(workflow.getId());
+			assertTrue(e.getMessage().contains("templateXml"));
 		}
 	}
 	
@@ -156,27 +168,13 @@ public class WorkflowServiceTest {
 	@Test
 	public void testDeactivateWorkflow() {
 		try {
-			Workflow workflow = getWorkflow(1);
-			assertTrue(workflow.isActive());
+			Workflow workflow = workflowService.getActiveWorkflowByName(WF1, USER1);
+			assertTrue(workflow.getId().equals(1L));
 			workflowService.deactivateWorkflow(workflow);
-			assertFalse(isWorkflowActive(1));
+			assertFalse(workflow.isActive());
+			assertNull(workflowService.getActiveWorkflowByName(WF1, USER1));
 		} catch (PladipusReportableException e) {
 			fail("Should have deactivated workflow: " + e.getMessage());
-		}
-	}
-	
-	@Transactional
-	@Test
-	public void testDeactivateErrorIfNoId() {
-		try {
-			Workflow workflow = new Workflow();
-			workflow.setUserId(USER1);
-			workflow.setTemplate(TEMPLATE);
-			workflow.setWorkflowName(WF1);
-			workflowService.deactivateWorkflow(workflow);
-			fail("Deactivate should fail if no ID on workflow object");
-		} catch (PladipusReportableException e) {
-			assertEquals(exceptionMessages.getMessage("db.invalidUpdate", "workflow"), e.getMessage());
 		}
 	}
 	
@@ -185,8 +183,7 @@ public class WorkflowServiceTest {
 		try {
 			Workflow workflow = workflowService.getActiveWorkflowByName(WF1, USER1);
 			assertNotNull(workflow);
-			assertEquals(1, workflow.getId());
-			assertEquals(TEMPLATE1, workflow.getTemplate());
+			assertTrue(workflow.getId().equals(1L));
 		} catch (PladipusReportableException e) {
 			fail("Should have got workflow: " + e.getMessage());
 		}
@@ -206,8 +203,7 @@ public class WorkflowServiceTest {
 		try {
 			Workflow workflow = workflowService.getActiveWorkflowByName(WF3, USER2);
 			assertNotNull(workflow);
-			assertEquals(4, workflow.getId());
-			assertEquals(TEMPLATE1, workflow.getTemplate());
+			assertTrue(workflow.getId().equals(4L));
 		} catch (PladipusReportableException e) {
 			fail("Should have got workflow: " + e.getMessage());
 		}
@@ -228,7 +224,7 @@ public class WorkflowServiceTest {
 			workflowService.getActiveWorkflowByName(WF4, USER2);
 			fail("Duplicate active workflow should throw exception");
 		} catch (PladipusReportableException e) {
-			assertEquals(exceptionMessages.getMessage("db.nonUniqueGet", "workflow"), e.getMessage());
+			assertEquals(exceptionMessages.getMessage("db.nonUniqueGet", "Workflow"), e.getMessage());
 		}
 	}
 	
@@ -254,17 +250,56 @@ public class WorkflowServiceTest {
 		}
 	}
 	
-	private boolean isWorkflowActive(int workflowId) throws PladipusReportableException {
-		Workflow workflow = getWorkflow(workflowId);
-		return workflow.isActive();
-	}
-	
-	private Workflow getWorkflow(int workflowId) throws PladipusReportableException {
-		Query query = new Query();
-		query.setWhereClause("WHERE " + WorkflowsColumn.WORKFLOW_ID.name() + " = :wfid");
-		query.setParameters(new MapSqlParameterSource().addValue("wfid", workflowId));
-		Workflow workflow = workflowDAO.get(query);
-		assertNotNull(workflow);
-		return workflow;
+	@Test
+	public void testGetLoadsAllTablesInfo() {
+		try {
+			Workflow workflow = workflowService.getActiveWorkflowByName(WF3, USER2);
+			assertNotNull(workflow);
+			Set<Step> steps = workflow.getTemplateSteps();
+			assertNotNull(steps);
+			assertEquals(2, steps.size());
+			Iterator<Step> iter = steps.iterator();
+			while (iter.hasNext()) {
+				Step step = iter.next();
+				if (step.getId().equals("s1")) {
+					assertEquals("One", step.getName());
+					assertEquals(1, step.getPrereqs().size());
+					assertEquals(2, step.getStepParams().size());
+					Iterator<WorkflowStepParameter> params = step.getStepParams().iterator();
+					while (params.hasNext()) {
+						WorkflowStepParameter param = params.next();
+						if (param.getName().equals("input_one")) {
+							assertEquals(1, param.getValues().size());
+						} else if (param.getName().equals("input_no_type")) {
+							assertEquals(0, param.getValues().size());
+						} else {
+							fail("Invalid step parameter found: " + param.getName());
+						}
+					}
+				} else if (step.getId().equals("s2")) {
+					assertEquals("Two", step.getName());
+					assertEquals(0, step.getPrereqs().size());
+					assertEquals(0, step.getStepParams().size());
+				} else {
+					fail("Invalid step found: " + step.getId());
+				}
+			}
+			
+			Set<WorkflowGlobalParameter> globals = workflow.getGlobalParams();
+			assertEquals(2, globals.size());
+			Iterator<WorkflowGlobalParameter> glob = globals.iterator();
+			while (glob.hasNext()) {
+				WorkflowGlobalParameter param = glob.next();
+				if (param.getName().equals("globalOne")) {
+					assertEquals(0, param.getValues().size());
+				} else if (param.getName().equals("globalTwo")) {
+					assertEquals(2, param.getValues().size());
+				} else {
+					fail("Invalid global parameter: " + param.getName());
+				}
+			}
+		} catch (PladipusReportableException e) {
+			fail("Failed to get workflow: " + e.getMessage());
+		}
 	}
 }

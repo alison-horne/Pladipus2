@@ -71,7 +71,7 @@ public class TestRepositoryConfiguration {
 
 			{  
 				setProperty("hibernate.hbm2ddl.auto", "create");
-				setProperty("hibernate.hbm2ddl.import_files", "insertTestUsers.sql, insertTestDefaults.sql");
+				setProperty("hibernate.hbm2ddl.import_files", "insertTestUsers.sql, insertTestDefaults.sql, insertTestWorkflows.sql");
 				setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");  
 				setProperty("hibernate.globally_quoted_identifiers", "true");
 		    }  
