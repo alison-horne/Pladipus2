@@ -1,5 +1,6 @@
 package com.compomics.pladipus.base;
 
+import com.compomics.pladipus.model.persist.User;
 import com.compomics.pladipus.shared.PladipusReportableException;
 
 /**
@@ -15,11 +16,5 @@ public interface UserControl {
 	 */
 	public void login(String username, String password) throws PladipusReportableException;
 	public void logout();
-	
-	/**
-	 * Get user ID number for the logged-in user
-	 * @return user ID number of the logged-in user
-	 * @throws PladipusReportableException if no user is currently logged in.
-	 */
-	public int getUserId() throws PladipusReportableException;
+	public User getLoggedInUser() throws PladipusReportableException;
 }

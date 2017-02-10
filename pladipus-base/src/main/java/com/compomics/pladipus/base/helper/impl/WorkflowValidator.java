@@ -2,11 +2,9 @@ package com.compomics.pladipus.base.helper.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +13,9 @@ import org.springframework.util.StringUtils;
 import com.compomics.pladipus.base.DefaultsControl;
 import com.compomics.pladipus.base.ToolControl;
 import com.compomics.pladipus.base.helper.ValidationChecker;
-import com.compomics.pladipus.model.core.Step;
-import com.compomics.pladipus.model.core.Workflow;
+import com.compomics.pladipus.model.persist.Parameter;
+import com.compomics.pladipus.model.persist.Step;
+import com.compomics.pladipus.model.persist.Workflow;
 import com.compomics.pladipus.shared.PladipusMessages;
 import com.compomics.pladipus.shared.PladipusReportableException;
 import com.compomics.pladipus.model.parameters.InputParameter;
@@ -54,13 +53,13 @@ public class WorkflowValidator implements ValidationChecker<Workflow> {
 	 * @throws PladipusReportableException
 	 */
 	private void checkStepDependencies(Workflow workflow) throws PladipusReportableException {
-		
+		List<Step> visited = new ArrayList<Step>();
 		class StepCheckNode {
 			int level;
 			Step step;
-			List<String> tree;
+			List<Step> tree;
 			
-			StepCheckNode(int level, Step step, List<String> tree) {
+			StepCheckNode(int level, Step step, List<Step> tree) {
 				this.level = level;
 				this.step = step;
 				this.tree = tree;
@@ -68,20 +67,20 @@ public class WorkflowValidator implements ValidationChecker<Workflow> {
 			
 			public void process() throws PladipusReportableException {
 				tree = tree.subList(0, level);
-				if (tree.contains(step.getStepIdentifier())) {
-					throw new PladipusReportableException(exceptionMessages.getMessage("template.stepDependency", step.getStepIdentifier()));
+				if (tree.contains(step)) {
+					throw new PladipusReportableException(exceptionMessages.getMessage("template.stepDependency", step.getId()));
 				} 
-				tree.add(step.getStepIdentifier());
-				step.setVisited();
-				for (String stepId: step.getDependencies()) {
-					new StepCheckNode(level + 1, workflow.getSteps().get(stepId), tree).process();
+				tree.add(step);
+				visited.add(step);
+				for (Step nextStep: step.getPrereqs()) {
+					new StepCheckNode(level + 1, nextStep, tree).process();
 				}
 			}
 		}
 		
-		List<String> tree = new ArrayList<String>();
-		for (Step step: workflow.getSteps().values()) {
-			if (!step.isVisited()) {
+		List<Step> tree = new ArrayList<Step>();
+		for (Step step: workflow.getSteps().getStep()) {
+			if (!visited.contains(step)) {
 				new StepCheckNode(0, step, tree).process();
 			}
 		}
@@ -89,8 +88,8 @@ public class WorkflowValidator implements ValidationChecker<Workflow> {
 	
 	private void checkGlobalParameters(Workflow workflow) throws PladipusReportableException {
 		// TODO check value types, standard mappings?  Tidy this up, no duplication etc.
-		Map<String, Integer> defaults = defaultsControl.getDefaultMap(workflow.getUserId());
-		for (Entry<String, Set<String>> param: workflow.getGlobalParameters().entrySet()) {
+		List<String> defaults = defaultsControl.getDefaultNamesForUser(workflow.getUser());
+		for (Parameter param : workflow.getGlobal().getParameters().getParameter()) {
 			Iterator<String> iter = param.getValue().iterator();
 			while (iter.hasNext()) {
 				String value = iter.next();
@@ -105,10 +104,7 @@ public class WorkflowValidator implements ValidationChecker<Workflow> {
 							throw new PladipusReportableException(exceptionMessages.getMessage("template.subFormat", value));
 						}
 						if (split[0].equalsIgnoreCase(DEFAULT_PREFIX)) {
-							if (defaults.get(split[1].toUpperCase()) != null) {
-								workflow.addSubstitution(SUBSTITUTE_PREFIX + DEFAULT_PREFIX + "." + split[1] + SUBSTITUTE_END, 
-										SUBSTITUTE_PREFIX + DEFAULT_PREFIX + "." + defaults.get(split[1].toUpperCase()) + SUBSTITUTE_END);
-							} else {
+							if (!defaults.contains(split[1].toUpperCase())) {
 								throw new PladipusReportableException(exceptionMessages.getMessage("template.invalidDefault", subValue));
 							}
 						} else {
@@ -121,7 +117,7 @@ public class WorkflowValidator implements ValidationChecker<Workflow> {
 	}
 	
 	private void checkStepParameters(Workflow workflow) throws PladipusReportableException {
-		for (Step step: workflow.getSteps().values()) {
+		for (Step step: workflow.getSteps().getStep()) {
 			checkStep(step);
 		}
 	}
@@ -133,17 +129,23 @@ public class WorkflowValidator implements ValidationChecker<Workflow> {
 	}
 	
 	private void checkMandatoryParameters(Step step) throws PladipusReportableException {
-		ImmutableSet<InputParameter> mandatory = toolControl.getMandatoryParameters(step.getToolType());
-		Set<String> stepParamNames = step.getStepParameters().keySet();
+		ImmutableSet<InputParameter> mandatory = toolControl.getMandatoryParameters(step.getName());
+		Set<String> stepParamNames = new HashSet<String>();
+		for (Parameter param: step.getParameters().getParameter()) {
+			stepParamNames.add(param.getName());
+		}
 		for (InputParameter mand: mandatory) {
 			if (!stepParamNames.contains(mand.getParamName())) {
 				String defaultValue = mand.getDefault();
 				if (defaultValue != null && !defaultValue.isEmpty()) {
+					Parameter p = new Parameter();
+					p.setName(mand.getParamName());
+					p.getValue().add(defaultValue);
+					step.getParameters().getParameter().add(p);
 					// TODO log adding default
-					step.addParameterValues(mand.getParamName(), Collections.singleton(defaultValue));
 				} else {
 					throw new PladipusReportableException(exceptionMessages.getMessage("template.missingMandatoryParameter", 
-																						step.getStepIdentifier(), 
+																						step.getId(), 
 																						mand.getParamName()));
 				}
 			}
@@ -151,32 +153,34 @@ public class WorkflowValidator implements ValidationChecker<Workflow> {
 	}
 	
 	private void checkParameterNames(Step step) throws PladipusReportableException {
-		ImmutableSet<String> toolParams = toolControl.getParameterMap(step.getToolType()).keySet();
-		Set<String> stepParamNames = step.getStepParameters().keySet();
-		for (String param: stepParamNames) {
+		ImmutableSet<String> toolParams = toolControl.getParameterMap(step.getName()).keySet();
+		Iterator<Parameter> iter = step.getParameters().getParameter().iterator();
+		while (iter.hasNext()) {
+			String param = iter.next().getName();
 			if (!toolParams.contains(param)) {
-				throw new PladipusReportableException(exceptionMessages.getMessage("template.invalidParameterName", step.getStepIdentifier(), param));
+				throw new PladipusReportableException(exceptionMessages.getMessage("template.invalidParameterName", step.getId(), param));
 			}
 		}
 	}
 	
 	private void validateValueTypes(Step step) throws PladipusReportableException {
-		ImmutableMap<String, InputParameter> inputParams = toolControl.getParameterMap(step.getToolType());
-		Iterator<Entry<String, Set<String>>> iter = step.getStepParameters().entrySet().iterator();
+		//TODO validate types when substitution value - check default/global
+		ImmutableMap<String, InputParameter> inputParams = toolControl.getParameterMap(step.getName());
+		Iterator<Parameter> iter = step.getParameters().getParameter().iterator();
 		while (iter.hasNext()) {
-			Entry<String, Set<String>> parameter = iter.next();
+			Parameter parameter = iter.next();
 			for (String value: parameter.getValue()) {
-				if (!inputParams.get(parameter.getKey()).isTypeValid(value)) {
-					throw new PladipusReportableException(exceptionMessages.getMessage("template.invalidParameterValue", step.getStepIdentifier(), parameter.getKey(), value));
+				if (!inputParams.get(parameter.getName()).isTypeValid(value)) {
+					throw new PladipusReportableException(exceptionMessages.getMessage("template.invalidParameterValue", step.getId(), parameter.getName(), value));
 				}
 			}
 		}
 	}
 	
 	private void checkSubstitutions(Workflow workflow) throws PladipusReportableException {
-		Map<String, Integer> defaults = defaultsControl.getDefaultMap(workflow.getUserId());
-		for (Step step: workflow.getSteps().values()) {
-			for (Entry<String, Set<String>> param: step.getStepParameters().entrySet()) {
+		List<String> defaults = defaultsControl.getDefaultNamesForUser(workflow.getUser());
+		for (Step step: workflow.getSteps().getStep()) {
+			for (Parameter param: step.getParameters().getParameter()) {
 				Iterator<String> iter = param.getValue().iterator();
 				while (iter.hasNext()) {
 					String value = iter.next();
@@ -191,16 +195,29 @@ public class WorkflowValidator implements ValidationChecker<Workflow> {
 								throw new PladipusReportableException(exceptionMessages.getMessage("template.subFormat", value));
 							}
 							if (split[0].equalsIgnoreCase(DEFAULT_PREFIX)) {
-								if (defaults.get(split[1].toUpperCase()) != null) {
-									workflow.addSubstitution(SUBSTITUTE_PREFIX + DEFAULT_PREFIX + "." + split[1] + SUBSTITUTE_END, 
-											SUBSTITUTE_PREFIX + DEFAULT_PREFIX + "." + defaults.get(split[1].toUpperCase()) + SUBSTITUTE_END);
-								} else {
+								if (!defaults.contains(split[1].toUpperCase())) {
 									throw new PladipusReportableException(exceptionMessages.getMessage("template.invalidDefault", subValue));
 								}
 							} else if (split[0].equalsIgnoreCase(GLOBAL_PREFIX)) {
-								workflow.addParameterValues(split[1], null);
+								Iterator<Parameter> glParams = workflow.getGlobal().getParameters().getParameter().iterator();
+								boolean found = false;
+								while (glParams.hasNext()) {
+									if (glParams.next().getName().equals(split[1])) {
+										found = true;
+										break;
+									}
+								}
+								if (!found) {
+									Parameter p = new Parameter();
+									p.setName(split[1]);
+									workflow.getGlobal().getParameters().getParameter().add(p);
+								}
 							} else {
-								step.addDependency(split[0]);
+								if (workflow.getSteps().getStepMap().keySet().contains(split[0])) {
+									step.addPrereq(workflow.getSteps().getStepMap().get(split[0]));
+								} else {
+									throw new PladipusReportableException(exceptionMessages.getMessage("template.stepMissing", step.getId(), split[0]));
+								}
 							}
 						}
 					}
@@ -228,10 +245,10 @@ public class WorkflowValidator implements ValidationChecker<Workflow> {
 
 	private void checkToolNamesValid(Workflow workflow) throws PladipusReportableException {
 		ImmutableSet<String> toolNames = toolControl.getToolNames();
-		Collection<Step> steps = workflow.getSteps().values();
+		Collection<Step> steps = workflow.getSteps().getStep();
 		for (Step step: steps) {
-			if (!toolNames.contains(step.getToolType())) {
-				throw new PladipusReportableException(exceptionMessages.getMessage("template.invalidXmlTool", step.getToolType()));
+			if (!toolNames.contains(step.getName())) {
+				throw new PladipusReportableException(exceptionMessages.getMessage("template.invalidXmlTool", step.getName()));
 			}
 		}
 	}

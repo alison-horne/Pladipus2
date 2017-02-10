@@ -1,6 +1,7 @@
 package com.compomics.pladipus.model.persist;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -61,6 +62,26 @@ public class WorkflowGlobalValue {
         }
         public void setValue(String value) { 
         	this.value = value; 
+        }
+    	
+        @Override
+        public boolean equals(Object o) {
+        	if (o == null) return false;
+            if (o == this) return true;
+           
+            if (!(o instanceof Key)) {
+                return false;
+            }
+
+            Key key = (Key) o;
+
+            return key.param.equals(this.param) &&
+                   key.value.equals(this.value);
+        }
+
+        @Override
+        public int hashCode() {
+        	return Objects.hash(this.param, this.value);
         }
     }
 }

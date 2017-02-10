@@ -6,7 +6,8 @@ import org.w3c.dom.Document;
 import com.compomics.pladipus.base.WorkflowControl;
 import com.compomics.pladipus.base.helper.ValidationChecker;
 import com.compomics.pladipus.base.helper.XMLHelper;
-import com.compomics.pladipus.model.core.Workflow;
+import com.compomics.pladipus.model.persist.Workflow;
+import com.compomics.pladipus.model.persist.User;
 import com.compomics.pladipus.shared.PladipusReportableException;
 import com.compomics.pladipus.repository.service.WorkflowService;
 
@@ -22,31 +23,31 @@ public class WorkflowControlImpl implements WorkflowControl {
 	private XMLHelper<Workflow> workflowXMLHelper;
 
 	@Override
-	public Workflow createWorkflow(String filepath, int userId) throws PladipusReportableException {
-		return createWorkflow(workflowXMLHelper.fileToDocument(filepath), userId);
+	public void createWorkflow(String filepath, User user) throws PladipusReportableException {
+		createWorkflow(workflowXMLHelper.filepathToDocument(filepath), user);
 	}
 	
 	@Override
-	public Workflow replaceWorkflow(String filepath, int userId) throws PladipusReportableException {
-		return replaceWorkflow(workflowXMLHelper.fileToDocument(filepath), userId);
+	public void replaceWorkflow(String filepath, User user) throws PladipusReportableException {
+		replaceWorkflow(workflowXMLHelper.filepathToDocument(filepath), user);
 	}
 
 	@Override
-	public Workflow createWorkflow(Document document, int userId) throws PladipusReportableException {
-		Workflow workflow = parseAndValidate(document, userId);
-		return workflowService.insertWorkflow(workflow);
+	public void createWorkflow(Document document, User user) throws PladipusReportableException {
+		Workflow workflow = parseAndValidate(document, user);
+		workflowService.insertWorkflow(workflow);
 	}
 
 	@Override
-	public Workflow replaceWorkflow(Document document, int userId) throws PladipusReportableException {
-		Workflow workflow = parseAndValidate(document, userId);
-		return workflowService.replaceWorkflow(workflow);
+	public void replaceWorkflow(Document document, User user) throws PladipusReportableException {
+		Workflow workflow = parseAndValidate(document, user);
+		workflowService.replaceWorkflow(workflow);
 	}
 	
-	private Workflow parseAndValidate(Document document, int userId) throws PladipusReportableException {
-		workflowXMLHelper.validateDocument(document);
+	private Workflow parseAndValidate(Document document, User user) throws PladipusReportableException {
 		Workflow workflow = workflowXMLHelper.parseDocument(document);
-		workflow.setUserId(userId);
+		workflow.setTemplateXml(workflowXMLHelper.documentToString(document));
+		workflow.setUser(user);
 		workflowValidator.validate(workflow);
 		return workflow;
 	}

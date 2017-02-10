@@ -1,6 +1,7 @@
 package com.compomics.pladipus.model.persist;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -10,6 +11,8 @@ import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import com.compomics.pladipus.model.persist.WorkflowGlobalValue.Key;
 
 @Entity
 @IdClass(value=WorkflowStepValue.Key.class)
@@ -61,6 +64,26 @@ public class WorkflowStepValue {
         }
         public void setValue(String value) { 
         	this.value = value; 
+        }
+        
+        @Override
+        public boolean equals(Object o) {
+        	if (o == null) return false;
+            if (o == this) return true;
+           
+            if (!(o instanceof Key)) {
+                return false;
+            }
+
+            Key key = (Key) o;
+
+            return key.param.equals(this.param) &&
+                   key.value.equals(this.value);
+        }
+
+        @Override
+        public int hashCode() {
+        	return Objects.hash(this.param, this.value);
         }
     }
 }

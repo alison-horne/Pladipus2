@@ -41,6 +41,9 @@ public class Global {
      *     
      */
     public Parameters getParameters() {
+    	if (parameters == null) {
+    		setParameters(new Parameters());
+    	}
         return parameters;
     }
 

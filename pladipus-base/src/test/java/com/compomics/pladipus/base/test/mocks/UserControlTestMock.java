@@ -19,7 +19,7 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
 
 import com.compomics.pladipus.base.UserControl;
 import com.compomics.pladipus.base.config.BaseConfiguration;
-import com.compomics.pladipus.model.core.User;
+import com.compomics.pladipus.model.persist.User;
 import com.compomics.pladipus.shared.PladipusMessages;
 import com.compomics.pladipus.shared.PladipusReportableException;
 import com.compomics.pladipus.repository.config.MockRepositoryConfiguration;
@@ -44,12 +44,12 @@ public class UserControlTestMock {
 	@Autowired
 	private PladipusMessages exceptionMessages;
 	
+	private static User USER_1 = new User();
+	private static User USER_2 = new User();
 	private static final String USER1 = "user1";
 	private static final String PASSWORD1 = "password1";
-	private static final int USERID1 = 1;
 	private static final String USER2 = "user2";
 	private static final String PASSWORD2 = "password2";
-	private static final int USERID2 = 2;
 	private static final String ERROR = "Error string";
 	
 	@Before
@@ -63,7 +63,7 @@ public class UserControlTestMock {
 		try {
 			userControl.login(USER1, PASSWORD1);
 			Mockito.verify(userService).login(USER1, PASSWORD1);
-			assertEquals(USERID1, userControl.getUserId());
+			assertEquals(USER_1, userControl.getLoggedInUser());
 		} catch (PladipusReportableException e) {
 			fail("Login should have succeeded: " + e.getMessage());
 		}
@@ -84,9 +84,9 @@ public class UserControlTestMock {
 	public void testLogout() {
 		try {
 			userControl.login(USER1, PASSWORD1);
-			assertEquals(USERID1, userControl.getUserId());
+			assertEquals(USER_1, userControl.getLoggedInUser());
 			userControl.logout();
-			userControl.getUserId();
+			userControl.getLoggedInUser();
 			fail("Should throw exception getting user ID when logged out");
 		} catch (PladipusReportableException e) {
 			assertEquals(exceptionMessages.getMessage("base.noLogin"), e.getMessage());
@@ -97,9 +97,9 @@ public class UserControlTestMock {
 	public void testChangeUser() {
 		try {
 			userControl.login(USER1, PASSWORD1);
-			assertEquals(USERID1, userControl.getUserId());
+			assertEquals(USER_1, userControl.getLoggedInUser());
 			userControl.login(USER2, PASSWORD2);
-			assertEquals(USERID2, userControl.getUserId());
+			assertEquals(USER_2, userControl.getLoggedInUser());
 			Mockito.verify(userService).login(USER1, PASSWORD1);
 			Mockito.verify(userService).login(USER2, PASSWORD2);
 		} catch (PladipusReportableException e) {
@@ -108,14 +108,10 @@ public class UserControlTestMock {
 	}
 	
 	private void loginExpect() {
-		User user1 = new User();
-		user1.setId(USERID1);
-		User user2 = new User();
-		user2.setId(USERID2);
 		try {
-		Mockito.when(userService.login(USER1, PASSWORD1)).thenReturn(user1);
-		Mockito.when(userService.login(USER2, PASSWORD2)).thenReturn(user2);
-		Mockito.doThrow(new PladipusReportableException(ERROR)).when(userService).login(USER1, PASSWORD2);
+			Mockito.when(userService.login(USER1, PASSWORD1)).thenReturn(USER_1);
+			Mockito.when(userService.login(USER2, PASSWORD2)).thenReturn(USER_2);
+			Mockito.doThrow(new PladipusReportableException(ERROR)).when(userService).login(USER1, PASSWORD2);
 		} catch (PladipusReportableException e) {
 			fail("Test setup failure: " + e.getMessage());
 		}

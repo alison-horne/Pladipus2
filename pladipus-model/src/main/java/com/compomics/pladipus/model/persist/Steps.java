@@ -1,10 +1,15 @@
 package com.compomics.pladipus.model.persist;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -35,6 +40,8 @@ public class Steps {
 
     @XmlElement(required = true)
     protected List<Step> step;
+    @XmlTransient
+    private Map<String, Step> stepMap = new HashMap<String, Step>();
 
     /**
      * Gets the value of the step property.
@@ -63,5 +70,20 @@ public class Steps {
             step = new ArrayList<Step>();
         }
         return this.step;
+    }
+    
+    public Map<String, Step> getStepMap() {
+    	if (stepMap.isEmpty()) {
+    		Iterator<Step> iter = getStep().iterator();
+    		while (iter.hasNext()) {
+    			Step step = iter.next();
+    			stepMap.put(step.getId(), step);
+    		}
+    	}
+    	return stepMap;
+    }
+    
+    public void clearStepMap() {
+    	stepMap.clear();
     }
 }

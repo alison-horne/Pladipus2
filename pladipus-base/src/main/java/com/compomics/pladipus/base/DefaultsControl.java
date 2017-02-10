@@ -1,13 +1,13 @@
 package com.compomics.pladipus.base;
 
 import java.util.List;
-import java.util.Map;
 
-import com.compomics.pladipus.model.core.Default;
+import com.compomics.pladipus.model.persist.Default;
+import com.compomics.pladipus.model.persist.User;
 import com.compomics.pladipus.shared.PladipusReportableException;
 
 public interface DefaultsControl {
-	public void addDefault(String name, String value, String type, int userId) throws PladipusReportableException;
-	public List<Default> getDefaults(int userId) throws PladipusReportableException;
-	public Map<String, Integer> getDefaultMap(int userId) throws PladipusReportableException;
+	public void addDefault(String name, String value, String type, User user) throws PladipusReportableException;
+	public List<Default> getDefaults(User user) throws PladipusReportableException;
+	public List<String> getDefaultNamesForUser(User user) throws PladipusReportableException;
 }

@@ -19,7 +19,7 @@ import com.compomics.pladipus.base.impl.QueueControlImpl;
 import com.compomics.pladipus.base.impl.UserControlImpl;
 import com.compomics.pladipus.base.impl.WorkerControlImpl;
 import com.compomics.pladipus.base.impl.WorkflowControlImpl;
-import com.compomics.pladipus.model.core.Workflow;
+import com.compomics.pladipus.model.persist.Workflow;
 import com.compomics.pladipus.repository.config.RepositoryConfiguration;
 import com.compomics.pladipus.shared.config.SharedConfiguration;
 import com.compomics.pladipus.base.helper.impl.WorkflowValidator;

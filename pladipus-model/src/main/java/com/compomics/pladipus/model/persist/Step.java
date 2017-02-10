@@ -151,6 +151,9 @@ public class Step {
      */
     @Transient
     public Parameters getParameters() {
+    	if (parameters == null) {
+    		setParameters(new Parameters());
+    	}
         return parameters;
     }
 
@@ -186,6 +189,9 @@ public class Step {
 	}
 	public void setPrereqs(Set<Step> steps) {
 		prereqs.addAll(steps);
+	}
+	public void addPrereq(Step step) {
+		prereqs.add(step);
 	}
 
 	@ManyToMany(mappedBy="prereqs")

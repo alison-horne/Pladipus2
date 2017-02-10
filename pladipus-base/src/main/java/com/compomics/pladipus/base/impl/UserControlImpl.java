@@ -3,13 +3,13 @@ package com.compomics.pladipus.base.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.compomics.pladipus.base.UserControl;
-import com.compomics.pladipus.model.core.User;
+import com.compomics.pladipus.model.persist.User;
 import com.compomics.pladipus.shared.PladipusMessages;
 import com.compomics.pladipus.shared.PladipusReportableException;
 import com.compomics.pladipus.repository.service.UserService;
 
 public class UserControlImpl implements UserControl {
-	
+	//TODO cache defaults/workflows etc for user
 	@Autowired
 	private UserService userService;
 	
@@ -29,11 +29,7 @@ public class UserControlImpl implements UserControl {
 	}
 
 	@Override
-	public int getUserId() throws PladipusReportableException {
-		return getLoggedInUser().getId();
-	}
-
-	private User getLoggedInUser() throws PladipusReportableException {
+	public User getLoggedInUser() throws PladipusReportableException {
 		if (loggedInUser == null) {
 			throw new PladipusReportableException(exceptionMessages.getMessage("base.noLogin"));
 		}

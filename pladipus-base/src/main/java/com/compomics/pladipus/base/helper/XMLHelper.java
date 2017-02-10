@@ -10,17 +10,9 @@ import com.compomics.pladipus.shared.PladipusReportableException;
  * @param <T> Type of object to parse XML document into
  */
 public interface XMLHelper<T> {
-
-	/**
-	 * Validates XML Document against XSD schema.  Throws exception if validation fails.
-	 * 
-	 * @param document - Document to be validated
-	 * @throws PladipusReportableException if validation fails
-	 */
-	void validateDocument(Document document) throws PladipusReportableException;
 	
 	/**
-	 * Parses out XML field from document into chosen object type
+	 * Parses out XML field from document into chosen object type, validating against schema
 	 * @param document
 	 * @return object
 	 * @throws PladipusReportableException
@@ -33,15 +25,7 @@ public interface XMLHelper<T> {
 	 * @return Document
 	 * @throws PladipusReportableException if file not found, cannot be read, or if there is a problem with the conversion
 	 */
-	Document fileToDocument(String filePath) throws PladipusReportableException;
-	
-	/**
-	 * Helper method to convert a string to an XML Document
-	 * @param string
-	 * @return Document
-	 * @throws PladipusReportableException
-	 */
-	Document stringToDocument(String string) throws PladipusReportableException;
+	Document filepathToDocument(String filePath) throws PladipusReportableException;
 	
 	/**
 	 * Helper method to convert an XML document to a string

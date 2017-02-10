@@ -105,6 +105,9 @@ public class Workflow {
      */
     @Transient
     public Global getGlobal() {
+    	if (global == null) {
+    		setGlobal(new Global());
+    	}
         return global;
     }
 

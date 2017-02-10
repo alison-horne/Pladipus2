@@ -3,8 +3,6 @@ package com.compomics.pladipus.base.test.mocks;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -12,9 +10,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.annotation.DirtiesContext;
@@ -31,8 +28,8 @@ import org.w3c.dom.Element;
 
 import com.compomics.pladipus.base.WorkflowControl;
 import com.compomics.pladipus.base.config.BaseConfiguration;
-import com.compomics.pladipus.model.core.Step;
-import com.compomics.pladipus.model.core.Workflow;
+import com.compomics.pladipus.model.persist.User;
+import com.compomics.pladipus.model.persist.Workflow;
 import com.compomics.pladipus.shared.PladipusMessages;
 import com.compomics.pladipus.shared.PladipusReportableException;
 import com.compomics.pladipus.repository.config.MockRepositoryConfiguration;
@@ -63,27 +60,24 @@ public class WorkflowControlTestMock {
 	@Autowired
 	private ResourceLoader resourceLoader;
 	
-	private static final int INSERT_ID = 10;
-	private static final int USER_ID = 5;
+	private static final User USER = new User();
 	private static final String VALID1_FILE = "classpath:valid1.xml";
-	private static final String VALID2_FILE = "classpath:valid2.xml";
 	private static final String INVALID_NO_NAME_FILE = "classpath:invalid_noname.xml";
 
 	@Before
 	public void setUp() throws PladipusReportableException {
 		Mockito.reset(workflowService);
-		setServiceDefaults();
 	}
 	
 	@Test
 	public void testValidInsertNoParams() {
 		try {
-			Workflow workflow = workflowControl.createWorkflow(getXMLFilePath(VALID1_FILE), USER_ID);
-			Mockito.verify(workflowService).insertWorkflow(Mockito.any(Workflow.class));
-			assertEquals(USER_ID, workflow.getUserId());
-			assertEquals(INSERT_ID, workflow.getId());
-			assertEquals(0, workflow.getGlobalParameters().size());
-			assertEquals(1, workflow.getSteps().size());
+			workflowControl.createWorkflow(getXMLFilePath(VALID1_FILE), USER);
+			ArgumentCaptor<Workflow> argument = ArgumentCaptor.forClass(Workflow.class);
+			Mockito.verify(workflowService).insertWorkflow(argument.capture());
+			assertEquals(USER, argument.getValue().getUser());
+			assertEquals(0, argument.getValue().getGlobal().getParameters().getParameter().size());
+			assertEquals(1, argument.getValue().getSteps().getStep().size());
 		} catch (PladipusReportableException e) {
 			fail("Failed insert: " + e.getMessage());
 		}
@@ -92,57 +86,21 @@ public class WorkflowControlTestMock {
 	@Test
 	public void testValidReplaceNoParams() {
 		try {
-			Workflow workflow = workflowControl.replaceWorkflow(getXMLFilePath(VALID1_FILE), USER_ID);
-			Mockito.verify(workflowService).replaceWorkflow(Mockito.any(Workflow.class));
-			assertEquals(USER_ID, workflow.getUserId());
-			assertEquals(INSERT_ID, workflow.getId());
-			assertEquals(0, workflow.getGlobalParameters().size());
-			assertEquals(1, workflow.getSteps().size());
+			workflowControl.replaceWorkflow(getXMLFilePath(VALID1_FILE), USER);
+			ArgumentCaptor<Workflow> argument = ArgumentCaptor.forClass(Workflow.class);
+			Mockito.verify(workflowService).replaceWorkflow(argument.capture());
+			assertEquals(USER, argument.getValue().getUser());
+			assertEquals(0, argument.getValue().getGlobal().getParameters().getParameter().size());
+			assertEquals(1, argument.getValue().getSteps().getStep().size());
 		} catch (PladipusReportableException e) {
 			fail("Failed replace: " + e.getMessage());
 		}
 	}
 	
 	@Test
-	public void testParsing() {
-		try {
-			Workflow workflow = workflowControl.createWorkflow(getXMLFilePath(VALID2_FILE), USER_ID);
-			assertEquals("valid2", workflow.getWorkflowName());
-			
-			Map<String, Set<String>> globals = workflow.getGlobalParameters();
-			assertEquals(1, globals.size());
-			assertTrue(globals.containsKey("GlobalParam1"));
-			assertEquals(1, globals.get("GlobalParam1").size());
-			assertTrue(globals.get("GlobalParam1").contains("Value1"));
-			
-			Map<String, Step> steps = workflow.getSteps();
-			assertEquals(2, steps.size());
-			
-			Step s1 = steps.get("s1");
-			assertNotNull(s1);
-			assertEquals(0, s1.getStepParameters().size());
-			assertEquals("Four", s1.getToolType());
-			
-			Step s2 = steps.get("s2");
-			assertNotNull(s2);
-			assertEquals("One", s2.getToolType());
-			Map<String, Set<String>> stepParams = s2.getStepParameters();
-			assertEquals(3, stepParams.size());
-			assertTrue(stepParams.containsKey("input_one"));
-			assertTrue(stepParams.containsKey("input_no_type"));
-			assertTrue(stepParams.containsKey("input_no_default_mandatory"));
-			assertEquals(0, stepParams.get("input_one").size());
-			assertEquals(2, stepParams.get("input_no_type").size());
-			assertEquals(1, stepParams.get("input_no_default_mandatory").size());
-		} catch (PladipusReportableException e) {
-			fail("Failed parsing: " + e.getMessage());
-		}
-	}
-	
-	@Test
 	public void testInvalidNoName() {
 		try {
-			workflowControl.createWorkflow(getXMLFilePath(INVALID_NO_NAME_FILE), USER_ID);
+			workflowControl.createWorkflow(getXMLFilePath(INVALID_NO_NAME_FILE), USER);
 			fail("Should not validate xml file with no name");
 		} catch (PladipusReportableException e) {
 			Mockito.verifyZeroInteractions(workflowService);
@@ -154,29 +112,13 @@ public class WorkflowControlTestMock {
 	@Test
 	public void testInvalidNoSteps() {
 		try {
-			workflowControl.replaceWorkflow(getDocNoSteps(), USER_ID);
+			workflowControl.replaceWorkflow(getDocNoSteps(), USER);
 			fail("Should not validate xml file with no steps");
 		} catch (PladipusReportableException e) {
 			Mockito.verifyZeroInteractions(workflowService);
 			assertTrue(e.getMessage().contains(exceptionMessages.getMessage("template.invalidXml", "")));
 			assertTrue(e.getMessage().contains("steps"));
 		}
-	}
-	
-	/**
-	 * Mock database inserts - return the parsed workflow with ID set, so it can be checked.
-	 */
-	private void setServiceDefaults() throws PladipusReportableException {
-		Answer<Workflow> answer = new Answer<Workflow>() {
-			@Override
-			public Workflow answer(InvocationOnMock invocation) throws Throwable {
-				Workflow workflow = invocation.getArgumentAt(0, Workflow.class);
-				workflow.setId(INSERT_ID);
-				return workflow;
-			}
-		};
-		Mockito.when(workflowService.insertWorkflow(Mockito.any(Workflow.class))).thenAnswer(answer);
-		Mockito.when(workflowService.replaceWorkflow(Mockito.any(Workflow.class))).thenAnswer(answer);
 	}
 	
 	private String getXMLFilePath(String classpath) {
