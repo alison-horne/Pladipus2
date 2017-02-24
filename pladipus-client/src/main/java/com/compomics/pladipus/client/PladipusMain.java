@@ -8,6 +8,7 @@ import com.compomics.pladipus.client.config.ClientConfiguration;
 public class PladipusMain {
 	public static void main(String[] args) {
 		new PladipusMain().init(args);
+		//TODO handle shutdown/closing threads elegantly.
 	}
 	
 	public void init(String[] args) {

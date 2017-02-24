@@ -1,6 +1,5 @@
 package com.compomics.pladipus.client;
 
-import java.text.MessageFormat;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -13,56 +12,24 @@ import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 
-import com.compomics.pladipus.base.BatchControl;
-import com.compomics.pladipus.base.DefaultsControl;
-import com.compomics.pladipus.base.QueueControl;
-import com.compomics.pladipus.base.UserControl;
-import com.compomics.pladipus.base.WorkerControl;
-import com.compomics.pladipus.base.WorkflowControl;
-import com.compomics.pladipus.model.core.TaskStatus;
-import com.compomics.pladipus.shared.PladipusReportableException;
-
-public class MainCLI implements Alert {
+public class MainCLI {
 	
 	@Autowired
 	protected ResourceBundle cmdLine;
 	
 	@Autowired
 	protected CommandLineIO cmdLineIO;
-	
-	@Lazy
+
 	@Autowired
-	private UserControl userControl;
-	
-	@Lazy
-	@Autowired
-	private WorkerControl workerControl;
-	
-	@Lazy
-	@Autowired
-	private WorkflowControl workflowControl;
-	
-	@Lazy
-	@Autowired
-	private BatchControl batchControl;
-	
-	@Lazy
-	@Autowired
-	private QueueControl queueControl;
-	
-	@Lazy
-	@Autowired
-	private DefaultsControl defaultsControl;
+	private CliTaskProcessor cliTaskProcessor;
 	
 	// Command line options
 	private OptionGroup optGroup = new OptionGroup();
 	private Options cmdLineOpts = new Options();
 	private Options helpOpts = new Options();
-	private CliOption helpOpt, workerOpt, templateOpt, batchOpt, processOpt, rerunOpt, statusOpt, generateOpt, defaultOpt, abortOpt, userOpt, passwordOpt, forceOpt, workflowOpt, batchnameOpt, valueOpt, typeOpt;
+	private CliOption helpOpt, templateOpt, batchOpt, processOpt, rerunOpt, statusOpt, generateOpt, defaultOpt, abortOpt, userOpt, passwordOpt, forceOpt, workflowOpt, batchnameOpt, valueOpt, typeOpt;
 
-	private boolean startWorker = false;
 	private String xmlFile;
 	private String batchFile;
 	private boolean process = false;
@@ -87,7 +54,7 @@ public class MainCLI implements Alert {
 				cmdLineIO.printHelp(helpOpts, null);
 			} else {
 				readOptions(line);
-				login();
+				cliTaskProcessor.login(userName, password);
 				doTask(); 
 			}
 	    } catch (ParseException e) {
@@ -103,10 +70,6 @@ public class MainCLI implements Alert {
 		
 		if (line.hasOption(forceOpt.getShortOpt())) {
 			force = true;
-		}
-		
-		if (line.hasOption(workerOpt.getShortOpt())) {
-			startWorker = true;
 		}
 		
 		if (line.hasOption(processOpt.getShortOpt())) {
@@ -165,7 +128,6 @@ public class MainCLI implements Alert {
 	
 	private void initOptions() {
 		helpOpt 	 = new CliOption("help", false, false, true);
-		workerOpt 	 = new CliOption("worker", false, false, true);
 		templateOpt  = new CliOption("template", true, false, true);
 		batchOpt 	 = new CliOption("batch", true, false, true);
 		processOpt 	 = new CliOption("process", true, true, true);
@@ -185,100 +147,14 @@ public class MainCLI implements Alert {
 		cmdLineOpts.addOptionGroup(optGroup);
 	}
 	
-	private void login() throws ParseException {
-		try {
-			if (password == null) {
-				password = cmdLineIO.getPassword();
-			}
-			if (password == null) {
-				throw new ParseException(cmdLine.getString("error.password"));
-			}
-			userControl.login(userName, password);
-		} catch (PladipusReportableException e) {
-			alertAndDie(e.getMessage());
-		}
-	}
-	
 	private void doTask() {
-		try {
-			if (startWorker) doWorkerTask();
-			if (xmlFile != null) doTemplateTask();
-			if (batchFile != null) doBatchTask();
-			if (process) doProcessTask();
-			if (status) doStatusTask();
-			if (generateFile != null) doGenerateTask();
-			if (defaultName != null) doDefaultTask();
-			if (abort) doAbortTask();
-		} catch (PladipusReportableException e) {
-			alertAndDie(e.getMessage());
-		}
-	}
-	
-	//TODO move tasks into separate class shared by GUI code
-	private void doWorkerTask() throws PladipusReportableException {
-		cmdLineIO.printOutput(cmdLine.getString("worker.start"));
-		workerControl.startWorker(userControl.getLoggedInUser());
-		//TODO output text - worker processing to update user on what it's doing.  Make sure it's kept alive, no ActiveMQ timeout hanging deaths
-	}
-	
-	private void doTemplateTask() throws PladipusReportableException {
-		if (force) {
-			workflowControl.replaceWorkflow(xmlFile, userControl.getLoggedInUser());
-			cmdLineIO.printOutput(cmdLine.getString("workflow.updated"));
-		} else {
-			workflowControl.createWorkflow(xmlFile, userControl.getLoggedInUser());
-			cmdLineIO.printOutput(cmdLine.getString("workflow.created"));
-		}
-	}
-	
-	private void doBatchTask() throws PladipusReportableException {
-		if (force) {
-			batchControl.replaceBatch(batchFile, workflowName, batchName, userControl.getLoggedInUser());
-			cmdLineIO.printOutput(cmdLine.getString("batch.updated"));
-		} else {
-			batchControl.createBatch(batchFile, workflowName, batchName, userControl.getLoggedInUser());
-			cmdLineIO.printOutput(cmdLine.getString("batch.created"));
-		}
-	}
-	
-	private void doProcessTask() throws PladipusReportableException {
-		if (force) {
-			queueControl.restart(batchName, userControl.getLoggedInUser());
-		} else {
-			queueControl.process(batchName, userControl.getLoggedInUser());
-		}
-		cmdLineIO.printOutput(MessageFormat.format(cmdLine.getString("process.success"), (batchName != null && !batchName.isEmpty()) ? batchName : "all"));
-	}
-	
-	private void doStatusTask() throws PladipusReportableException {
-		TaskStatus taskStatus = queueControl.status(batchName, userControl.getLoggedInUser());
-		cmdLineIO.printOutput(taskStatus.toString());
-	}
-	
-	private void doGenerateTask() throws PladipusReportableException {
-		batchControl.generateHeaders(generateFile, workflowName, userControl.getLoggedInUser(), force);
-		cmdLineIO.printOutput(MessageFormat.format(cmdLine.getString("generate.success"), generateFile));
-	}
-	
-	private void doDefaultTask() throws PladipusReportableException {
-		defaultsControl.addDefault(defaultName, defaultValue, defaultType, userControl.getLoggedInUser());
-		cmdLineIO.printOutput(MessageFormat.format(cmdLine.getString("default.success"), defaultName));
-	}
-	
-	private void doAbortTask() throws PladipusReportableException {
-		queueControl.abort(batchName, userControl.getLoggedInUser());
-		cmdLineIO.printOutput(MessageFormat.format(cmdLine.getString("abort.success"), (batchName != null && !batchName.isEmpty()) ? batchName : "all"));
-	}
-	
-	@Override
-	public void alert(String msg) {
-		cmdLineIO.printAlert(msg);
-	}
-
-	@Override
-	public void alertAndDie(String msg) {
-		cmdLineIO.printAlert(msg);
-		System.exit(1);
+		if (xmlFile != null) cliTaskProcessor.doTemplateTask(xmlFile, force);
+		if (batchFile != null) cliTaskProcessor.doBatchTask(batchFile, workflowName, batchName, force);
+		if (process) cliTaskProcessor.doProcessTask(batchName, force);
+		if (status) cliTaskProcessor.doStatusTask(batchName);
+		if (generateFile != null) cliTaskProcessor.doGenerateTask(generateFile, workflowName, force);
+		if (defaultName != null) cliTaskProcessor.doDefaultTask(defaultName, defaultValue, defaultType);
+		if (abort) cliTaskProcessor.doAbortTask(batchName);
 	}
 	
 	private class CliOption {
@@ -290,7 +166,8 @@ public class MainCLI implements Alert {
 			try {
 				shortOpt = cmdLine.getString("options.short." + identifier);
 			} catch (MissingResourceException e) {
-				alertAndDie(e.getMessage());
+				cmdLineIO.printAlert(e.getMessage());
+				System.exit(1);
 			}
 			
 			try {

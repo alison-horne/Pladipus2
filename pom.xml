@@ -13,9 +13,10 @@
 		<module>pladipus-model</module>
 		<module>pladipus-tools</module>
 		<module>pladipus-repository</module>
-        <module>pladipus-queue</module>
-	    <module>pladipus-base</module>
+        <module>pladipus-base</module>
+	    <module>pladipus-queue</module>
         <module>pladipus-client</module>
+		<module>pladipus-worker</module>
     </modules>
 
     <name>pladipus</name>
@@ -35,6 +36,7 @@
 		<hibernatecore.version>5.2.6.Final</hibernatecore.version>
 		<hibernateannotations.version>3.5.6-Final</hibernateannotations.version>
 		<apache.commons.version>3.4</apache.commons.version>
+		<commons.csv.version>1.4</commons.csv.version>
 		<commons.cli.version>1.3.1</commons.cli.version>
 		<mockito.version>2.0.2-beta</mockito.version>
 		<systemrules.version>1.16.1</systemrules.version>
@@ -103,6 +105,12 @@
 			<dependency>
                 <groupId>com.compomics.pladipus</groupId>
                 <artifactId>pladipus-repository</artifactId>
+                <version>${pladipus.version}</version>
+            </dependency>
+			
+			<dependency>
+                <groupId>com.compomics.pladipus</groupId>
+                <artifactId>pladipus-worker</artifactId>
                 <version>${pladipus.version}</version>
             </dependency>
 			
@@ -222,6 +230,12 @@
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-lang3</artifactId>
 				<version>${apache.commons.version}</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-csv</artifactId>
+				<version>${commons.csv.version}</version>
 			</dependency>
 			
 			<dependency>

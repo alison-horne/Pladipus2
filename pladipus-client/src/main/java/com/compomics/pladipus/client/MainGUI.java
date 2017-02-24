@@ -6,7 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class MainGUI extends Application implements Alert{
+public class MainGUI extends Application {
 
 	protected Parent root;
 	
@@ -38,17 +38,5 @@ public class MainGUI extends Application implements Alert{
 	    stage.setTitle("Pladipus");
 	    stage.setScene(scene);
 	    stage.show();
-	}
-
-	@Override
-	public void alert(String msg) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void alertAndDie(String msg) {
-		// TODO Auto-generated method stub
-		
 	}
 }

@@ -16,7 +16,6 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
-import com.compomics.pladipus.base.test.config.MockBaseConfiguration;
 import com.compomics.pladipus.client.config.ClientConfiguration;
 import com.compomics.pladipus.client.config.MockClientConfiguration;
 
@@ -25,7 +24,7 @@ import com.compomics.pladipus.client.config.MockClientConfiguration;
  * so real services would never be called if unexpected command line success.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={ClientConfiguration.class, MockBaseConfiguration.class, MockClientConfiguration.class}, loader=AnnotationConfigContextLoader.class)
+@ContextConfiguration(classes={ClientConfiguration.class, MockClientConfiguration.class}, loader=AnnotationConfigContextLoader.class)
 @TestExecutionListeners({ DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class,
 						  TransactionalTestExecutionListener.class })
 public class CliInvalidOptionsTest {

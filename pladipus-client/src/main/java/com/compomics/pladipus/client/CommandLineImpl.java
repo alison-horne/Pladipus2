@@ -18,7 +18,7 @@ public class CommandLineImpl implements CommandLineIO {
 	private static final String DEFAULT_ERROR = "Error.";
 	
 	private static final String[] USAGE_TEXTS 
-    	= new String[]{"main", "help", "user", "worker", "template", "batch", "process", "rerun", "status", "generate", "default", "abort"};
+    	= new String[]{"main", "help", "user", "template", "batch", "process", "rerun", "status", "generate", "default", "abort"};
 	
 	@Override
 	public String getPassword() {

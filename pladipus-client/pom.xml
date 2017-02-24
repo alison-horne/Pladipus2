@@ -38,7 +38,7 @@
                         <descriptorRefs>
                             <descriptorRef>jar-with-dependencies</descriptorRef>
                         </descriptorRefs>
-						<finalName>pladipus</finalName>
+						<finalName>pladipus-client</finalName>
 						<appendAssemblyId>false</appendAssemblyId>
                         <archive>
                             <manifest>
@@ -64,7 +64,12 @@
 	
 	    <dependency>
             <groupId>com.compomics.pladipus</groupId>
-            <artifactId>pladipus-base</artifactId>
+            <artifactId>pladipus-shared</artifactId>
+        </dependency>
+		
+		<dependency>
+            <groupId>com.compomics.pladipus</groupId>
+            <artifactId>pladipus-model</artifactId>
         </dependency>
 		
 		<dependency>
@@ -75,12 +80,6 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.compomics.pladipus</groupId>
-			<artifactId>pladipus-base</artifactId>
-			<type>test-jar</type>
 		</dependency>
 		
 		<dependency>
@@ -99,13 +98,13 @@
         </dependency>
 		
 		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jms</artifactId>
 		</dependency>
-			
-		<dependency>                                    
-			<groupId>org.slf4j</groupId>                
-			<artifactId>jcl-over-slf4j</artifactId>     
+
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-spring</artifactId>
 		</dependency>
 		
 		<dependency>
