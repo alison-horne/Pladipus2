@@ -3,9 +3,15 @@ package com.compomics.pladipus.base.test.mocks;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.io.StringWriter;
+import java.nio.file.Files;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -13,7 +19,8 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ResourceLoader;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
@@ -57,12 +64,13 @@ public class WorkflowControlTestMock {
 	@Autowired
 	private PladipusMessages exceptionMessages;
 	
-	@Autowired
-	private ResourceLoader resourceLoader;
+    @Value("classpath:valid1.xml")
+    private Resource VALID1_FILE;
+    
+    @Value("classpath:invalid_noname.xml")
+    private Resource INVALID_NO_NAME_FILE;
 	
 	private static final User USER = new User();
-	private static final String VALID1_FILE = "classpath:valid1.xml";
-	private static final String INVALID_NO_NAME_FILE = "classpath:invalid_noname.xml";
 
 	@Before
 	public void setUp() throws PladipusReportableException {
@@ -72,7 +80,7 @@ public class WorkflowControlTestMock {
 	@Test
 	public void testValidInsertNoParams() {
 		try {
-			workflowControl.createWorkflow(getXMLFilePath(VALID1_FILE), USER);
+			workflowControl.createWorkflow(getXMLFileContent(VALID1_FILE), USER);
 			ArgumentCaptor<Workflow> argument = ArgumentCaptor.forClass(Workflow.class);
 			Mockito.verify(workflowService).insertWorkflow(argument.capture());
 			assertEquals(USER, argument.getValue().getUser());
@@ -86,7 +94,7 @@ public class WorkflowControlTestMock {
 	@Test
 	public void testValidReplaceNoParams() {
 		try {
-			workflowControl.replaceWorkflow(getXMLFilePath(VALID1_FILE), USER);
+			workflowControl.replaceWorkflow(getXMLFileContent(VALID1_FILE), USER);
 			ArgumentCaptor<Workflow> argument = ArgumentCaptor.forClass(Workflow.class);
 			Mockito.verify(workflowService).replaceWorkflow(argument.capture());
 			assertEquals(USER, argument.getValue().getUser());
@@ -100,7 +108,7 @@ public class WorkflowControlTestMock {
 	@Test
 	public void testInvalidNoName() {
 		try {
-			workflowControl.createWorkflow(getXMLFilePath(INVALID_NO_NAME_FILE), USER);
+			workflowControl.createWorkflow(getXMLFileContent(INVALID_NO_NAME_FILE), USER);
 			fail("Should not validate xml file with no name");
 		} catch (PladipusReportableException e) {
 			Mockito.verifyZeroInteractions(workflowService);
@@ -121,16 +129,28 @@ public class WorkflowControlTestMock {
 		}
 	}
 	
-	private String getXMLFilePath(String classpath) {
+	@Test
+	public void testGetWorkflow() {
 		try {
-			return resourceLoader.getResource(classpath).getFile().getAbsolutePath();
+			Mockito.when(workflowService.getActiveWorkflowByName("name", USER)).thenReturn(new Workflow());
+			Workflow workflow = workflowControl.getNamedWorkflow("name", USER);
+			assertNotNull(workflow);
+			Mockito.verify(workflowService).getActiveWorkflowByName("name", USER);
+		} catch (PladipusReportableException e) {
+			fail("getNamedWorkflow failed: " + e.getMessage());
+		}
+	}
+	
+	private String getXMLFileContent(Resource res) {
+		try {
+			return new String(Files.readAllBytes(res.getFile().toPath()));
 		} catch (IOException e) {
-			fail("Could not load XML file " + classpath);
+			fail("Could not load XML file");
 			return null;
 		}
 	}
 	
-	private Document getDocNoSteps() {
+	private String getDocNoSteps() {
 		try {
 			DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			Document doc = docBuilder.newDocument();
@@ -139,7 +159,10 @@ public class WorkflowControlTestMock {
 			Element globalElement = doc.createElement("global");
 			rootElement.appendChild(globalElement);
 			doc.appendChild(rootElement);
-			return doc;
+	        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+	        StringWriter writer = new StringWriter();
+	        transformer.transform(new DOMSource(doc), new StreamResult(writer));
+	        return writer.getBuffer().toString();
 		} catch (Exception e) {
 			fail("Failed to create XML document: " + e.getMessage());
 			return null;

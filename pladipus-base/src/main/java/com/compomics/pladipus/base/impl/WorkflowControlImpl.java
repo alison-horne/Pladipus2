@@ -1,7 +1,7 @@
 package com.compomics.pladipus.base.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.w3c.dom.Document;
+import org.springframework.context.annotation.Lazy;
 
 import com.compomics.pladipus.base.WorkflowControl;
 import com.compomics.pladipus.base.helper.ValidationChecker;
@@ -14,6 +14,7 @@ import com.compomics.pladipus.repository.service.WorkflowService;
 public class WorkflowControlImpl implements WorkflowControl {
 	
 	@Autowired
+	@Lazy
 	private WorkflowService workflowService;
 	
 	@Autowired
@@ -23,30 +24,25 @@ public class WorkflowControlImpl implements WorkflowControl {
 	private XMLHelper<Workflow> workflowXMLHelper;
 
 	@Override
-	public void createWorkflow(String filepath, User user) throws PladipusReportableException {
-		createWorkflow(workflowXMLHelper.filepathToDocument(filepath), user);
-	}
-	
-	@Override
-	public void replaceWorkflow(String filepath, User user) throws PladipusReportableException {
-		replaceWorkflow(workflowXMLHelper.filepathToDocument(filepath), user);
-	}
-
-	@Override
-	public void createWorkflow(Document document, User user) throws PladipusReportableException {
-		Workflow workflow = parseAndValidate(document, user);
+	public void createWorkflow(String content, User user) throws PladipusReportableException {
+		Workflow workflow = parseAndValidate(content, user);
 		workflowService.insertWorkflow(workflow);
 	}
 
 	@Override
-	public void replaceWorkflow(Document document, User user) throws PladipusReportableException {
-		Workflow workflow = parseAndValidate(document, user);
+	public void replaceWorkflow(String content, User user) throws PladipusReportableException {
+		Workflow workflow = parseAndValidate(content, user);
 		workflowService.replaceWorkflow(workflow);
 	}
 	
-	private Workflow parseAndValidate(Document document, User user) throws PladipusReportableException {
-		Workflow workflow = workflowXMLHelper.parseDocument(document);
-		workflow.setTemplateXml(workflowXMLHelper.documentToString(document));
+	@Override
+	public Workflow getNamedWorkflow(String name, User user) throws PladipusReportableException {
+		return workflowService.getActiveWorkflowByName(name, user);
+	}
+	
+	private Workflow parseAndValidate(String content, User user) throws PladipusReportableException {
+		Workflow workflow = workflowXMLHelper.parseXml(content);
+		workflow.setTemplateXml(content);
 		workflow.setUser(user);
 		workflowValidator.validate(workflow);
 		return workflow;

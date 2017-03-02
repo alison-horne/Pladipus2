@@ -1,16 +1,14 @@
 package com.compomics.pladipus.base;
 
-import org.w3c.dom.Document;
-
 import com.compomics.pladipus.model.persist.User;
+import com.compomics.pladipus.model.persist.Workflow;
 import com.compomics.pladipus.shared.PladipusReportableException;
 
 /**
  * Creation, validation, and retrieval of user workflows.
  */
 public interface WorkflowControl {
-	public void createWorkflow(String filepath, User user) throws PladipusReportableException;
-	public void createWorkflow(Document document, User user) throws PladipusReportableException;
-	public void replaceWorkflow(String filepath, User user) throws PladipusReportableException;
-	public void replaceWorkflow(Document document, User user) throws PladipusReportableException;
+	public void createWorkflow(String filecontent, User user) throws PladipusReportableException;
+	public void replaceWorkflow(String filecontent, User user) throws PladipusReportableException;
+	public Workflow getNamedWorkflow(String name, User user) throws PladipusReportableException;
 }
