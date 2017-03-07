@@ -22,15 +22,19 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.compomics.pladipus.repository.helpers.impl.BasicEncryptor;
+import com.compomics.pladipus.repository.persist.BatchRepository;
 import com.compomics.pladipus.repository.persist.DefaultRepository;
 import com.compomics.pladipus.repository.persist.UserRepository;
 import com.compomics.pladipus.repository.persist.WorkflowRepository;
+import com.compomics.pladipus.repository.persist.impl.BatchRepositoryImpl;
 import com.compomics.pladipus.repository.persist.impl.DefaultRepositoryImpl;
 import com.compomics.pladipus.repository.persist.impl.UserRepositoryImpl;
 import com.compomics.pladipus.repository.persist.impl.WorkflowRepositoryImpl;
+import com.compomics.pladipus.repository.service.BatchService;
 import com.compomics.pladipus.repository.service.DefaultService;
 import com.compomics.pladipus.repository.service.UserService;
 import com.compomics.pladipus.repository.service.WorkflowService;
+import com.compomics.pladipus.repository.service.impl.BatchServiceImpl;
 import com.compomics.pladipus.repository.service.impl.DefaultServiceImpl;
 import com.compomics.pladipus.repository.service.impl.UserServiceImpl;
 import com.compomics.pladipus.repository.service.impl.WorkflowServiceImpl;
@@ -112,7 +116,8 @@ public class RepositoryConfiguration {
 			private static final long serialVersionUID = -1311982616224454610L;
 
 			{  
-				setProperty("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));  
+				setProperty("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));
+				setProperty("hibernate.hbm2ddl.import_files", "initialInserts.sql");
 				setProperty("hibernate.dialect", env.getProperty("hibernate.dialect"));  
 				setProperty("hibernate.globally_quoted_identifiers", env.getProperty("hibernate.globally_quoted_identifiers"));  
 		    }  
@@ -141,6 +146,18 @@ public class RepositoryConfiguration {
 	@Bean
 	public DefaultService defaultService() {
 		return new DefaultServiceImpl();
+	}
+	
+	@Lazy
+	@Bean
+	public BatchRepository batchRepo() {
+		return new BatchRepositoryImpl();
+	}
+	
+	@Lazy
+	@Bean
+	public BatchService batchService() {
+		return new BatchServiceImpl();
 	}
 	
 	@Lazy
