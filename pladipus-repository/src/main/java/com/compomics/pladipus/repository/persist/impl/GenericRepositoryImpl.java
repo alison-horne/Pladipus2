@@ -9,11 +9,13 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.compomics.pladipus.repository.persist.GenericRepository;
 import com.compomics.pladipus.shared.PladipusMessages;
 import com.compomics.pladipus.shared.PladipusReportableException;
 
+@Transactional
 public abstract class GenericRepositoryImpl<T> implements GenericRepository<T> {
 	
 	@Autowired
