@@ -3,6 +3,7 @@ package com.compomics.pladipus.model.queue.messages.client;
 public class ControlToClientMessage {
 	private ClientTaskStatus status;
 	private String errorMsg;
+	private String content;
 
 	public ClientTaskStatus getStatus() {
 		return status;
@@ -15,5 +16,11 @@ public class ControlToClientMessage {
 	}
 	public void setErrorMsg(String errorMsg) {
 		this.errorMsg = errorMsg;
+	}
+	public String getContent() {
+		return content;
+	}
+	public void setContent(String content) {
+		this.content = content;
 	}
 }

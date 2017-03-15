@@ -71,6 +71,7 @@ public class Batch {
     	this.runs = runs;
     }
     public void addRun(BatchRun run) {
+    	run.setBatch(this);
     	runs.add(run);
     }
 }

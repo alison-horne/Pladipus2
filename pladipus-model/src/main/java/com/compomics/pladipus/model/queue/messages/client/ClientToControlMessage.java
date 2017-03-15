@@ -6,12 +6,19 @@ public class ClientToControlMessage {
 	private String password;
 	private String fileContent;
 	private String batchName;
+	private String workflowName;
+	private String defaultName;
+	private String defaultValue;
+	private String defaultType;
+	
+	public ClientToControlMessage() {}
+	
+	public ClientToControlMessage(ClientTask task) {
+		this.task = task;
+	}
 	
 	public ClientTask getTask() {
 		return task;
-	}
-	public void setTask(ClientTask task) {
-		this.task = task;
 	}
 	public String getUsername() {
 		return username;
@@ -36,5 +43,29 @@ public class ClientToControlMessage {
 	}
 	public void setBatchName(String batchName) {
 		this.batchName = batchName;
+	}
+	public String getWorkflowName() {
+		return workflowName;
+	}
+	public void setWorkflowName(String workflowName) {
+		this.workflowName = workflowName;
+	}
+	public String getDefaultName() {
+		return defaultName;
+	}
+	public void setDefaultName(String defaultName) {
+		this.defaultName = defaultName;
+	}
+	public String getDefaultValue() {
+		return defaultValue;
+	}
+	public void setDefaultValue(String defaultValue) {
+		this.defaultValue = defaultValue;
+	}
+	public String getDefaultType() {
+		return defaultType;
+	}
+	public void setDefaultType(String defaultType) {
+		this.defaultType = defaultType;
 	}
 }
