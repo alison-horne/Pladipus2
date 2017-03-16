@@ -21,6 +21,7 @@ public class PladipusMain {
 		else {
 			((MainCLI)context.getBean("cli")).cliMain(args);
 		}
+		System.exit(0);
 	}
 	
 	class Logout extends Thread {

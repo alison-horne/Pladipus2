@@ -10,6 +10,7 @@ import org.apache.commons.csv.CSVPrinter;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.compomics.pladipus.shared.PladipusMessages;
+import com.compomics.pladipus.shared.PladipusReportableException;
 import com.google.common.io.Files;
 
 public class BatchCsvIO {
@@ -17,15 +18,12 @@ public class BatchCsvIO {
 	@Autowired
 	private PladipusMessages exceptionMessages;
 	
-	@Autowired
-	private CommandLineIO cmdLineIO;
-	
-	public void checkFileValid(String filepath, boolean force) {
+	public void checkFileValid(String filepath, boolean force) throws PladipusReportableException {
 		checkFileName(filepath);
 		checkExistingFile(filepath, force);
 	}
 	
-	private void checkFileName(String filepath) {
+	private void checkFileName(String filepath) throws PladipusReportableException {
 		boolean valid = false;
 		if ((filepath != null) && !filepath.isEmpty()) {			
 			String ext = Files.getFileExtension(filepath);
@@ -35,23 +33,23 @@ public class BatchCsvIO {
 		}
 		
 		if (!valid) {
-			cmdLineIO.printError(exceptionMessages.getMessage("batch.invalidFilename"));
+			throw new PladipusReportableException(exceptionMessages.getMessage("batch.invalidFilename"));
 		}
 	}
 	
-	private void checkExistingFile(String filepath, boolean force) {
+	private void checkExistingFile(String filepath, boolean force) throws PladipusReportableException {
 		File file = new File(filepath);
 		if (file.exists()) {
 			if (file.isDirectory() || !file.canWrite()) {
-				cmdLineIO.printError(exceptionMessages.getMessage("batch.invalidFilename"));
+				throw new PladipusReportableException(exceptionMessages.getMessage("batch.invalidFilename"));
 			}
 			if (!force) {
-				cmdLineIO.printError(exceptionMessages.getMessage("batch.replaceFile"));
+				throw new PladipusReportableException(exceptionMessages.getMessage("batch.replaceFile"));
 			}
 		}
 	}
 	
-	public void writeHeaderFile(String filepath, List<String> headers) {
+	public void writeHeaderFile(String filepath, List<String> headers) throws PladipusReportableException {
         FileWriter writer = null;
         CSVPrinter printer = null;       
         try {
@@ -59,14 +57,14 @@ public class BatchCsvIO {
         	printer = new CSVPrinter(writer, CSVFormat.EXCEL);
         	printer.printRecord(headers);
         } catch (IOException e) {
-        	cmdLineIO.printError(exceptionMessages.getMessage("batch.fileWriteError", e.getMessage()));
+        	throw new PladipusReportableException(exceptionMessages.getMessage("batch.fileWriteError", e.getMessage()));
         } finally {
         	try {
         		writer.flush();
         		writer.close();
         		printer.close();
         	} catch (IOException e) {
-            	cmdLineIO.printError(exceptionMessages.getMessage("batch.fileWriteError", e.getMessage()));
+            	throw new PladipusReportableException(exceptionMessages.getMessage("batch.fileWriteError", e.getMessage()));
         	}
         }
 	}
