@@ -6,5 +6,5 @@ public interface CommandLineIO {
 	String getPassword();
 	void printOutput(String output);
 	void printHelp(Options helpOpts, String errorMsg);
-	void printAlert(String alert);
+	void printError(String error);
 }

@@ -36,13 +36,13 @@ public class CommandLineImpl implements CommandLineIO {
 	}
 	
 	@Override
-	public void printAlert(String alert) {
+	public void printError(String error) {
 		try {
 			System.out.println(cmdLine.getString("error.string"));
 		} catch (MissingResourceException e) {
 			System.out.println(DEFAULT_ERROR);
 		}
-		printOutput(alert);
+		printOutput(error);
 	}
 
 	@Override
@@ -59,7 +59,6 @@ public class CommandLineImpl implements CommandLineIO {
         	printOutput(errorMsg + "\n");
         }
         formatter.printHelp(constructHelpText(), cmdLine.getString("usage.header"), helpOpts, cmdLine.getString("usage.footer"), false);
-        System.exit(0);
 	}
 	
 	private String constructHelpText() {

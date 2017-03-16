@@ -13,6 +13,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.compomics.pladipus.shared.PladipusReportableException;
+
 public class MainCLI {
 	
 	@Autowired
@@ -55,10 +57,12 @@ public class MainCLI {
 			} else {
 				readOptions(line);
 				cliTaskProcessor.login(userName, password);
-				doTask(); 
+				doTask();
 			}
 	    } catch (ParseException e) {
 	    	cmdLineIO.printHelp(helpOpts, e.getMessage());
+	    } catch (PladipusReportableException e) {
+	    	cmdLineIO.printError(e.getMessage());
 	    }
 	}
 	
@@ -147,7 +151,7 @@ public class MainCLI {
 		cmdLineOpts.addOptionGroup(optGroup);
 	}
 	
-	private void doTask() {
+	private void doTask() throws PladipusReportableException {
 		if (xmlFile != null) cliTaskProcessor.doTemplateTask(xmlFile, force);
 		if (batchFile != null) cliTaskProcessor.doBatchTask(batchFile, workflowName, batchName, force);
 		if (process) cliTaskProcessor.doProcessTask(batchName, force);
@@ -166,8 +170,7 @@ public class MainCLI {
 			try {
 				shortOpt = cmdLine.getString("options.short." + identifier);
 			} catch (MissingResourceException e) {
-				cmdLineIO.printAlert(e.getMessage());
-				System.exit(1);
+				cmdLineIO.printError(e.getMessage());
 			}
 			
 			try {

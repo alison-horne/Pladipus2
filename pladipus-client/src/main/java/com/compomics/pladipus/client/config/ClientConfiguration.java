@@ -7,6 +7,7 @@ import org.apache.activemq.command.ActiveMQQueue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.Scope;
@@ -15,6 +16,7 @@ import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 
+import com.compomics.pladipus.client.BatchCsvIO;
 import com.compomics.pladipus.client.CliTaskProcessor;
 import com.compomics.pladipus.client.CliTaskProcessorImpl;
 import com.compomics.pladipus.client.CommandLineIO;
@@ -23,11 +25,16 @@ import com.compomics.pladipus.client.MainCLI;
 import com.compomics.pladipus.client.MainGUI;
 import com.compomics.pladipus.client.queue.ClientListener;
 import com.compomics.pladipus.client.queue.ClientMessageProducer;
+import com.compomics.pladipus.client.queue.ClientMessageTask;
 import com.compomics.pladipus.client.queue.MessageMap;
 import com.compomics.pladipus.client.queue.MessageTask;
 import com.compomics.pladipus.client.queue.UuidGenerator;
+import com.compomics.pladipus.shared.config.SharedConfiguration;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
+@Import(SharedConfiguration.class)
 @PropertySource({"classpath:application.properties", "classpath:queue.properties"})
 public class ClientConfiguration {
 	
@@ -79,6 +86,11 @@ public class ClientConfiguration {
 	}
 	
 	@Bean
+	public BatchCsvIO batchCsvIO() {
+		return new BatchCsvIO();
+	}
+	
+	@Bean
 	public ActiveMQConnectionFactory amqConnectionFactory() {
 		return new ActiveMQConnectionFactory("tcp://" + env.getRequiredProperty("amq.host") + ":" + env.getRequiredProperty("amq.queue.port"));
 	}
@@ -107,6 +119,13 @@ public class ClientConfiguration {
 	}
 	
 	@Bean
+	public ObjectMapper jsonMapper() {
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.setSerializationInclusion(Include.NON_NULL);
+		return mapper;
+	}
+	
+	@Bean
 	public ClientListener clientListener() {
 		return new ClientListener();
 	}
@@ -130,6 +149,6 @@ public class ClientConfiguration {
 	@Scope(value = "prototype")
 	@Lazy
 	public MessageTask messageTask(String text) {
-		return new MessageTask(text);
+		return new ClientMessageTask(text);
 	}
 }

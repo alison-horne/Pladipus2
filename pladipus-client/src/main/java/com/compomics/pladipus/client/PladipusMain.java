@@ -4,22 +4,31 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.support.AbstractApplicationContext;
 
 import com.compomics.pladipus.client.config.ClientConfiguration;
+import com.compomics.pladipus.client.queue.MessageMap;
 
 public class PladipusMain {
+	private AbstractApplicationContext context = new AnnotationConfigApplicationContext(ClientConfiguration.class);
+	
 	public static void main(String[] args) {
 		new PladipusMain().init(args);
-		//TODO handle shutdown/closing threads elegantly.
 	}
 	
 	public void init(String[] args) {
-		@SuppressWarnings("resource")
-		AbstractApplicationContext context = new AnnotationConfigApplicationContext(ClientConfiguration.class);
-		context.registerShutdownHook();
+		Runtime.getRuntime().addShutdownHook(new Logout());
 		if (args.length == 0) {
 			((MainGUI)context.getBean("gui")).guiMain();
 		}
 		else {
 			((MainCLI)context.getBean("cli")).cliMain(args);
+		}
+	}
+	
+	class Logout extends Thread {
+		public void run() {
+			// TODO send logout message?
+			MessageMap map = context.getBean("messageMap", MessageMap.class);
+			map.terminateFutures();
+			context.close();
 		}
 	}
 }

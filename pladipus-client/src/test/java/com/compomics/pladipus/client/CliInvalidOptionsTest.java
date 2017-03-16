@@ -20,8 +20,7 @@ import com.compomics.pladipus.client.config.ClientConfiguration;
 import com.compomics.pladipus.client.config.MockClientConfiguration;
 
 /**
- * Test invalid command line inputs give appropriate error messages.  Using MockBase config just in case of 'failure'
- * so real services would never be called if unexpected command line success.
+ * Test invalid command line inputs give appropriate error messages.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes={ClientConfiguration.class, MockClientConfiguration.class}, loader=AnnotationConfigContextLoader.class)
@@ -93,8 +92,7 @@ public class CliInvalidOptionsTest {
 	@Test
 	@DirtiesContext
 	public void testErrorNoPasswordWithoutConsole() {
-		Mockito.when(cmdLineIO.getPassword()).thenReturn(null);
-		cli.cliMain("-w -u username".split(" "));
+		cli.cliMain("-s -u username".split(" "));
 		Mockito.verify(cmdLineIO).printHelp(Matchers.any(Options.class), Matchers.anyString());
 		Mockito.verify(cmdLineIO).getPassword();
 	}
