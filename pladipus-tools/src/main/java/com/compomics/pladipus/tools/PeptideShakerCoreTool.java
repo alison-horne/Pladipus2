@@ -1,5 +1,7 @@
 package com.compomics.pladipus.tools;
 
+import java.util.Map;
+
 import com.compomics.pladipus.model.parameters.InputParameter;
 import com.compomics.pladipus.tools.annotations.PladipusTool;
 import com.compomics.pladipus.tools.core.Tool;
@@ -14,11 +16,30 @@ import com.google.common.collect.ImmutableSet;
 @PladipusTool(displayName = "Peptide Shaker")
 public class PeptideShakerCoreTool extends Tool {
 	
+	public PeptideShakerCoreTool() {
+		super();
+	}
+	public PeptideShakerCoreTool(Map<String, String> parameters) {
+		super(parameters);
+	}
+	
 	private static ImmutableSet<InputParameter> allParams = ImmutableSet.of(
 			);
 	
 	@Override
 	public ImmutableSet<InputParameter> getAllToolInputParameters() {
 		return allParams;
+	}
+
+	@Override
+	public int getDefaultTimeout() {
+		// TODO if needed, override timeout for tool
+		return super.getDefaultTimeout();
+	}
+
+	@Override
+	public String getJar() {
+		// TODO actual jar location
+		return null;
 	}
 }

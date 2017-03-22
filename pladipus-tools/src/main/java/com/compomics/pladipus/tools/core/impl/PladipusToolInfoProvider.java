@@ -45,7 +45,7 @@ public class PladipusToolInfoProvider implements ToolInfoProvider {
 		}
 		allToolInfo = builder.build();
 		if (allToolInfo.isEmpty()) {
-			throw new PladipusReportableException(exceptionMessages.getMessage("tool.noToolInfo"));
+			throw new PladipusReportableException(exceptionMessages.getMessage("tools.noToolInfo"));
 		}
     }
 	

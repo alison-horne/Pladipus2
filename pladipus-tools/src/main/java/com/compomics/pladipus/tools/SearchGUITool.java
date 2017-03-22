@@ -1,5 +1,7 @@
 package com.compomics.pladipus.tools;
 
+import java.util.Map;
+
 import com.compomics.pladipus.model.parameters.InputParameter;
 import com.compomics.pladipus.model.parameters.InputType;
 import com.compomics.pladipus.tools.annotations.PladipusTool;
@@ -14,6 +16,13 @@ import com.google.common.collect.ImmutableSet;
 @PladipusTool(displayName = "SearchGUI")
 public class SearchGUITool extends Tool {
 	
+	public SearchGUITool() {
+		super();
+	}
+	public SearchGUITool(Map<String, String> parameters) {
+		super(parameters);
+	}
+	
 	private static ImmutableSet<InputParameter> allParams = ImmutableSet.of(
 			new InputParameter("spectrum_files", 
 							   "Spectrum files (mgf format), comma separated list or an entire folder.",
@@ -24,5 +33,17 @@ public class SearchGUITool extends Tool {
 	@Override
 	public ImmutableSet<InputParameter> getAllToolInputParameters() {
 		return allParams;
+	}
+
+	@Override
+	public int getDefaultTimeout() {
+		// TODO if needed, override timeout for tool
+		return super.getDefaultTimeout();
+	}
+
+	@Override
+	public String getJar() {
+		// TODO actual jar location
+		return null;
 	}
 }
