@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.compomics.pladipus.model.persist.Run;
 import com.compomics.pladipus.model.persist.RunStatus;
 import com.compomics.pladipus.model.persist.RunStep;
+import com.compomics.pladipus.model.queue.messages.worker.WorkerToControlMessage;
 import com.compomics.pladipus.repository.persist.RunRepository;
 import com.compomics.pladipus.repository.persist.RunStepRepository;
 import com.compomics.pladipus.repository.service.RunService;
@@ -41,5 +42,9 @@ public class RunServiceImpl implements RunService {
 		runRepo.merge(run);
 	}
 
-
+	@Override
+	public void processWorkerResponse(WorkerToControlMessage msg) throws PladipusReportableException {
+		// TODO update run/step status, outputs, error messages, etc.
+		
+	}
 }

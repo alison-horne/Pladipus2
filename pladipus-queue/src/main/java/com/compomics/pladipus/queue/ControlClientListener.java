@@ -2,6 +2,7 @@ package com.compomics.pladipus.queue;
 
 import javax.jms.Message;
 import javax.jms.MessageListener;
+import javax.jms.TextMessage;
 
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,10 @@ public class ControlClientListener implements MessageListener {
 	
 	@Override
 	public void onMessage(Message msg) {
-		beanFactory.getBean(ClientTaskProcessor.class, msg).start();
+		if (msg instanceof TextMessage) {
+			beanFactory.getBean(ClientTaskProcessor.class, (TextMessage)msg).start();
+		} else {
+			// TODO handle bad message
+		}
 	}
 }

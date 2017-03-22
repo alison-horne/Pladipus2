@@ -1,6 +1,6 @@
 package com.compomics.pladipus.queue.config;
 
-import javax.jms.Message;
+import javax.jms.TextMessage;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQQueue;
@@ -22,6 +22,8 @@ import com.compomics.pladipus.queue.ControlClientListener;
 import com.compomics.pladipus.queue.ControlClientProducer;
 import com.compomics.pladipus.queue.ControlWorkerListener;
 import com.compomics.pladipus.queue.ControlWorkerProducer;
+import com.compomics.pladipus.queue.ReadyTaskScheduler;
+import com.compomics.pladipus.queue.WorkerTaskProcessor;
 
 @Configuration
 @Import(BaseConfiguration.class)
@@ -51,6 +53,11 @@ public class QueueConfiguration {
 	    JmsTemplate temp = new JmsTemplate();
 		temp.setConnectionFactory(cacheConnectionFactory());
 		temp.setDefaultDestination(new ActiveMQQueue(env.getRequiredProperty("queue.toClients")));
+		try {
+			Long timeout = Long.parseLong(env.getProperty("queue.clientTimeout")) * 2;
+			temp.setExplicitQosEnabled(true);
+			temp.setTimeToLive(timeout);
+		} catch (Exception e) {}
 		return temp;
 	}
 	
@@ -101,9 +108,21 @@ public class QueueConfiguration {
 	}
 	
 	@Bean
+	public ReadyTaskScheduler readyTaskScheduler() {
+		return new ReadyTaskScheduler();
+	}
+	
+	@Bean
 	@Scope(value = "prototype")
 	@Lazy
-	public ClientTaskProcessor clientTaskProcessor(Message message) {
+	public ClientTaskProcessor clientTaskProcessor(TextMessage message) {
 		return new ClientTaskProcessor(message);
+	}
+	
+	@Bean
+	@Scope(value = "prototype")
+	@Lazy
+	public WorkerTaskProcessor workerTaskProcessor(TextMessage message) {
+		return new WorkerTaskProcessor(message);
 	}
 }
