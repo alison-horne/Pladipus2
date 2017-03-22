@@ -14,11 +14,17 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Table(name="runs")
 @Entity(name="runs")
+@NamedQueries({
+	@NamedQuery(name="Run.findByStatus", query="SELECT r FROM runs r WHERE r.status = :status"),
+	@NamedQuery(name="Run.findByBatch", query="SELECT r FROM runs r WHERE r.batchRun IN :batch")
+})
 public class Run {
 	
 	private Long runId;
@@ -38,7 +44,7 @@ public class Run {
         this.runId = id;  
     }  
     
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="batch_run_id")
     public BatchRun getBatchRun() {
     	return batchRun;

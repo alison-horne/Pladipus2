@@ -56,7 +56,7 @@ public class RunStepOutput {
 	public void setFinalStep(boolean finalStep) {
 		this.finalStep = finalStep;
 	}
-	
+
     static class Key implements Serializable {
 
     	private static final long serialVersionUID = 2090053687778015734L;

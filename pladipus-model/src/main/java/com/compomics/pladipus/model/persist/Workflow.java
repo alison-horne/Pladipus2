@@ -183,7 +183,7 @@ public class Workflow {
     	this.templateXml = templateXml;
     }
     
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="user_id")
     public User getUser() {
     	return user;

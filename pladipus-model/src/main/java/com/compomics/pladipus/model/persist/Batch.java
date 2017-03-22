@@ -6,6 +6,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -63,7 +64,7 @@ public class Batch {
     	this.active = active;
     }
     
-    @OneToMany(cascade=CascadeType.ALL, mappedBy="batch")
+    @OneToMany(cascade=CascadeType.ALL, mappedBy="batch", fetch=FetchType.EAGER)
     public Set<BatchRun> getRuns() {
     	return runs;
     }
