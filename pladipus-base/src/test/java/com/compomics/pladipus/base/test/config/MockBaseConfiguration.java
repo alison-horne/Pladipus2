@@ -8,7 +8,6 @@ import com.compomics.pladipus.base.BatchControl;
 import com.compomics.pladipus.base.DefaultsControl;
 import com.compomics.pladipus.base.QueueControl;
 import com.compomics.pladipus.base.UserControl;
-import com.compomics.pladipus.base.WorkerControl;
 import com.compomics.pladipus.base.WorkflowControl;
 
 @Configuration
@@ -37,10 +36,5 @@ public class MockBaseConfiguration {
 	@Bean
 	public QueueControl queueControl() {
 		return Mockito.mock(QueueControl.class);
-	}
-	
-	@Bean
-	public WorkerControl workerControl() {
-		return Mockito.mock(WorkerControl.class);
 	}
 }

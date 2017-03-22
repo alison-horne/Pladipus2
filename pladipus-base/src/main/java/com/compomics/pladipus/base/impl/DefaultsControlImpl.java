@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 import com.compomics.pladipus.base.DefaultsControl;
 import com.compomics.pladipus.model.persist.Default;
@@ -14,6 +15,7 @@ import com.compomics.pladipus.repository.service.DefaultService;
 public class DefaultsControlImpl implements DefaultsControl {
 
 	@Autowired
+	@Lazy
 	private DefaultService defaultService;
 	
 	@Override
