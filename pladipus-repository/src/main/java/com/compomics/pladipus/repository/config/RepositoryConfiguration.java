@@ -24,18 +24,24 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import com.compomics.pladipus.repository.helpers.impl.BasicEncryptor;
 import com.compomics.pladipus.repository.persist.BatchRepository;
 import com.compomics.pladipus.repository.persist.DefaultRepository;
+import com.compomics.pladipus.repository.persist.RunRepository;
+import com.compomics.pladipus.repository.persist.RunStepRepository;
 import com.compomics.pladipus.repository.persist.UserRepository;
 import com.compomics.pladipus.repository.persist.WorkflowRepository;
 import com.compomics.pladipus.repository.persist.impl.BatchRepositoryImpl;
 import com.compomics.pladipus.repository.persist.impl.DefaultRepositoryImpl;
+import com.compomics.pladipus.repository.persist.impl.RunRepositoryImpl;
+import com.compomics.pladipus.repository.persist.impl.RunStepRepositoryImpl;
 import com.compomics.pladipus.repository.persist.impl.UserRepositoryImpl;
 import com.compomics.pladipus.repository.persist.impl.WorkflowRepositoryImpl;
 import com.compomics.pladipus.repository.service.BatchService;
 import com.compomics.pladipus.repository.service.DefaultService;
+import com.compomics.pladipus.repository.service.RunService;
 import com.compomics.pladipus.repository.service.UserService;
 import com.compomics.pladipus.repository.service.WorkflowService;
 import com.compomics.pladipus.repository.service.impl.BatchServiceImpl;
 import com.compomics.pladipus.repository.service.impl.DefaultServiceImpl;
+import com.compomics.pladipus.repository.service.impl.RunServiceImpl;
 import com.compomics.pladipus.repository.service.impl.UserServiceImpl;
 import com.compomics.pladipus.repository.service.impl.WorkflowServiceImpl;
 import com.compomics.pladipus.shared.config.SharedConfiguration;
@@ -170,5 +176,23 @@ public class RepositoryConfiguration {
 	@Bean
 	public WorkflowService workflowService() {
 		return new WorkflowServiceImpl();
+	}
+	
+	@Lazy
+	@Bean
+	public RunRepository runRepo() {
+		return new RunRepositoryImpl();
+	}
+	
+	@Lazy
+	@Bean
+	public RunStepRepository runStepRepo() {
+		return new RunStepRepositoryImpl();
+	}
+	
+	@Lazy
+	@Bean
+	public RunService runService() {
+		return new RunServiceImpl();
 	}
 }
