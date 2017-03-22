@@ -7,11 +7,21 @@ import com.compomics.pladipus.worker.config.WorkerConfiguration;
 
 public class WorkerMain {
 
+	private AbstractApplicationContext context = new AnnotationConfigApplicationContext(WorkerConfiguration.class);
+	
 	public static void main(String[] args) {
-		//TODO handle shutdown properly
-		// command line output to let user know it's running?
-		@SuppressWarnings("resource")
-		AbstractApplicationContext context = new AnnotationConfigApplicationContext(WorkerConfiguration.class);
-		context.registerShutdownHook();
+		new WorkerMain().init(args);
+	}
+	
+	public void init(String[] args) {
+		Runtime.getRuntime().addShutdownHook(new Logout());
+		// TODO setup prerequisites (i.e. is this running on Windows?  Add message property to listen for Windows, etc)  
+	}
+	
+	class Logout extends Thread {
+		public void run() {
+			// TODO cancel running jobs, alert controller if possible
+			context.close();
+		}
 	}
 }
