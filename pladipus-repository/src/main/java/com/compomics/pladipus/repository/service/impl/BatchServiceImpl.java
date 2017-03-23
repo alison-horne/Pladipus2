@@ -1,10 +1,14 @@
 package com.compomics.pladipus.repository.service.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.compomics.pladipus.model.persist.Batch;
+import com.compomics.pladipus.model.persist.User;
 import com.compomics.pladipus.repository.persist.BatchRepository;
+import com.compomics.pladipus.repository.persist.WorkflowRepository;
 import com.compomics.pladipus.repository.service.BatchService;
 import com.compomics.pladipus.shared.PladipusMessages;
 import com.compomics.pladipus.shared.PladipusReportableException;
@@ -13,6 +17,9 @@ public class BatchServiceImpl implements BatchService {
 
 	@Autowired
 	private BatchRepository batchRepo;
+	
+	@Autowired
+	private WorkflowRepository workflowRepo;
 	
 	@Autowired
 	private PladipusMessages exceptionMessages;
@@ -38,5 +45,15 @@ public class BatchServiceImpl implements BatchService {
 			oldBatch.setActive(false);
 			batchRepo.merge(oldBatch);
 		}
+	}
+
+	@Override
+	public Batch getActiveNamedBatch(String batchName, User user) throws PladipusReportableException {
+		return batchRepo.findNamedActiveBatchWithinWorkflows(batchName, workflowRepo.findAllActiveWorkflowsForUser(user));
+	}
+
+	@Override
+	public List<Batch> getAllActiveBatchesForUser(User user) throws PladipusReportableException {
+		return batchRepo.findActiveBatchesForWorkflows(workflowRepo.findAllActiveWorkflowsForUser(user));
 	}
 }

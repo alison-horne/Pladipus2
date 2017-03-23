@@ -12,13 +12,18 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Table(name="batches")  
 @Entity(name="batches")
-@NamedQuery(name="Batch.findNamedActive", query="SELECT b FROM batches b WHERE b.name = :name AND b.workflow = :workflow AND b.active = true")
+@NamedQueries({
+	@NamedQuery(name="Batch.findNamedActive", query="SELECT b FROM batches b WHERE b.name = :name AND b.workflow = :workflow AND b.active = true"),
+	@NamedQuery(name="Batch.findActiveForWorkflows", query="SELECT b FROM batches b WHERE b.active = true AND b.workflow IN :workflows"),
+	@NamedQuery(name="Batch.findNamedActiveForWorkflows", query="SELECT b FROM batches b WHERE b.name = :name AND b.active = true AND b.workflow IN :workflows")
+})
 public class Batch {
     
     private Long id;
@@ -47,7 +52,7 @@ public class Batch {
         this.name = value;
     }
     
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="workflow_id")
     public Workflow getWorkflow() {
     	return workflow;
