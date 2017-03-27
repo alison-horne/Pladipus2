@@ -1,6 +1,8 @@
 package com.compomics.pladipus.model.persist;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -13,6 +15,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Table(name="batch_runs")  
 @Entity(name="batch_runs")
@@ -65,6 +68,17 @@ public class BatchRun {
     	val.setRun(this);
     	stepValues.add(val);
     }
+    @Transient
+    public Map<Long, Set<String>> getStepParamMap() {
+    	Map<Long, Set<String>> map = new HashMap<Long, Set<String>>();
+    	for (BatchStepValue stepVal : stepValues) {
+    		if (map.get(stepVal.getParamId()) == null) {
+    			map.put(stepVal.getParamId(), new HashSet<String>());
+    		}
+    		map.get(stepVal.getParamId()).add(stepVal.getValue());
+    	}
+    	return map;
+    }
 
     @OneToMany(cascade=CascadeType.ALL, mappedBy="run")
     public Set<BatchGlobalValue> getGlobalValues() {
@@ -77,5 +91,16 @@ public class BatchRun {
     	BatchGlobalValue val = new BatchGlobalValue(globalParamId, value);
     	val.setRun(this);
     	globalValues.add(val);
+    }
+    @Transient
+    public Map<Long, Set<String>> getGlobalParamMap() {
+    	Map<Long, Set<String>> map = new HashMap<Long, Set<String>>();
+    	for (BatchGlobalValue globalVal : globalValues) {
+    		if (map.get(globalVal.getParamId()) == null) {
+    			map.put(globalVal.getParamId(), new HashSet<String>());
+    		}
+    		map.get(globalVal.getParamId()).add(globalVal.getValue());
+    	}
+    	return map;
     }
 }

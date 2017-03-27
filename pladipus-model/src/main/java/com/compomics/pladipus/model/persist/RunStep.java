@@ -28,6 +28,7 @@ public class RunStep {
 	private Run run;
 	private Long runStepId;
 	private String toolName;
+	private String stepIdentifier;
 	private RunStatus status = RunStatus.BLOCKED;
 	private Set<RunStepParameter> parameters = new HashSet<RunStepParameter>();
 	private Set<RunStepOutput> outputs = new HashSet<RunStepOutput>();
@@ -61,6 +62,14 @@ public class RunStep {
     }
     public void setToolName(String toolName) {
     	this.toolName = toolName;
+    }
+    
+    @Column(name="step_identifier", nullable=false)
+    public String getStepIdentifier() {
+    	return stepIdentifier;
+    }
+    public void setStepIdentifier(String stepIdentifier) {
+    	this.stepIdentifier = stepIdentifier;
     }
     
     @Column(name="run_step_status", nullable=false)
