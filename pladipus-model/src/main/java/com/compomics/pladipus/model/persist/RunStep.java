@@ -32,6 +32,7 @@ public class RunStep {
 	private RunStatus status = RunStatus.BLOCKED;
 	private Set<RunStepParameter> parameters = new HashSet<RunStepParameter>();
 	private Set<RunStepOutput> outputs = new HashSet<RunStepOutput>();
+	private String errorText;
     private Set<RunStep> prereqs = new HashSet<RunStep>();
     private Set<RunStep> dependents = new HashSet<RunStep>();
 	
@@ -94,6 +95,18 @@ public class RunStep {
     	rsp.setParamValue(paramValue);
     	rsp.setRunStep(this);
     	parameters.add(rsp);
+    }
+    
+    @Column(name="error_text", nullable=true)
+    public String getErrorText() {
+    	return errorText;
+    }
+    public void setErrorText(String errorText) {
+    	this.errorText = errorText;
+    }
+    public void addError(String errorText) {
+    	setErrorText(errorText);
+    	setStatus(RunStatus.ERROR);
     }
     
     @OneToMany(cascade=CascadeType.ALL, mappedBy="runStep", fetch=FetchType.EAGER)

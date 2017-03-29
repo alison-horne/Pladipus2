@@ -19,6 +19,7 @@ import com.compomics.pladipus.model.persist.Workflow;
 import com.compomics.pladipus.shared.PladipusMessages;
 import com.compomics.pladipus.shared.PladipusReportableException;
 import com.compomics.pladipus.model.parameters.InputParameter;
+import com.compomics.pladipus.model.parameters.Substitution;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
@@ -32,11 +33,6 @@ public class WorkflowValidator implements ValidationChecker<Workflow> {
 	
 	@Autowired
 	private PladipusMessages exceptionMessages;
-	
-	private static final String SUBSTITUTE_PREFIX = "{$";
-	private static final String SUBSTITUTE_END = "}";
-	private static final String DEFAULT_PREFIX = "DEFAULT";
-	private static final String GLOBAL_PREFIX = "GLOBAL";
 	
 	@Override
 	public void validate(Workflow workflow) throws PladipusReportableException {
@@ -94,16 +90,16 @@ public class WorkflowValidator implements ValidationChecker<Workflow> {
 			while (iter.hasNext()) {
 				String value = iter.next();
 				if (isSubstitution(value)) {
-					int start = value.indexOf(SUBSTITUTE_PREFIX);
+					int start = value.indexOf(Substitution.getPrefix());
 					while (start > -1) {
-						int end = value.indexOf(SUBSTITUTE_END, start);
-						String subValue = value.substring(start + SUBSTITUTE_PREFIX.length(), end);
-						start = value.indexOf(SUBSTITUTE_PREFIX, end);
+						int end = value.indexOf(Substitution.getEnd(), start);
+						String subValue = value.substring(start + Substitution.getPrefix().length(), end);
+						start = value.indexOf(Substitution.getPrefix(), end);
 						String[] split = subValue.split("\\.", 2);
 						if (split.length != 2) {
 							throw new PladipusReportableException(exceptionMessages.getMessage("template.subFormat", value));
 						}
-						if (split[0].equalsIgnoreCase(DEFAULT_PREFIX)) {
+						if (split[0].equalsIgnoreCase(Substitution.getDefault())) {
 							if (!defaults.contains(split[1].toUpperCase())) {
 								throw new PladipusReportableException(exceptionMessages.getMessage("template.invalidDefault", subValue));
 							}
@@ -185,20 +181,20 @@ public class WorkflowValidator implements ValidationChecker<Workflow> {
 				while (iter.hasNext()) {
 					String value = iter.next();
 					if (isSubstitution(value)) {
-						int start = value.indexOf(SUBSTITUTE_PREFIX);
+						int start = value.indexOf(Substitution.getPrefix());
 						while (start > -1) {
-							int end = value.indexOf(SUBSTITUTE_END, start);
-							String subValue = value.substring(start + SUBSTITUTE_PREFIX.length(), end);
-							start = value.indexOf(SUBSTITUTE_PREFIX, end);
+							int end = value.indexOf(Substitution.getEnd(), start);
+							String subValue = value.substring(start + Substitution.getPrefix().length(), end);
+							start = value.indexOf(Substitution.getPrefix(), end);
 							String[] split = subValue.split("\\.", 2);
 							if (split.length != 2) {
 								throw new PladipusReportableException(exceptionMessages.getMessage("template.subFormat", value));
 							}
-							if (split[0].equalsIgnoreCase(DEFAULT_PREFIX)) {
+							if (split[0].equalsIgnoreCase(Substitution.getDefault())) {
 								if (!defaults.contains(split[1].toUpperCase())) {
 									throw new PladipusReportableException(exceptionMessages.getMessage("template.invalidDefault", subValue));
 								}
-							} else if (split[0].equalsIgnoreCase(GLOBAL_PREFIX)) {
+							} else if (split[0].equalsIgnoreCase(Substitution.getGlobal())) {
 								Iterator<Parameter> glParams = workflow.getGlobal().getParameters().getParameter().iterator();
 								boolean found = false;
 								while (glParams.hasNext()) {
@@ -227,7 +223,7 @@ public class WorkflowValidator implements ValidationChecker<Workflow> {
 	}
 	
 	private boolean isSubstitution(String value) throws PladipusReportableException {
-		if (!value.contains(SUBSTITUTE_PREFIX)) {
+		if (!value.contains(Substitution.getPrefix())) {
 			return false;
 		}
 		if (!isValid(value)) {
@@ -237,10 +233,10 @@ public class WorkflowValidator implements ValidationChecker<Workflow> {
 	}
 	
 	private boolean isValid(String valueString) {
-		int startCount = StringUtils.countOccurrencesOf(valueString, SUBSTITUTE_PREFIX);
-		int endCount = StringUtils.countOccurrencesOf(valueString, SUBSTITUTE_END);
+		int startCount = StringUtils.countOccurrencesOf(valueString, Substitution.getPrefix());
+		int endCount = StringUtils.countOccurrencesOf(valueString, Substitution.getEnd());
 		return ((startCount == endCount) && 
-				(valueString.indexOf(SUBSTITUTE_PREFIX) < valueString.indexOf(SUBSTITUTE_END)));
+				(valueString.indexOf(Substitution.getPrefix()) < valueString.indexOf(Substitution.getEnd())));
 	}
 
 	private void checkToolNamesValid(Workflow workflow) throws PladipusReportableException {

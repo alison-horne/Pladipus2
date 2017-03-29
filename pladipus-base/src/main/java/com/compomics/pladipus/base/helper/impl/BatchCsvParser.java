@@ -102,7 +102,7 @@ public class BatchCsvParser implements CsvParser<Batch, Workflow> {
 		Predicate<WorkflowStepParameter> pred = sp -> sp.getValues().isEmpty();
 		for (WorkflowStepParameter param: stepParams) {
 			if (pred.test(param)) {
-				paramMap.put(step.getId() + "." + param.getName(), step.getStepId());
+				paramMap.put(step.getId() + "." + param.getName(), param.getStepParamId());
 			}
 		}
 		return paramMap;
