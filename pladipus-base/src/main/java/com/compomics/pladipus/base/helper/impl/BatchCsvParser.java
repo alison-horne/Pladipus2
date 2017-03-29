@@ -47,10 +47,14 @@ public class BatchCsvParser implements CsvParser<Batch, Workflow> {
 		    	BatchRun run = new BatchRun();
 		    	run.setName(record.get(RUN_ID_HEADER));
 		    	for (Entry<String, Long> global: getBatchGlobalParameters(workflow).entrySet()) {
-		    		run.addGlobalValue(global.getValue(), record.get(global.getKey()));
+		    		for (String value : record.get(global.getKey()).split(",")) {
+		    			run.addGlobalValue(global.getValue(), value);
+		    		}
 		    	}
 		    	for (Entry<String, Long> step: getAllBatchStepParameters(workflow).entrySet()) {
-		    		run.addStepValue(step.getValue(), record.get(step.getKey()));
+		    		for (String value: record.get(step.getKey()).split(",")) {
+		    			run.addStepValue(step.getValue(), value);	
+		    		}
 		    	}
 		    	batch.addRun(run);
 		    }
