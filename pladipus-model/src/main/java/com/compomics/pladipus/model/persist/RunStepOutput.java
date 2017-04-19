@@ -6,6 +6,7 @@ import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
@@ -23,7 +24,7 @@ public class RunStepOutput {
 	private boolean finalStep = false;
     
 	@Id
-    @ManyToOne(cascade=CascadeType.ALL)
+    @ManyToOne(cascade=CascadeType.ALL, fetch=FetchType.LAZY)
     @JoinColumn(name="run_step_id")
 	public RunStep getRunStep() {
 		return runStep;

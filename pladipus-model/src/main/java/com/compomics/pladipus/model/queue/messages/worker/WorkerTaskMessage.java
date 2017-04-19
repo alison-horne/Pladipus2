@@ -5,6 +5,7 @@ import java.util.Map;
 
 public class WorkerTaskMessage {
 	int timeout = -1;
+	WorkerDirectTask task;
 	String toolName;
 	Map<String, String> parameters = new HashMap<String, String>();
 	Long jobId;
@@ -14,6 +15,13 @@ public class WorkerTaskMessage {
 	}
 	public int getTimeout() {
 		return timeout;
+	}
+	
+	public void setTask(WorkerDirectTask task) {
+		this.task = task;
+	}
+	public WorkerDirectTask getTask() {
+		return task;
 	}
 	
 	public void setToolname(String toolname) {

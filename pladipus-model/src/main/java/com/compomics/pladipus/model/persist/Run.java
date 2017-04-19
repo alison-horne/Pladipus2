@@ -30,6 +30,7 @@ public class Run {
 	private Long runId;
 	private BatchRun batchRun;
 	private RunStatus status = RunStatus.READY;
+	private String runIdentifier;
 	private Set<RunStep> runSteps = new HashSet<RunStep>();
     
     @Id  
@@ -60,6 +61,14 @@ public class Run {
     }
     public void setStatus(RunStatus status) {
     	this.status = status;
+    }
+    
+    @Column(name="run_identifier", nullable=false)
+    public String getRunIdentifier() {
+    	return runIdentifier;
+    }
+    public void setRunIdentifier(String runIdentifier) {
+    	this.runIdentifier = runIdentifier;
     }
     
     @OneToMany(cascade=CascadeType.ALL, mappedBy="run", fetch=FetchType.EAGER)

@@ -1,5 +1,6 @@
 package com.compomics.pladipus.model.persist;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,11 +33,11 @@ public class RunStep {
 	private RunStatus status = RunStatus.BLOCKED;
 	private Set<RunStepParameter> parameters = new HashSet<RunStepParameter>();
 	private Set<RunStepOutput> outputs = new HashSet<RunStepOutput>();
-	private String errorText;
+	private Set<RunStepWorker> workers = new HashSet<RunStepWorker>();
     private Set<RunStep> prereqs = new HashSet<RunStep>();
     private Set<RunStep> dependents = new HashSet<RunStep>();
 	
-    @ManyToOne(cascade=CascadeType.ALL)
+    @ManyToOne(cascade=CascadeType.ALL, fetch=FetchType.LAZY)
     @JoinColumn(name="run_id")
 	public Run getRun() {
 		return run;
@@ -97,18 +98,6 @@ public class RunStep {
     	parameters.add(rsp);
     }
     
-    @Column(name="error_text", nullable=true)
-    public String getErrorText() {
-    	return errorText;
-    }
-    public void setErrorText(String errorText) {
-    	this.errorText = errorText;
-    }
-    public void addError(String errorText) {
-    	setErrorText(errorText);
-    	setStatus(RunStatus.ERROR);
-    }
-    
     @OneToMany(cascade=CascadeType.ALL, mappedBy="runStep", fetch=FetchType.EAGER)
     public Set<RunStepOutput> getOutputs() {
     	return outputs;
@@ -122,6 +111,37 @@ public class RunStep {
     	rso.setOutputValue(value);
     	if (name != null) rso.setOutputId(name);
     	outputs.add(rso);
+    }
+    
+    @OneToMany(cascade=CascadeType.ALL, mappedBy="runStep", fetch=FetchType.EAGER)
+    public Set<RunStepWorker> getWorkers() {
+    	return workers;
+    }
+    public void setWorkers(Set<RunStepWorker> workers) {
+    	this.workers = workers;
+    }
+    public RunStepWorker findExistingWorker(String workerId) {
+    	for (RunStepWorker worker: workers) {
+    		if (worker.getWorkerId().equals(workerId)) return worker;
+    	}
+    	return null;
+    }
+    public void addWorker(String workerId) {
+    	if (findExistingWorker(workerId) == null) {
+	    	RunStepWorker rsw = new RunStepWorker(workerId);
+	    	rsw.setRunStep(this);
+	    	workers.add(rsw);
+    	}
+    }
+    public void endWorker(String workerId, String errorText) {
+    	RunStepWorker worker = findExistingWorker(workerId);
+    	if (worker == null) {
+    		worker = new RunStepWorker(workerId);
+	    	worker.setRunStep(this);
+	    	workers.add(worker);
+    	}
+    	worker.setEnd(new Date());
+    	worker.setError(errorText);
     }
     
 	@ManyToMany(cascade={CascadeType.ALL})

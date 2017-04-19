@@ -10,17 +10,19 @@ public class WorkerMain {
 	private AbstractApplicationContext context = new AnnotationConfigApplicationContext(WorkerConfiguration.class);
 	
 	public static void main(String[] args) {
-		new WorkerMain().init(args);
+		new WorkerMain().init();
 	}
 	
-	public void init(String[] args) {
-		Runtime.getRuntime().addShutdownHook(new Logout());
-		// TODO setup prerequisites (i.e. is this running on Windows?  Add message property to listen for Windows, etc)  
+	public void init() {
+		Runtime.getRuntime().addShutdownHook(new CleanShutdown());
+		// TODO command line output to let the user know it's running
 	}
 	
-	class Logout extends Thread {
+	class CleanShutdown extends Thread {
 		public void run() {
-			// TODO cancel running jobs, alert controller if possible
+			// Try to cancel all tasks neatly, and send cancel messages to the controller
+			QueueProcessor qp = context.getBean("workerTaskQueueProcessor", QueueProcessor.class);
+			qp.cancelAll();
 			context.close();
 		}
 	}
