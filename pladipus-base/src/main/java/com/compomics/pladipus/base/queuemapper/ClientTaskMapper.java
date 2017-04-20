@@ -72,7 +72,7 @@ public class ClientTaskMapper {
 					queueControl.process(msg.getBatchName(), getUser(clientId));
 					break;
 				case ABORT:
-					//TODO
+					queueControl.abort(msg.getBatchName(), getUser(clientId));
 					break;
 				case ADD_DEFAULT:
 					defaultsControl.addDefault(msg.getDefaultName(), msg.getDefaultValue(), msg.getDefaultType(), getUser(clientId));
@@ -87,7 +87,7 @@ public class ClientTaskMapper {
 					batchControl.replaceBatch(msg.getFileContent(), msg.getWorkflowName(), msg.getBatchName(), getUser(clientId));
 					break;
 				case RESTART_BATCH:
-					// TODO
+					queueControl.restart(msg.getBatchName(), getUser(clientId));
 					break;
 				case STATUS:
 					// TODO

@@ -18,6 +18,7 @@ import com.compomics.pladipus.base.impl.QueueControlImpl;
 import com.compomics.pladipus.base.impl.UserControlImpl;
 import com.compomics.pladipus.base.impl.WorkflowControlImpl;
 import com.compomics.pladipus.base.queuemapper.ClientTaskMapper;
+import com.compomics.pladipus.base.queuemapper.WorkerResponseMapper;
 import com.compomics.pladipus.model.persist.Batch;
 import com.compomics.pladipus.model.persist.Workflow;
 import com.compomics.pladipus.repository.config.RepositoryConfiguration;
@@ -89,6 +90,11 @@ public class BaseConfiguration {
 	@Bean
 	public ClientTaskMapper clientTaskMapper() {
 		return new ClientTaskMapper();
+	}
+	
+	@Bean
+	public WorkerResponseMapper workerResponseMapper() {
+		return new WorkerResponseMapper();
 	}
 	
 	@Bean

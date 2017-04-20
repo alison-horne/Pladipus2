@@ -65,7 +65,7 @@ public class QueueControlImpl implements QueueControl {
 		
 		for (Batch batch: batches) {
 			for (BatchRun batchRun: batch.getRuns()) {
-				new CreateRun(batchRun, defaultsMap).insertRun();
+				new CreateRun(batch.getName(), batchRun, defaultsMap).insertRun();
 			}
 		}
 	}
@@ -84,8 +84,9 @@ public class QueueControlImpl implements QueueControl {
 
 	@Override
 	public void abort(String batchName, User user) throws PladipusReportableException {
-		// TODO Auto-generated method stub
-		// If batchName null/empty, abort all...set run status to cancel/abort, then have another polling job on controller pick it up and pull from queue/end currently running tasks
+		for (Batch batch: getActiveBatches(batchName, user)) {
+			runService.abortBatchRuns(batch);
+		}
 	}
 	
 	private List<Batch> getActiveBatches(String batchName, User user) throws PladipusReportableException {
@@ -109,6 +110,7 @@ public class QueueControlImpl implements QueueControl {
 	}
 	
 	class CreateRun {
+		private String batchName;
 		private BatchRun batchRun;
 		private Map<String, String> defaultMap;
 		private Run run = new Run();
@@ -119,7 +121,8 @@ public class QueueControlImpl implements QueueControl {
 		private Map<Step, Set<String>> batchPrereqs = new HashMap<Step, Set<String>>();
 		private Map<String, Set<String>> globalMap = new HashMap<String, Set<String>>();
 		
-		CreateRun(BatchRun batchRun, Map<String, String> defaultMap) {
+		CreateRun(String batchName, BatchRun batchRun, Map<String, String> defaultMap) {
+			this.batchName = batchName;
 			this.batchRun = batchRun;
 			this.defaultMap = defaultMap;
 			batchStepParamMap = batchRun.getStepParamMap();
@@ -130,6 +133,7 @@ public class QueueControlImpl implements QueueControl {
 		private void setupRun() {
 			run.setStatus(RunStatus.READY);
 			run.setBatchRun(batchRun);
+			run.setRunIdentifier(batchName + "_" + batchRun.getName());
 			setupGlobalParameterMap();
 			setupRunSteps();
 			setupRunStepPrereqs();
