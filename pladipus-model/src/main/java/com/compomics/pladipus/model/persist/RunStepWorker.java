@@ -21,7 +21,6 @@ public class RunStepWorker {
 	
 	private RunStep runStep;
 	private String workerId;
-	private boolean inQueue = false;
 	private Date start;
 	private Date end;
 	private String error;
@@ -49,14 +48,6 @@ public class RunStepWorker {
 	}
 	public void setWorkerId(String workerId) {
 		this.workerId = workerId;
-	}
-	
-	@Column(name="task_queued", nullable=false)
-	public boolean isInQueue() {
-		return inQueue;
-	}
-	public void setInQueue(boolean inQueue) {
-		this.inQueue = inQueue;
 	}
 	
 	@Column(name="started", nullable=false)
