@@ -75,8 +75,14 @@ public class RepositoryConfiguration {
              
         dataSource.setDriverClassName(DB_DRIVER);
         dataSource.setUrl(constructDbUrl());
-        dataSource.setUsername(env.getRequiredProperty(DB_USER));       
-        dataSource.setPassword(basicEncryptor().decryptString(env.getRequiredProperty(DB_PASSWORD)));
+        dataSource.setUsername(env.getRequiredProperty(DB_USER));
+        String password = env.getRequiredProperty(DB_PASSWORD);
+		final String encoded = "ENC(";
+        if (password.startsWith(encoded)) {
+        	password = password.substring(password.indexOf(encoded) + encoded.length(), password.length()-1);
+        	password = basicEncryptor().decryptString(password);
+        }
+        dataSource.setPassword(password);
      
         return dataSource;
     }
