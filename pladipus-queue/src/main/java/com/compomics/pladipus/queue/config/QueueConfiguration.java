@@ -29,7 +29,6 @@ import com.compomics.pladipus.queue.ControlWorkerListener;
 import com.compomics.pladipus.queue.ControlWorkerProducer;
 import com.compomics.pladipus.queue.QueueMessageController;
 import com.compomics.pladipus.queue.ReadyTaskScheduler;
-import com.compomics.pladipus.queue.WorkerTaskProcessor;
 import com.compomics.pladipus.queue.impl.QueueMessageControllerImpl;
 
 @Configuration
@@ -145,12 +144,5 @@ public class QueueConfiguration {
 	@Lazy
 	public ClientTaskProcessor clientTaskProcessor(TextMessage message) {
 		return new ClientTaskProcessor(message);
-	}
-	
-	@Bean
-	@Scope(value = "prototype")
-	@Lazy
-	public WorkerTaskProcessor workerTaskProcessor(TextMessage message) {
-		return new WorkerTaskProcessor(message);
 	}
 }

@@ -59,7 +59,10 @@ public class ReadyTaskScheduler {
 				abortRuns();
 				queueReadySteps();
 			} catch (PladipusReportableException | JsonProcessingException e) {
+				e.printStackTrace();
 				// TODO Log error...or decide how otherwise to deal with it
+				// What to do if JMX connection times out when trying to remove messages from queue.
+				// This would hang/block and no tasks would get processed
 			}
 		}
     }
