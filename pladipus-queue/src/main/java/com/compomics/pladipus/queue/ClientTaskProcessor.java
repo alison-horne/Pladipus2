@@ -8,6 +8,7 @@ import javax.jms.TextMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.compomics.pladipus.base.queuemapper.ClientTaskMapper;
+import com.compomics.pladipus.model.queue.MessageSelector;
 import com.compomics.pladipus.model.queue.messages.client.ClientToControlMessage;
 import com.compomics.pladipus.model.queue.messages.client.ControlToClientMessage;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -25,9 +26,6 @@ public class ClientTaskProcessor extends Thread {
 	@Autowired
 	private ObjectMapper jsonMapper;
 	
-	@Autowired
-	private String clientIdProperty;
-	
 	private TextMessage msg;
 	private String clientId;
 	private String corrId;
@@ -38,7 +36,7 @@ public class ClientTaskProcessor extends Thread {
 	
 	public void run() {
 		try {
-			clientId = msg.getStringProperty(clientIdProperty);
+			clientId = msg.getStringProperty(MessageSelector.CLIENT_ID.name());
 			corrId = msg.getJMSCorrelationID(); // TODO if either of these is null, do not process, just log error.
 			ControlToClientMessage response = clientTaskMapper.doMessageTask(jsonMapper.readValue(msg.getText(), ClientToControlMessage.class), clientId);
 			clientProducer.sendMessage(jsonMapper.writeValueAsString(response), corrId, clientId);

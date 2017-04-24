@@ -10,6 +10,7 @@ public class QueueMain {
 	private AbstractApplicationContext context = new AnnotationConfigApplicationContext(QueueConfiguration.class);
 	
 	public static void main(String[] args) {
+		// TODO command line output so user knows it's running...
 		QueueMain qm = new QueueMain();
 		qm.init();
 	}

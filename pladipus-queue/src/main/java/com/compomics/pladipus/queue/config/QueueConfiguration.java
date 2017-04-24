@@ -1,6 +1,9 @@
 package com.compomics.pladipus.queue.config;
 
+import java.net.MalformedURLException;
+
 import javax.jms.TextMessage;
+import javax.management.MalformedObjectNameException;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQQueue;
@@ -15,15 +18,19 @@ import org.springframework.core.env.Environment;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
+import org.springframework.jmx.support.MBeanServerConnectionFactoryBean;
 
 import com.compomics.pladipus.base.config.BaseConfiguration;
 import com.compomics.pladipus.queue.ClientTaskProcessor;
 import com.compomics.pladipus.queue.ControlClientListener;
 import com.compomics.pladipus.queue.ControlClientProducer;
+import com.compomics.pladipus.queue.ControlWorkerDirectProducer;
 import com.compomics.pladipus.queue.ControlWorkerListener;
 import com.compomics.pladipus.queue.ControlWorkerProducer;
+import com.compomics.pladipus.queue.QueueMessageController;
 import com.compomics.pladipus.queue.ReadyTaskScheduler;
 import com.compomics.pladipus.queue.WorkerTaskProcessor;
+import com.compomics.pladipus.queue.impl.QueueMessageControllerImpl;
 
 @Configuration
 @Import(BaseConfiguration.class)
@@ -32,11 +39,6 @@ public class QueueConfiguration {
 	
 	@Autowired
 	private Environment env;
-	
-	@Bean
-	public String clientIdProperty() {
-		return env.getRequiredProperty("queue.clientId");
-	}
 
 	@Bean
 	public ActiveMQConnectionFactory amqConnectionFactory() {
@@ -54,7 +56,7 @@ public class QueueConfiguration {
 		temp.setConnectionFactory(cacheConnectionFactory());
 		temp.setDefaultDestination(new ActiveMQQueue(env.getRequiredProperty("queue.toClients")));
 		try {
-			Long timeout = Long.parseLong(env.getProperty("queue.clientTimeout")) * 2;
+			Long timeout = Long.parseLong(env.getProperty("queue.clientTimeoutMs")) * 2;
 			temp.setExplicitQosEnabled(true);
 			temp.setTimeToLive(timeout);
 		} catch (Exception e) {}
@@ -89,12 +91,33 @@ public class QueueConfiguration {
 	}
 	
 	@Bean
+	public JmsTemplate toWorkerDirectTemplate() {
+	    JmsTemplate temp = new JmsTemplate();
+		temp.setConnectionFactory(cacheConnectionFactory());
+		temp.setDefaultDestination(new ActiveMQQueue(env.getRequiredProperty("queue.toWorkerDirect")));
+		return temp;
+	}
+	
+	@Bean
 	public DefaultMessageListenerContainer workerListenerContainer() {
 		DefaultMessageListenerContainer cont = new DefaultMessageListenerContainer();
 		cont.setMessageListener(workerListener());
 		cont.setConnectionFactory(amqConnectionFactory());
 		cont.setDestination(new ActiveMQQueue(env.getRequiredProperty("queue.fromWorkers")));
 		return cont;
+	}
+	
+	@Bean
+	public MBeanServerConnectionFactoryBean jmxConnection() throws MalformedURLException, IllegalStateException {
+		MBeanServerConnectionFactoryBean bean = new MBeanServerConnectionFactoryBean();
+		bean.setConnectOnStartup(false);
+		bean.setServiceUrl(env.getRequiredProperty("amq.jmx.serviceurl"));
+		return bean;
+	}
+	
+	@Bean
+	public QueueMessageController workerQueueController() throws MalformedObjectNameException, IllegalStateException {
+		return new QueueMessageControllerImpl(env.getRequiredProperty("amq.jmx.brokername"), env.getRequiredProperty("queue.toWorkers"));
 	}
 	
 	@Bean
@@ -105,6 +128,11 @@ public class QueueConfiguration {
 	@Bean
 	public ControlWorkerProducer workerProducer() {
 		return new ControlWorkerProducer();
+	}
+	
+	@Bean
+	public ControlWorkerDirectProducer workerDirectProducer() {
+		return new ControlWorkerDirectProducer();
 	}
 	
 	@Bean

@@ -7,8 +7,9 @@ import javax.jms.TextMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.compomics.pladipus.base.queuemapper.WorkerResponseMapper;
+import com.compomics.pladipus.model.queue.MessageSelector;
 import com.compomics.pladipus.model.queue.messages.worker.WorkerToControlMessage;
-import com.compomics.pladipus.repository.service.RunService;
 import com.compomics.pladipus.shared.PladipusReportableException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -20,7 +21,7 @@ public class WorkerTaskProcessor extends Thread {
 	private ObjectMapper jsonMapper;
 	
 	@Autowired
-	private RunService runService;
+	private WorkerResponseMapper workerResponseMapper;
 	
 	private TextMessage msg;
 	
@@ -31,7 +32,8 @@ public class WorkerTaskProcessor extends Thread {
 	public void run() {
 		try {
 			WorkerToControlMessage task = jsonMapper.readValue(msg.getText(), WorkerToControlMessage.class);
-			runService.processWorkerResponse(task);
+			String workerId = msg.getStringProperty(MessageSelector.WORKER_ID.toString());
+			workerResponseMapper.doResponseProcess(task, workerId);
 		} catch (JsonParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
