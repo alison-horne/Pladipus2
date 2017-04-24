@@ -20,6 +20,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Table(name="run_steps")
 @Entity(name="run_steps")
@@ -143,6 +144,25 @@ public class RunStep {
     	worker.setEnd(new Date());
     	worker.setError(errorText);
     }
+    @Transient
+    public String getFailedWorkers() {
+    	Set<String> failedSet = new HashSet<String>();
+    	for (RunStepWorker worker: workers) {
+    		if (worker.getEnd() != null) {
+    			failedSet.add(worker.getWorkerId());
+    		}
+    	}
+    	return (failedSet.isEmpty())? "" : String.join(",", failedSet);
+    }
+    @Transient
+	public String getCurrentWorker() {
+		for (RunStepWorker worker: workers) {
+			if (worker.getEnd() == null) {
+				return worker.getWorkerId();
+			}
+		}
+		return null;
+	}
     
 	@ManyToMany(cascade={CascadeType.ALL})
 	@JoinTable(name="run_step_dependencies",

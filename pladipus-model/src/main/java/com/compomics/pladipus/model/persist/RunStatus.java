@@ -6,8 +6,8 @@ public enum RunStatus {
 	QUEUED,
 	ON_WORKER,
 	IN_PROGRESS,
-	COMPLETE,
 	ABORT,
 	CANCELLED,
-	ERROR
+	ERROR,
+	COMPLETE
 }
