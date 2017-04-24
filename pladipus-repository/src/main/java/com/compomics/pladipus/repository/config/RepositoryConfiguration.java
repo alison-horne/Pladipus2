@@ -87,6 +87,15 @@ public class RepositoryConfiguration {
         return dataSource;
     }
 	
+	@Bean
+	public int taskRetries() {
+		int retries = 0;
+		try {
+			retries = Integer.parseInt(env.getProperty("task.retries"));
+		} catch (Exception e) {} 
+		return retries;
+	}
+	
 	private String constructDbUrl() {
 		return DB_URL_START +
 			   env.getRequiredProperty(DB_HOST) + ":" +
