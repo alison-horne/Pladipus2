@@ -46,4 +46,9 @@ public class SearchGUITool extends Tool {
 		// TODO actual jar location
 		return null;
 	}
+	@Override
+	public String getOutput() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

@@ -14,12 +14,12 @@ import com.google.common.collect.ImmutableSet;
  * Performs setup and running of a tool.
  *
  * TODO - Do we need to specify output types for a tool, for use as input parameters in other tools?
- * 		- Are we going to perform validation here?
+ * 		- Are we going to perform validation here?  Check able to read/write to file locations in parameters
  * 		- Pre-run setup, e.g. unzip files if necessary.  Tool-specific setup can override.
  * 		- Do actual running of tool from here, i.e. construct command line arguments
  * 		- Progress reporting from here?
  */
-public abstract class Tool implements Callable<Boolean> {
+public abstract class Tool implements Callable<String> {
 	
 	private Map<String, String> parameters;
 	private int TIMEOUT = 100000; // TODO get default timeout from properties file
@@ -27,13 +27,17 @@ public abstract class Tool implements Callable<Boolean> {
 	public Tool(Map<String, String> parameters) {
 		this.parameters = parameters;
 	}
+	protected String getParameter(String paramName) {
+		if (parameters != null && !parameters.isEmpty()) return parameters.get(paramName);
+		return null;
+	}
 	
 	public abstract ImmutableSet<InputParameter> getAllToolInputParameters();
 	public abstract String getJar();
+	public abstract String getOutput(); // TODO make sure unique, not overwriting other output...before running tool, maybe add runID?  Check output exists before returning, else error response
 	public int getDefaultTimeout() { return TIMEOUT; }
-	public Boolean call() {
-		runTool();
-		return true;
+	public String call() {
+		return runTool();
 	}
 	
 	public String getExecCommand() {
@@ -48,30 +52,30 @@ public abstract class Tool implements Callable<Boolean> {
 				builder.append(" -");
 				if (param.length() > 1) builder.append("-");
 				builder.append(param);
-				builder.append(" ");
+				builder.append(" \"");
 				builder.append(parameters.get(param));
+				builder.append("\"");
 			}
 		}
 		return builder.toString();
 	}
 
-	public boolean runTool() { 
-		// TODO instead of boolean, should return string (set if more than one possible?) with the tool output to insert into outputs db table
+	public String runTool() { 
 		Process pr = null;
 		try {
 			pr = Runtime.getRuntime().exec(getExecCommand());
 			ReadOutput outputReader = new ReadOutput(pr);
 			outputReader.start();
 			pr.waitFor();
-			return true;
+			return getOutput();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return false;
+			return null;
 		} catch (InterruptedException e) {
 			// Timeout.  TODO what if worker dies/killed mid-task?  How does controller know?
 			pr.destroyForcibly();
-			return false;
+			return null;
 		}
 		
 	}

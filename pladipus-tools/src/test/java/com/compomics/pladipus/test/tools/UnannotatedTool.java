@@ -29,4 +29,9 @@ public class UnannotatedTool extends Tool {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	@Override
+	public String getOutput() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
