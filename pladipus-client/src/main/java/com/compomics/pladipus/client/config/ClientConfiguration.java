@@ -29,6 +29,7 @@ import com.compomics.pladipus.client.queue.ClientMessageTask;
 import com.compomics.pladipus.client.queue.MessageMap;
 import com.compomics.pladipus.client.queue.MessageTask;
 import com.compomics.pladipus.client.queue.UuidGenerator;
+import com.compomics.pladipus.model.queue.MessageSelector;
 import com.compomics.pladipus.shared.config.SharedConfiguration;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -44,14 +45,9 @@ public class ClientConfiguration {
 	private final static long DEFAULT_TIMEOUT = 10000L;
 	
 	@Bean
-	public String clientIdProperty() {
-		return env.getRequiredProperty("queue.clientId");
-	}
-	
-	@Bean
 	public long clientTimeout() {
 		try {
-			return Long.parseLong(env.getProperty("queue.clientTimeout"));
+			return Long.parseLong(env.getProperty("queue.clientTimeoutMs"));
 		} catch (Exception e) {
 			return DEFAULT_TIMEOUT;
 		}
@@ -114,7 +110,7 @@ public class ClientConfiguration {
 		cont.setMessageListener(clientListener());
 		cont.setConnectionFactory(amqConnectionFactory());
 		cont.setDestination(new ActiveMQQueue(env.getRequiredProperty("queue.toClients")));
-		cont.setMessageSelector(clientIdProperty() + "='" + uuidGen().getClientID() + "'");
+		cont.setMessageSelector(MessageSelector.CLIENT_ID.name() + "='" + uuidGen().getClientID() + "'");
 		return cont;
 	}
 	

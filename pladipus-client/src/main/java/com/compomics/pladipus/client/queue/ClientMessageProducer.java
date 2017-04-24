@@ -9,12 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 
+import com.compomics.pladipus.model.queue.MessageSelector;
+
 public class ClientMessageProducer {
 	@Autowired
 	private JmsTemplate jmsTemplate;
-	
-	@Autowired
-	private String clientIdProperty;
 	
 	@Autowired
 	private UuidGenerator uuidGen;
@@ -25,7 +24,7 @@ public class ClientMessageProducer {
 			@Override
 			public Message createMessage(Session session) throws JMSException {
 				TextMessage msg = session.createTextMessage(txt);
-				msg.setStringProperty(clientIdProperty, uuidGen.getClientID());
+				msg.setStringProperty(MessageSelector.CLIENT_ID.name(), uuidGen.getClientID());
 				msg.setJMSCorrelationID(correlationId);
 				return msg;
 			}
