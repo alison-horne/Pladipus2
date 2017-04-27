@@ -13,6 +13,7 @@ import com.compomics.pladipus.model.persist.Run;
 import com.compomics.pladipus.model.persist.RunStatus;
 import com.compomics.pladipus.model.persist.RunStep;
 import com.compomics.pladipus.model.persist.RunStepParameter;
+import com.compomics.pladipus.model.queue.MessageSelector;
 import com.compomics.pladipus.model.queue.messages.worker.WorkerDirectTask;
 import com.compomics.pladipus.model.queue.messages.worker.WorkerTaskMessage;
 import com.compomics.pladipus.repository.service.RunService;
@@ -57,12 +58,14 @@ public class ReadyTaskScheduler {
 		public void run() {
 			try {
 				abortRuns();
-				queueReadySteps();
 			} catch (PladipusReportableException | JsonProcessingException e) {
 				e.printStackTrace();
 				// TODO Log error...or decide how otherwise to deal with it
-				// What to do if JMX connection times out when trying to remove messages from queue.
-				// This would hang/block and no tasks would get processed
+			}
+			try {
+				queueReadySteps();
+			} catch (PladipusReportableException | JsonProcessingException e) {
+				// TODO
 			}
 		}
     }
@@ -72,14 +75,17 @@ public class ReadyTaskScheduler {
 		if (!readySteps.isEmpty()) {
 			// TODO max queue size?
 			// TODO option to add overriding timeout in workflow?  Or manually in GUI?
+			// TODO if sending task to worker direct, make sure JMX ID is added as a parameter.  Used to make sure output location is unique/not overwritten
 			for (RunStep step: readySteps) {
 				WorkerTaskMessage message = new WorkerTaskMessage();
 				message.setToolname(step.getToolName());
 				message.setJobId(step.getRunStepId());
+				String runIdentifier = runService.getRunIdentifier(step);
 				for (RunStepParameter parameter : step.getParameters()) {
 					message.addParameter(parameter.getParamName(), runService.doStepSubstitutions(parameter.getParamValue(), step.getRun().getRunId()));
 				}
-				workerProducer.sendMessage(jsonMapper.writeValueAsString(message), step.getFailedWorkers(), runService.getRunIdentifier(step));
+				message.addParameter(MessageSelector.JMX_IDENTIFIER.name(), runIdentifier);
+				workerProducer.sendMessage(jsonMapper.writeValueAsString(message), step.getFailedWorkers(), runIdentifier);
 				runService.updateStepStatus(step, RunStatus.QUEUED);
 			}
 		}

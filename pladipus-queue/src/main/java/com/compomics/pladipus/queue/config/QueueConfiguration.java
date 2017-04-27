@@ -1,7 +1,5 @@
 package com.compomics.pladipus.queue.config;
 
-import java.net.MalformedURLException;
-
 import javax.jms.TextMessage;
 import javax.management.MalformedObjectNameException;
 
@@ -18,7 +16,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
-import org.springframework.jmx.support.MBeanServerConnectionFactoryBean;
 
 import com.compomics.pladipus.base.config.BaseConfiguration;
 import com.compomics.pladipus.queue.ClientTaskProcessor;
@@ -107,16 +104,8 @@ public class QueueConfiguration {
 	}
 	
 	@Bean
-	public MBeanServerConnectionFactoryBean jmxConnection() throws MalformedURLException, IllegalStateException {
-		MBeanServerConnectionFactoryBean bean = new MBeanServerConnectionFactoryBean();
-		bean.setConnectOnStartup(false);
-		bean.setServiceUrl(env.getRequiredProperty("amq.jmx.serviceurl"));
-		return bean;
-	}
-	
-	@Bean
 	public QueueMessageController workerQueueController() throws MalformedObjectNameException, IllegalStateException {
-		return new QueueMessageControllerImpl(env.getRequiredProperty("amq.jmx.brokername"), env.getRequiredProperty("queue.toWorkers"));
+		return new QueueMessageControllerImpl(env.getRequiredProperty("amq.jmx.serviceurl"), env.getRequiredProperty("amq.jmx.brokername"), env.getRequiredProperty("queue.toWorkers"));
 	}
 	
 	@Bean
