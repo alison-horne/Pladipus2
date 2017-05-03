@@ -1,6 +1,7 @@
 package com.compomics.pladipus.worker.impl;
 
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,8 +40,11 @@ public class WorkerTaskQueueProcessor implements QueueProcessor {
 	@Autowired
 	private PladipusMessages exceptionMessages;
 	
+	@Autowired
+	private int defaultToolTimeout;
+	
 	private AtomicReference<WorkerTaskMessage> currentTask = new AtomicReference<WorkerTaskMessage>();
-	private ConcurrentMap<Long, Future<String>> runningTask = new ConcurrentHashMap<Long, Future<String>>();
+	private ConcurrentMap<Long, Future<Map<String, String>>> runningTask = new ConcurrentHashMap<Long, Future<Map<String, String>>>();
 	private Queue<WorkerTaskMessage> taskQueue = new LinkedList<WorkerTaskMessage>();
 	private Semaphore queueLock = new Semaphore(1);
 	private int lockTimeoutMs = 30000;
@@ -97,7 +101,7 @@ public class WorkerTaskQueueProcessor implements QueueProcessor {
 	
 	private void startTask(WorkerTaskMessage msg) {
 		Tool tool = null;
-		Future<String> future = null;
+		Future<Map<String, String>> future = null;
 		ExecutorService es = null;
 		Long jobId = msg.getJobId();
 		try {
@@ -105,24 +109,31 @@ public class WorkerTaskQueueProcessor implements QueueProcessor {
 			if (tool != null) {
 				int timeout = msg.getTimeout();
 				if (timeout < 0) {
-					timeout = tool.getDefaultTimeout();
+					timeout = tool.getDefaultTimeoutSeconds();
+					if (timeout < 0) {
+						timeout = defaultToolTimeout;
+					}
 				}
 				workerProducer.sendMessage(jobId, WorkerStatus.PROCESSING, null);
 				es = Executors.newSingleThreadExecutor();
 				future = es.submit(tool);
 				runningTask.put(jobId, future);
-				String output = future.get(timeout, TimeUnit.MILLISECONDS);
-				if (output != null) {
-					workerProducer.sendMessage(jobId, WorkerStatus.COMPLETED, output);
+				Map<String, String> outputs = future.get(timeout, TimeUnit.SECONDS);
+				if (outputs != null) {
+					if (outputs.get(Tool.ERROR) != null) {
+						workerProducer.sendErrorMessage(jobId, outputs.get(Tool.ERROR));
+					} else {
+						workerProducer.sendMessage(jobId, WorkerStatus.COMPLETED, outputs);
+					}
 				}
 				else {
-					workerProducer.sendMessage(jobId, WorkerStatus.ERROR, exceptionMessages.getMessage("worker.noOutput"));
+					workerProducer.sendErrorMessage(jobId, exceptionMessages.getMessage("worker.noOutput"));
 				}
 			} else {
-				workerProducer.sendMessage(jobId, WorkerStatus.ERROR, exceptionMessages.getMessage("worker.invalidTool"));
+				workerProducer.sendErrorMessage(jobId, exceptionMessages.getMessage("worker.invalidTool"));
 			}
 		} catch (BeansException e) {
-			workerProducer.sendMessage(jobId, WorkerStatus.ERROR, exceptionMessages.getMessage("worker.invalidTool"));
+			workerProducer.sendErrorMessage(jobId, exceptionMessages.getMessage("worker.invalidTool"));
 		} catch (TimeoutException e) {
 			future.cancel(true);
 			workerProducer.sendMessage(jobId, WorkerStatus.TIMEOUT, null);
@@ -130,7 +141,7 @@ public class WorkerTaskQueueProcessor implements QueueProcessor {
 			workerProducer.sendMessage(jobId, WorkerStatus.CANCELLED, null);
 		} catch (Exception e) {
 			if (future != null) future.cancel(true);
-			workerProducer.sendMessage(jobId, WorkerStatus.ERROR, exceptionMessages.getMessage("worker.generalError", e.getMessage()));
+			workerProducer.sendErrorMessage(jobId, exceptionMessages.getMessage("worker.generalError", e.getMessage()));
 		} finally {
 			synchronized(msg) {
 				msg.notify();
@@ -174,22 +185,22 @@ public class WorkerTaskQueueProcessor implements QueueProcessor {
 	
 	public void cancelTask(Long cancelJobId) {
 		if (removeQueueTask(cancelJobId)) {
-			Future<String> running = runningTask.get(cancelJobId);
+			Future<Map<String, String>> running = runningTask.get(cancelJobId);
 			if (running != null) {
 				running.cancel(true);
 			}
 		} else {
-			workerProducer.sendMessage(cancelJobId, WorkerStatus.ERROR, exceptionMessages.getMessage("worker.cancelFail"));
+			workerProducer.sendErrorMessage(cancelJobId, exceptionMessages.getMessage("worker.cancelFail"));
 		}
 	}
 	
 	public void cancelAll() {
 		if (removeQueueTask(null)) {
-			for (Future<String> future: runningTask.values()) {
+			for (Future<Map<String, String>> future: runningTask.values()) {
 				future.cancel(true);
 			}
 		} else {
-			workerProducer.sendMessage(null, WorkerStatus.ERROR, exceptionMessages.getMessage("worker.cancelFail"));
+			workerProducer.sendErrorMessage(null, exceptionMessages.getMessage("worker.cancelFail"));
 		}
 	}
 	
@@ -220,6 +231,6 @@ public class WorkerTaskQueueProcessor implements QueueProcessor {
 		synchronized(msg) {
 			msg.notify();
 		}
-		workerProducer.sendMessage(msg.getJobId(), WorkerStatus.ERROR, errorMessage);
+		workerProducer.sendErrorMessage(msg.getJobId(), errorMessage);
 	}
 }

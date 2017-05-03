@@ -96,9 +96,11 @@ public class RunServiceImpl implements RunService {
 
 	@Transactional(rollbackFor={Exception.class})
 	@Override
-	public void completeRunStep(Long runStepId, String output, String workerId) throws PladipusReportableException {
+	public void completeRunStep(Long runStepId, Map<String, String> outputs, String workerId) throws PladipusReportableException {
 		RunStep rs = runStepRepo.findById(runStepId);
-		rs.addOutput("out", output); // TODO multiple outputs with different names possible?
+		for (String name: outputs.keySet()) {
+			rs.addOutput(name, outputs.get(name));
+		}
 		rs.endWorker(workerId, null);
 		updateStepStatus(rs, RunStatus.COMPLETE);
 		unblockDependentSteps(rs);

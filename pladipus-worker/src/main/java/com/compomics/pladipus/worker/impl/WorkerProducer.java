@@ -1,5 +1,7 @@
 package com.compomics.pladipus.worker.impl;
 
+import java.util.Map;
+
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
@@ -40,11 +42,24 @@ public class WorkerProducer implements MessageProducer {
 	}
 	
 	@Override
-	public void sendMessage(Long jobId, WorkerStatus status, String message) {
+	public void sendMessage(Long jobId, WorkerStatus status, Map<String, String> outputs) {
 		WorkerToControlMessage msg = new WorkerToControlMessage();
 		msg.setJobId(jobId);
 		msg.setStatus(status);
-		msg.setMessage(message);
+		if (outputs != null) msg.setOutputs(outputs);
+		sendMessage(msg);
+	}
+
+	@Override
+	public void sendErrorMessage(Long jobId, String errorMsg) {
+		WorkerToControlMessage msg = new WorkerToControlMessage();
+		msg.setJobId(jobId);
+		msg.setStatus(WorkerStatus.ERROR);
+		msg.setErrorMessage(errorMsg);
+		sendMessage(msg);
+	}
+	
+	private void sendMessage(WorkerToControlMessage msg) {
 		try {
 			sendMessage(jsonMapper.writeValueAsString(msg));
 		} catch (JsonProcessingException e) {

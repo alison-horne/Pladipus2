@@ -38,7 +38,12 @@ public class TestToolOne extends Tool {
 		return null;
 	}
 	@Override
-	public String getOutput() {
+	public Map<String, String> getOutputs() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public ImmutableSet<String> getErrorStrings() {
 		// TODO Auto-generated method stub
 		return null;
 	}

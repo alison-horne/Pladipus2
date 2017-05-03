@@ -32,9 +32,9 @@ public class PeptideShakerCoreTool extends Tool {
 	}
 
 	@Override
-	public int getDefaultTimeout() {
+	public int getDefaultTimeoutSeconds() {
 		// TODO if needed, override timeout for tool
-		return super.getDefaultTimeout();
+		return super.getDefaultTimeoutSeconds();
 	}
 
 	@Override
@@ -43,7 +43,12 @@ public class PeptideShakerCoreTool extends Tool {
 		return null;
 	}
 	@Override
-	public String getOutput() {
+	public Map<String, String> getOutputs() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public ImmutableSet<String> getErrorStrings() {
 		// TODO Auto-generated method stub
 		return null;
 	}

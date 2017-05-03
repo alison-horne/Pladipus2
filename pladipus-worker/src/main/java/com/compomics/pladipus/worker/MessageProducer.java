@@ -1,5 +1,7 @@
 package com.compomics.pladipus.worker;
 
+import java.util.Map;
+
 import com.compomics.pladipus.model.queue.messages.worker.WorkerStatus;
 
 /**
@@ -12,7 +14,15 @@ public interface MessageProducer {
 	 * 
 	 * @param jobId - run step identifier
 	 * @param status - WorkerStatus
-	 * @param message - error message, or the output of a successful completed task
+	 * @param outputs - the outputs of a successful completed task (name -> output), or null
 	 */
-	public void sendMessage(Long jobId, WorkerStatus status, String message);
+	public void sendMessage(Long jobId, WorkerStatus status, Map<String, String> outputs);
+	
+	/**
+	 * Send an error message to the controller
+	 * 
+	 * @param jobId - run step identifier
+	 * @param errorMsg - description of the error
+	 */
+	public void sendErrorMessage(Long jobId, String errorMsg);
 }

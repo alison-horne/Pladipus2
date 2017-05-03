@@ -35,10 +35,10 @@ public class WorkerResponseMapper {
 				runService.workerStepStatus(msg.getJobId(), RunStatus.IN_PROGRESS, workerId);
 				break;
 			case COMPLETED:
-				runService.completeRunStep(msg.getJobId(), msg.getMessage(), workerId);
+				runService.completeRunStep(msg.getJobId(), msg.getOutputs(), workerId);
 				break;
 			case ERROR:
-				runService.workerErrorStatus(msg.getJobId(), workerId, msg.getMessage());
+				runService.workerErrorStatus(msg.getJobId(), workerId, msg.getErrorMessage());
 				break;
 			case CANCELLED:
 				runService.workerStepStatus(msg.getJobId(), RunStatus.CANCELLED, workerId);

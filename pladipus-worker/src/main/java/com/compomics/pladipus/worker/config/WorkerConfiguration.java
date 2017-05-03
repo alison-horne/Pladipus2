@@ -38,6 +38,15 @@ public class WorkerConfiguration {
 	
 	@Autowired
 	private Environment env;
+	
+	@Bean
+	public int defaultToolTimeout() {
+		try {
+			return Integer.parseInt(env.getProperty("task.defaultTimeoutSeconds"));
+		} catch (Exception e) {
+			return 36000; // 10 hours
+		}
+	}
 
 	@Bean
 	public ActiveMQConnectionFactory amqConnectionFactory() {
