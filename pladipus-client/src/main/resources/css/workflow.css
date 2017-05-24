@@ -1,0 +1,4 @@
+.canv-background {
+  -fx-background-image: url('../images/check.png');
+  -fx-opacity: 0.25;
+}

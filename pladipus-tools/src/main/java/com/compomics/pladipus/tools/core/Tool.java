@@ -110,7 +110,7 @@ public abstract class Tool implements Callable<Map<String, String>> {
 			pr = Runtime.getRuntime().exec(getExecCommand());
 			ReadOutput outputReader = new ReadOutput(pr);
 			ReadError readError = new ReadError(pr);
-			outputReader.start();
+			outputReader.start(); // TODO check error code.  Error return if, Sys.exit(1)...
 			readError.start();
 			pr.waitFor();
 			return getReturnOutput();

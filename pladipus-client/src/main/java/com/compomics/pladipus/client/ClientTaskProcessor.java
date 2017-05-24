@@ -4,7 +4,7 @@ import org.apache.commons.cli.ParseException;
 
 import com.compomics.pladipus.shared.PladipusReportableException;
 
-public interface CliTaskProcessor {
+public interface ClientTaskProcessor {
 	public void login(String username, String password) throws ParseException, PladipusReportableException;
 	public void doTemplateTask(String filepath, boolean force) throws PladipusReportableException;
 	public void doBatchTask(String filepath, String workflowName, String batchName, boolean force) throws PladipusReportableException;

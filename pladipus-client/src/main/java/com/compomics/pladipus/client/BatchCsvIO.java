@@ -3,6 +3,7 @@ package com.compomics.pladipus.client;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.apache.commons.csv.CSVFormat;
@@ -71,5 +72,13 @@ public class BatchCsvIO {
 	
 	public String getFileName(String filepath) {
 		return Files.getNameWithoutExtension(filepath);
+	}
+	
+	public String fileToString(String filepath) throws PladipusReportableException {
+		try {
+			return new String(java.nio.file.Files.readAllBytes(Paths.get(filepath)));
+		} catch (IOException e) {
+			throw new PladipusReportableException(exceptionMessages.getMessage("clierror.fileread", filepath, e.getMessage()));
+		}
 	}
 }

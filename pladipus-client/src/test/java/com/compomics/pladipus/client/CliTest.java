@@ -19,6 +19,8 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
+import com.compomics.pladipus.client.cmdline.CommandLineIO;
+import com.compomics.pladipus.client.cmdline.MainCLI;
 import com.compomics.pladipus.client.config.ClientConfiguration;
 import com.compomics.pladipus.client.config.FullMockClientConfiguration;
 import com.compomics.pladipus.shared.PladipusReportableException;
@@ -40,7 +42,7 @@ public class CliTest {
 	CommandLineIO cmdLineIO;
 	
 	@Autowired
-	CliTaskProcessor cliTaskProcessor;
+	ClientTaskProcessor cliTaskProcessor;
 
 	private static final String USER = "username";
 	private static final String PASSWORD = "password";

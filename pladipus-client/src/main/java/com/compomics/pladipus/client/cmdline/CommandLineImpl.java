@@ -1,4 +1,4 @@
-package com.compomics.pladipus.client;
+package com.compomics.pladipus.client.cmdline;
 
 import java.io.Console;
 import java.util.Comparator;

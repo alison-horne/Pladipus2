@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 
-import com.compomics.pladipus.client.CommandLineIO;
+import com.compomics.pladipus.client.cmdline.CommandLineIO;
 import com.compomics.pladipus.client.queue.MessageTask;
 
 @Configuration

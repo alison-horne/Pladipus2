@@ -1,4 +1,4 @@
-package com.compomics.pladipus.client;
+package com.compomics.pladipus.client.cmdline;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -13,6 +13,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.compomics.pladipus.client.ClientTaskProcessor;
 import com.compomics.pladipus.shared.PladipusReportableException;
 
 public class MainCLI {
@@ -24,7 +25,7 @@ public class MainCLI {
 	protected CommandLineIO cmdLineIO;
 
 	@Autowired
-	private CliTaskProcessor cliTaskProcessor;
+	private ClientTaskProcessor cliTaskProcessor;
 	
 	// Command line options
 	private OptionGroup optGroup = new OptionGroup();

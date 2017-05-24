@@ -1,30 +1,24 @@
-package com.compomics.pladipus.client;
+package com.compomics.pladipus.client.cmdline;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import org.apache.commons.cli.ParseException;
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.compomics.pladipus.client.queue.MessageMap;
-import com.compomics.pladipus.client.queue.MessageTask;
+import com.compomics.pladipus.client.BatchCsvIO;
+import com.compomics.pladipus.client.ClientTaskProcessor;
+import com.compomics.pladipus.client.queue.MessageSender;
 import com.compomics.pladipus.model.queue.messages.client.ClientTask;
 import com.compomics.pladipus.model.queue.messages.client.ClientToControlMessage;
-import com.compomics.pladipus.model.queue.messages.client.ControlToClientMessage;
 import com.compomics.pladipus.shared.PladipusMessages;
 import com.compomics.pladipus.shared.PladipusReportableException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class CliTaskProcessorImpl implements CliTaskProcessor {
+public class CliTaskProcessor implements ClientTaskProcessor {
 
 	@Autowired
 	private CommandLineIO cmdLineIO;
@@ -36,10 +30,7 @@ public class CliTaskProcessorImpl implements CliTaskProcessor {
 	private PladipusMessages exceptionMessages;
 	
 	@Autowired
-	private MessageMap messageMap;
-	
-	@Autowired
-	private BeanFactory beanFactory;
+	private MessageSender messageSender;
 	
 	@Autowired
 	private ObjectMapper jsonMapper;
@@ -69,7 +60,7 @@ public class CliTaskProcessorImpl implements CliTaskProcessor {
 		} else {
 			msg = new ClientToControlMessage(ClientTask.CREATE_WORKFLOW);
 		}
-		msg.setFileContent(fileToString(filepath));
+		msg.setFileContent(batchCsvIO.fileToString(filepath));
 		makeRequest(msg);
 		cmdLineIO.printOutput(cmdLine.getString("workflow.updated"));
 	}
@@ -82,7 +73,7 @@ public class CliTaskProcessorImpl implements CliTaskProcessor {
 		} else {
 			msg = new ClientToControlMessage(ClientTask.CREATE_BATCH);
 		}
-		msg.setFileContent(fileToString(filepath));
+		msg.setFileContent(batchCsvIO.fileToString(filepath));
 		msg.setWorkflowName(workflowName);
 		if ((batchName == null) || batchName.isEmpty()) batchName = batchCsvIO.getFileName(filepath);
 		msg.setBatchName(batchName);
@@ -143,46 +134,8 @@ public class CliTaskProcessorImpl implements CliTaskProcessor {
 		cmdLineIO.printOutput(MessageFormat.format(cmdLine.getString("abort.success"), (batchName != null && !batchName.isEmpty()) ? batchName : "all"));
 	}
 	
-	private String makeRequest(ClientToControlMessage message) throws PladipusReportableException {
-		try {
-			ExecutorService es = Executors.newSingleThreadExecutor();
-			Future<String> response = es.submit(beanFactory.getBean(MessageTask.class, jsonMapper.writeValueAsString(message)));
-			messageMap.addFuture(response);
-			String responseText = response.get();
-			messageMap.removeFuture(response);
-			es.shutdown();
-		    if ((responseText != null) && !responseText.isEmpty()) {
-		    	ControlToClientMessage responseMessage = jsonMapper.readValue(responseText, ControlToClientMessage.class);
-		    	checkResponseStatus(responseMessage);
-		    	return responseMessage.getContent();
-		    } else {
-			    throw new PladipusReportableException(exceptionMessages.getMessage("clierror.timeout"));
-		    }
-		} catch (InterruptedException e) {
-			cmdLineIO.printOutput(cmdLine.getString("info.taskinterrupt"));
-		} catch (Exception e) {
-			throw new PladipusReportableException(e.getMessage());
-		}
-		return null;
-	}
-	
-	private void checkResponseStatus(ControlToClientMessage msg) throws PladipusReportableException {
-		switch (msg.getStatus()) {
-			case ERROR:
-				throw new PladipusReportableException(msg.getErrorMsg());
-			case NO_LOGIN:
-				throw new PladipusReportableException(exceptionMessages.getMessage("clierror.login"));
-			case OK:
-				return;
-		}	
-	}
-	
-	private String fileToString(String filepath) throws PladipusReportableException {
-		try {
-			return new String(Files.readAllBytes(Paths.get(filepath)));
-		} catch (IOException e) {
-			throw new PladipusReportableException(exceptionMessages.getMessage("clierror.fileread", filepath, e.getMessage()));
-		}
+	private String makeRequest(ClientToControlMessage msg) throws PladipusReportableException {
+		return messageSender.makeRequest(msg);
 	}
 	
 }

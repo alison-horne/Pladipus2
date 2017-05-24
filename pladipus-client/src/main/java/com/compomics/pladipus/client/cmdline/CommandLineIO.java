@@ -1,4 +1,4 @@
-package com.compomics.pladipus.client;
+package com.compomics.pladipus.client.cmdline;
 
 import org.apache.commons.cli.Options;
 

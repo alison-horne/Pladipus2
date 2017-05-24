@@ -16,6 +16,8 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
+import com.compomics.pladipus.client.cmdline.CommandLineIO;
+import com.compomics.pladipus.client.cmdline.MainCLI;
 import com.compomics.pladipus.client.config.ClientConfiguration;
 import com.compomics.pladipus.client.config.MockClientConfiguration;
 

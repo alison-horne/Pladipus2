@@ -17,16 +17,19 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 
 import com.compomics.pladipus.client.BatchCsvIO;
-import com.compomics.pladipus.client.CliTaskProcessor;
-import com.compomics.pladipus.client.CliTaskProcessorImpl;
-import com.compomics.pladipus.client.CommandLineIO;
-import com.compomics.pladipus.client.CommandLineImpl;
-import com.compomics.pladipus.client.MainCLI;
-import com.compomics.pladipus.client.MainGUI;
+import com.compomics.pladipus.client.ClientTaskProcessor;
+import com.compomics.pladipus.client.cmdline.CliTaskProcessor;
+import com.compomics.pladipus.client.cmdline.CommandLineIO;
+import com.compomics.pladipus.client.cmdline.CommandLineImpl;
+import com.compomics.pladipus.client.cmdline.MainCLI;
+import com.compomics.pladipus.client.gui.GuiTaskProcessor;
+import com.compomics.pladipus.client.gui.MainGUI;
 import com.compomics.pladipus.client.queue.ClientListener;
 import com.compomics.pladipus.client.queue.ClientMessageProducer;
 import com.compomics.pladipus.client.queue.ClientMessageTask;
 import com.compomics.pladipus.client.queue.MessageMap;
+import com.compomics.pladipus.client.queue.MessageSender;
+import com.compomics.pladipus.client.queue.MessageSenderImpl;
 import com.compomics.pladipus.client.queue.MessageTask;
 import com.compomics.pladipus.client.queue.UuidGenerator;
 import com.compomics.pladipus.model.queue.MessageSelector;
@@ -53,9 +56,16 @@ public class ClientConfiguration {
 		}
 	}
 	
+	@Lazy
 	@Bean
-	public CliTaskProcessor cliTaskProcessor() {
-		return new CliTaskProcessorImpl();
+	public ClientTaskProcessor cliTaskProcessor() {
+		return new CliTaskProcessor();
+	}
+	
+	@Lazy
+	@Bean
+	public ClientTaskProcessor guiTaskProcessor() {
+		return new GuiTaskProcessor();
 	}
 	
 	@Lazy
@@ -73,7 +83,7 @@ public class ClientConfiguration {
 	@Lazy
 	@Bean
 	public MainGUI gui() {
-		return new MainGUI();
+		return new MainGUI(guiTaskProcessor());
 	}
 	
 	@Bean
@@ -84,6 +94,12 @@ public class ClientConfiguration {
 	@Bean
 	public BatchCsvIO batchCsvIO() {
 		return new BatchCsvIO();
+	}
+	
+	@Lazy
+	@Bean
+	public MessageSender messageSender() {
+		return new MessageSenderImpl();
 	}
 	
 	@Bean
