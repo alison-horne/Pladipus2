@@ -1,4 +1,4 @@
-package com.compomics.pladipus.base.helper.impl;
+package com.compomics.pladipus.shared;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.xml.sax.SAXException;
 
-import com.compomics.pladipus.base.helper.XMLHelper;
 import com.compomics.pladipus.model.persist.Workflow;
 import com.compomics.pladipus.shared.PladipusMessages;
 import com.compomics.pladipus.shared.PladipusReportableException;

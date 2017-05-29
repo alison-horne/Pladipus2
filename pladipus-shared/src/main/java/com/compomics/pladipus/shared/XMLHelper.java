@@ -1,4 +1,4 @@
-package com.compomics.pladipus.base.helper;
+package com.compomics.pladipus.shared;
 
 import com.compomics.pladipus.shared.PladipusReportableException;
 

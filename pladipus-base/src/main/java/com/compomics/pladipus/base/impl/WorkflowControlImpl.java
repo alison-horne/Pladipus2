@@ -5,10 +5,10 @@ import org.springframework.context.annotation.Lazy;
 
 import com.compomics.pladipus.base.WorkflowControl;
 import com.compomics.pladipus.base.helper.ValidationChecker;
-import com.compomics.pladipus.base.helper.XMLHelper;
 import com.compomics.pladipus.model.persist.Workflow;
 import com.compomics.pladipus.model.persist.User;
 import com.compomics.pladipus.shared.PladipusReportableException;
+import com.compomics.pladipus.shared.XMLHelper;
 import com.compomics.pladipus.repository.service.WorkflowService;
 
 public class WorkflowControlImpl implements WorkflowControl {

@@ -25,10 +25,8 @@ import com.compomics.pladipus.repository.config.RepositoryConfiguration;
 import com.compomics.pladipus.shared.config.SharedConfiguration;
 import com.compomics.pladipus.base.helper.impl.BatchCsvParser;
 import com.compomics.pladipus.base.helper.impl.WorkflowValidator;
-import com.compomics.pladipus.base.helper.impl.WorkflowXMLHelper;
 import com.compomics.pladipus.base.helper.CsvParser;
 import com.compomics.pladipus.base.helper.ValidationChecker;
-import com.compomics.pladipus.base.helper.XMLHelper;
 import com.compomics.pladipus.tools.config.ToolsConfiguration;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -70,11 +68,6 @@ public class BaseConfiguration {
 	@Bean
 	public QueueControl queueControl() {
 		return new QueueControlImpl();
-	}
-			
-	@Bean
-	public XMLHelper<Workflow> workflowXMLHelper() {
-		return new WorkflowXMLHelper();
 	}
 	
 	@Bean
