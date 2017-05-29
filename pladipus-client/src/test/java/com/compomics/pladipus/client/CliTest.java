@@ -19,6 +19,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
+import com.compomics.pladipus.client.cmdline.CliTaskProcessor;
 import com.compomics.pladipus.client.cmdline.CommandLineIO;
 import com.compomics.pladipus.client.cmdline.MainCLI;
 import com.compomics.pladipus.client.config.ClientConfiguration;
@@ -42,7 +43,7 @@ public class CliTest {
 	CommandLineIO cmdLineIO;
 	
 	@Autowired
-	ClientTaskProcessor cliTaskProcessor;
+	CliTaskProcessor cliTaskProcessor;
 
 	private static final String USER = "username";
 	private static final String PASSWORD = "password";

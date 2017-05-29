@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+
+
+<AnchorPane prefHeight="300.0" prefWidth="500.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.102" fx:controller="com.compomics.pladipus.client.gui.controllers.NewWorkflowController">
+   <children>
+      <GridPane AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="5.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES"/>
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints percentHeight="14.0" vgrow="SOMETIMES" />
+          <RowConstraints percentHeight="14.0" vgrow="SOMETIMES" />
+          <RowConstraints percentHeight="14.0" vgrow="SOMETIMES" />
+          <RowConstraints percentHeight="8.0" vgrow="SOMETIMES" />
+          <RowConstraints percentHeight="14.0" vgrow="SOMETIMES" />
+          <RowConstraints percentHeight="14.0" vgrow="SOMETIMES" />
+          <RowConstraints percentHeight="8.0" vgrow="SOMETIMES" />
+          <RowConstraints percentHeight="14.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Label text="%newworkflow.header" GridPane.halignment="CENTER" />
+            <RadioButton fx:id="radioNew" mnemonicParsing="false" text="%newworkflow.radioNew" GridPane.rowIndex="1" />
+            <RadioButton fx:id="radioFile" mnemonicParsing="false" text="%newworkflow.radioFile" GridPane.rowIndex="2" />
+            <StackPane GridPane.rowIndex="4">
+               <children>
+                  <Button fx:id="browseBtn" mnemonicParsing="false" text="%newworkflow.browseBtn" StackPane.alignment="CENTER_RIGHT" onAction="#handleBrowse"/>
+                  <Label fx:id="instructionLbl" text="" StackPane.alignment="CENTER_LEFT" />
+               </children>
+            </StackPane>
+            <TextField fx:id="workflowIdentifier" GridPane.rowIndex="5" />
+            <StackPane GridPane.rowIndex="7">
+               <children>
+              	  <Button fx:id="openBtn" mnemonicParsing="false" text="%newworkflow.openBtn" GridPane.halignment="CENTER" onAction="#handleOpen"/>
+                  <Button mnemonicParsing="false" text="%newworkflow.cancelBtn" StackPane.alignment="CENTER_RIGHT" onAction="#handleCancel"/>
+               </children>
+            </StackPane>
+         </children>
+      </GridPane>
+   </children>
+</AnchorPane>

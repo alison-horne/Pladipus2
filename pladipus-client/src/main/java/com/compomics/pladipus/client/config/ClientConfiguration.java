@@ -17,12 +17,13 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 
 import com.compomics.pladipus.client.BatchCsvIO;
-import com.compomics.pladipus.client.ClientTaskProcessor;
 import com.compomics.pladipus.client.cmdline.CliTaskProcessor;
+import com.compomics.pladipus.client.cmdline.CliTaskProcessorImpl;
 import com.compomics.pladipus.client.cmdline.CommandLineIO;
 import com.compomics.pladipus.client.cmdline.CommandLineImpl;
 import com.compomics.pladipus.client.cmdline.MainCLI;
 import com.compomics.pladipus.client.gui.GuiTaskProcessor;
+import com.compomics.pladipus.client.gui.GuiTaskProcessorImpl;
 import com.compomics.pladipus.client.gui.MainGUI;
 import com.compomics.pladipus.client.queue.ClientListener;
 import com.compomics.pladipus.client.queue.ClientMessageProducer;
@@ -58,14 +59,14 @@ public class ClientConfiguration {
 	
 	@Lazy
 	@Bean
-	public ClientTaskProcessor cliTaskProcessor() {
-		return new CliTaskProcessor();
+	public CliTaskProcessor cliTaskProcessor() {
+		return new CliTaskProcessorImpl();
 	}
 	
 	@Lazy
 	@Bean
-	public ClientTaskProcessor guiTaskProcessor() {
-		return new GuiTaskProcessor();
+	public GuiTaskProcessor guiTaskProcessor() {
+		return new GuiTaskProcessorImpl();
 	}
 	
 	@Lazy

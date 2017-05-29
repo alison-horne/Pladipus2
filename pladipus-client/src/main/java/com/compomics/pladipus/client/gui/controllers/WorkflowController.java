@@ -8,6 +8,8 @@ import com.compomics.pladipus.client.gui.model.WorkflowGui;
 import com.compomics.pladipus.model.core.ToolInformation;
 import com.compomics.pladipus.model.persist.Workflow;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -17,6 +19,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -38,6 +41,10 @@ public class WorkflowController {
     private TableColumn<LegendItem, Rectangle> colorColumn;
     @FXML
     private TableColumn<LegendItem, String> toolNameColumn;
+    @FXML
+    private Button deleteStepBtn;
+    @FXML
+    private Button editStepBtn;
 	
     // TODO warnings on edit/delete about existing runs
     @FXML
@@ -53,10 +60,27 @@ public class WorkflowController {
     		workflowGui.addStep(toolInfo, null, true);
     	}
     }
+    
+    @FXML
+    public void handleDeleteStep() {
+    	
+    }
+    
+    @FXML
+    public void handleEditStep() {
+    	
+    }
 
     public void setWorkflow(Workflow workflow) {
     	workflowGui = new WorkflowGui(workflow, canvasPane);
+    	bindButtons();
     	legendTable.setItems(workflowGui.getLegendData());
+    }
+    
+    private void bindButtons() {
+        final BooleanBinding stepSelected = Bindings.isNull(workflowGui.selectedStepProperty());
+        deleteStepBtn.disableProperty().bind(stepSelected);
+        editStepBtn.disableProperty().bind(stepSelected);
     }
 // 
 //    public void arrangeIcons() {

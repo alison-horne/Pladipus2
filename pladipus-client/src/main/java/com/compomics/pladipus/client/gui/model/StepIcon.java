@@ -4,6 +4,8 @@ import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.effect.Effect;
+import javafx.scene.effect.InnerShadow;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
@@ -29,7 +31,6 @@ public class StepIcon extends StackPane {
 	private Rectangle labelRect;
 	private Circle inCirc;
 	private Circle outCirc;
-	private DropShadow highlight; 
 	final IconInteract ii = new IconInteract();
 	
 	class IconInteract {
@@ -58,16 +59,26 @@ public class StepIcon extends StackPane {
 		getChildren().add(labelRect);
 		getChildren().add(labelText);
 		setStyle("-fx-border-color:black; -fx-background-color:" + color.toString().replaceFirst("0x", "#"));
-		
+		StackPane.setAlignment(this, Pos.TOP_LEFT);
 		addIconListeners();
 		addCircleListeners();
 	}
 	
-	private void initHighlightEffect() {
-		highlight = new DropShadow();
-		highlight.setColor(Color.RED);
-		highlight.setOffsetX(0f);
-		highlight.setOffsetY(0f);
+	private DropShadow getHighlight(Color color) {
+		DropShadow highlight = new DropShadow();
+		highlight.setColor(color);
+		highlight.setOffsetX(0.0);
+		highlight.setOffsetY(0.0);
+		highlight.setRadius(size*0.3);
+		return highlight;
+	}
+	
+	private InnerShadow getGlow(Color color) {
+		InnerShadow glow = new InnerShadow();
+		glow.setColor(color);
+		glow.setOffsetX(0.0);
+		glow.setOffsetY(0.0);
+		return glow;
 	}
 	
 	public void setInitPosition(double xpos, double ypos) {
@@ -90,6 +101,22 @@ public class StepIcon extends StackPane {
 		labelRect.setStroke(color);
 	}
 	
+	public void highlightIcon(boolean highlightOn) {
+		if (highlightOn) {
+			setEffect(getHighlight(Color.RED));
+		} else {
+			setEffect(null);
+		}
+	}
+	
+	public void highlightInCircle(boolean highlightOn) {
+		if (highlightOn) {
+			inCirc.setEffect(getGlow(Color.BLUE));
+		} else {
+			inCirc.setEffect(null);
+		}
+	}
+	
 	public Circle getOutCircle() {
 		return outCirc;
 	}
@@ -103,7 +130,6 @@ public class StepIcon extends StackPane {
 	}
 	
 	private void createIconParts() {
-		initHighlightEffect();
 		createLabelText();
 		createRectangles();
 		createCircles();
@@ -170,7 +196,8 @@ public class StepIcon extends StackPane {
 		setOnMousePressed(new EventHandler<MouseEvent>() {
 			@Override 
 			public void handle(MouseEvent mouseEvent) {
-				toFront();
+				mouseEvent.consume();
+				workflow.setSelectedStep(step);
 				ii.xDrag = getLayoutX() - mouseEvent.getSceneX();
 				ii.yDrag = getLayoutY() - mouseEvent.getSceneY();
 				setCursor(Cursor.MOVE);
@@ -181,6 +208,7 @@ public class StepIcon extends StackPane {
 			@Override 
 			public void handle(MouseEvent mouseEvent) {
 				if (workflow.getDrawingLink() == null) {
+					mouseEvent.consume();
 					setManaged(false);
 	
 					double buffer = size * 0.16;
@@ -256,7 +284,7 @@ public class StepIcon extends StackPane {
 			public void handle(MouseEvent mouseEvent) {
 				mouseEvent.consume();
 				setCursor(Cursor.DEFAULT);
-				outCirc.setEffect(highlight);
+				outCirc.setEffect(getGlow(Color.BLUE));
 			}
 		});
 		
@@ -286,13 +314,16 @@ public class StepIcon extends StackPane {
 			@Override 
 			public void handle(MouseEvent mouseEvent) {
 				workflow.clearDrawingLink();
+				outCirc.setEffect(null);
 			}
 		});
 
 		outCirc.setOnMouseExited(new EventHandler<MouseEvent>() {
 			@Override 
 			public void handle(MouseEvent mouseEvent) {
-				
+				if (!isStartLinkIcon()) {
+					outCirc.setEffect(null);
+				}
 			}
 		});
 	}

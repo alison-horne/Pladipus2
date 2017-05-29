@@ -4,7 +4,7 @@ import java.util.ResourceBundle;
 
 import org.apache.commons.cli.ParseException;
 
-import com.compomics.pladipus.client.ClientTaskProcessor;
+import com.compomics.pladipus.client.gui.GuiTaskProcessor;
 import com.compomics.pladipus.client.gui.MainGUI;
 import com.compomics.pladipus.shared.PladipusReportableException;
 
@@ -23,7 +23,7 @@ public class LoginController {
 	// Allow cancel after login button hit but before return from control
 	
 	private MainGUI main;
-	private ClientTaskProcessor processor;
+	private GuiTaskProcessor processor;
 	
 	@FXML
 	private TextField usernameField;
@@ -52,7 +52,7 @@ public class LoginController {
     		try {
     			processor.login(username, password);
     			main.initDashboard(username);
-    		} catch (PladipusReportableException | ParseException e) {
+    		} catch (PladipusReportableException e) {
     			doAlert(e.getMessage()); 			
     		}
     	}

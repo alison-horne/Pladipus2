@@ -2,30 +2,25 @@ package com.compomics.pladipus.client.gui.controllers;
 
 import java.util.ResourceBundle;
 
-import org.apache.commons.cli.ParseException;
-
-import com.compomics.pladipus.client.ClientTaskProcessor;
+import com.compomics.pladipus.client.gui.GuiTaskProcessor;
 import com.compomics.pladipus.client.gui.MainGUI;
 import com.compomics.pladipus.client.gui.model.BatchGui;
 import com.compomics.pladipus.client.gui.model.WorkflowGui;
-import com.compomics.pladipus.shared.PladipusReportableException;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
-import javafx.scene.control.PasswordField;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 
 public class DashboardController {
 	
 	private MainGUI main;
-	private ClientTaskProcessor processor;
+	private GuiTaskProcessor processor;
 
     @FXML
     private TableView<WorkflowGui> workflowTable;
@@ -49,6 +44,7 @@ public class DashboardController {
     	batchNameColumn.setCellValueFactory(cellData -> cellData.getValue().batchNameProperty());
     	batchRunsColumn.setCellValueFactory(cellData -> cellData.getValue().runSizeProperty());
         showBatchDetails(null);
+        workflowTable.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         workflowTable.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldWorkflow, newWorkflow) -> showBatchDetails(newWorkflow));
     }
@@ -65,7 +61,13 @@ public class DashboardController {
     
     @FXML
     public void handleNewWorkflow() {
-    	main.initWorkflowDialog(null, false);
+    	main.initNewWorkflow(null);
+    }
+    
+    @FXML
+    public void handleEditWorkflow() {
+    	WorkflowGui selected = workflowTable.getSelectionModel().getSelectedItem();
+    	main.initEditWorkflow((selected != null) ? selected.getWorkflow() : null);
     }
     
     @FXML

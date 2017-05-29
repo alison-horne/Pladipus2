@@ -3,9 +3,9 @@ package com.compomics.pladipus.client.gui;
 import java.io.IOException;
 import java.util.ResourceBundle;
 
-import com.compomics.pladipus.client.ClientTaskProcessor;
 import com.compomics.pladipus.client.gui.controllers.DashboardController;
 import com.compomics.pladipus.client.gui.controllers.LoginController;
+import com.compomics.pladipus.client.gui.controllers.NewWorkflowController;
 import com.compomics.pladipus.client.gui.controllers.ToolChoiceController;
 import com.compomics.pladipus.client.gui.controllers.WorkflowController;
 import com.compomics.pladipus.client.gui.model.DefaultGui;
@@ -34,7 +34,7 @@ import javafx.stage.WindowEvent;
 
 public class MainGUI extends Application {
 
-	private static ClientTaskProcessor guiTaskProcessor;
+	private static GuiTaskProcessor guiTaskProcessor;
 	// TODO sort out ToolInfo getting into model (as Properties, not String, etc?)  Need most methods in Base ToolControl?
 	private ObservableList<WorkflowGui> userWorkflows = FXCollections.observableArrayList();
 	private ObservableList<DefaultGui> userDefaults = FXCollections.observableArrayList();
@@ -53,9 +53,11 @@ public class MainGUI extends Application {
 	private static final String WORKFLOW_CSS = "css/workflow.css";
 	private static final String TOOLCHOICE_FXML = "fxml/ToolChoice.fxml";
 	private static final String TOOLCHOICE_TEXTS = "guiTexts/toolchoice";
+	private static final String NEWWORKFLOW_FXML = "fxml/NewWorkflow.fxml";
+	private static final String NEWWORKFLOW_TEXTS = "guiTexts/newworkflow";
 
 	public MainGUI(){}
-	public MainGUI(ClientTaskProcessor proc) {
+	public MainGUI(GuiTaskProcessor proc) {
 		super();
 		MainGUI.guiTaskProcessor = proc;
 	}
@@ -67,7 +69,7 @@ public class MainGUI extends Application {
 	@Override
 	public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        addStageName(primaryStage);
+        setDefaultLook(primaryStage);
         primaryStage.setOnCloseRequest(sureCloseHandler()); 
         if (isSetup()) {
         	initLogin();
@@ -76,8 +78,11 @@ public class MainGUI extends Application {
         }
 	}
 	
-	private void addStageName(Stage stage) {
+	private void setDefaultLook(Stage stage) {
 		stage.setTitle(PLADIPUS_NAME);
+		addStageIcon(stage);
+	}
+	private void addStageIcon(Stage stage) {
 		stage.getIcons().add(new Image(PLADIPUS_ICON));
 	}
 	
@@ -89,7 +94,7 @@ public class MainGUI extends Application {
 		return primaryStage;
 	}
 	
-	public ClientTaskProcessor getProcessor() {
+	public GuiTaskProcessor getProcessor() {
 		return guiTaskProcessor;
 	}
 	
@@ -141,26 +146,46 @@ public class MainGUI extends Application {
 	        Scene scene = new Scene(dashboardLayout);
 	        primaryStage.setScene(scene);
 	        primaryStage.centerOnScreen();
-	        primaryStage.show();
 	    } catch (IOException e) {
 	    	// TODO how to handle scene loading errors
 			e.printStackTrace();
 		}
     }
     
-    public Workflow initWorkflowChoice(boolean edit) {
-    	//TODO If edit, give dropdown list of available workflows...if none exist, give new dialog with error message
-    	// If new, give 'load from xml' option, and ability to name it
-    	return null;
+    public void initNewWorkflow(Stage wfStage) {
+    	if (wfStage == null) {
+	        wfStage = new Stage();
+	        setDefaultLook(wfStage);
+	        wfStage.initModality(Modality.NONE);
+    	}
+    	
+    	try {
+	    	FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(NEWWORKFLOW_FXML));
+	    	loader.setResources(ResourceBundle.getBundle(NEWWORKFLOW_TEXTS));
+			AnchorPane newWorkflowLayout = (AnchorPane) loader.load();
+	        NewWorkflowController controller = loader.getController();
+	        controller.setMain(this);
+	        controller.setStage(wfStage);
+
+	        Scene scene = new Scene(newWorkflowLayout);
+	        wfStage.setScene(scene);
+	        wfStage.centerOnScreen();
+	        wfStage.show();
+    	} catch (IOException e) {
+	    	// TODO how to handle scene loading errors
+			e.printStackTrace();
+    	}
     }
     
-    public void initWorkflowDialog(Workflow workflow, boolean edit) {
-    	if (workflow == null) {
-    		workflow = initWorkflowChoice(edit);
+    public void initEditWorkflow(Workflow editWorkflow) {
+    	if (editWorkflow == null) {
+    		// TODO select workflow from drop-down list pop-up (or choice to open 'new' dialog - only choice if existing workflows list empty)
     	}
-    	// Clone workflow to go in the editor so changes can be reset
-    	// Or have 'EditableWorkflow' class?
-    	// Logic to convert xml <-> editable workflow obj?
+ //   	initWorkflowDialog(editWorkflow, editWorkflow.getName());
+    }
+    
+    public void initWorkflowDialog(Workflow workflow, String name, Stage wfStage) {
+    	// TODO make this WorkflowGUI passed in, so can go straight to edit? Check the step dependency getting method already in Workflow...
     	try {
 	    	FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(WORKFLOW_FXML));
 	    	loader.setResources(ResourceBundle.getBundle(WORKFLOW_TEXTS));
@@ -169,7 +194,7 @@ public class MainGUI extends Application {
 	        controller.setWorkflow(workflow);
 
 	        Stage workflowStage = new Stage();
-	        addStageName(workflowStage);
+	        setDefaultLook(workflowStage);
 	        workflowStage.initModality(Modality.NONE);
 	        Scene scene = new Scene(workflowLayout);
 	        scene.getStylesheets().add(getClass().getClassLoader().getResource(WORKFLOW_CSS).toExternalForm());
@@ -195,7 +220,7 @@ public class MainGUI extends Application {
 			AnchorPane toolChoiceLayout = (AnchorPane) loader.load();
 			
 			Stage toolChoiceStage = new Stage();
-			addStageName(toolChoiceStage);
+			setDefaultLook(toolChoiceStage);
 			toolChoiceStage.initModality(Modality.WINDOW_MODAL);
 			toolChoiceStage.initOwner(wfStage);
 			

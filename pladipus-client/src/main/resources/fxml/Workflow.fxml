@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
@@ -62,7 +63,13 @@
                   <StackPane fx:id="canvasPane" style="-fx-border-color: black;">
                      <children>
                         <AnchorPane styleClass="canv-background"/>
-                        <Button mnemonicParsing="false" text="%workflow.addStepButton" StackPane.alignment="BOTTOM_RIGHT" onAction="#handleAddStep"/>
+                        <ButtonBar maxHeight="40.0" StackPane.alignment="BOTTOM_RIGHT">
+              				<buttons>
+             				 	<Button mnemonicParsing="false" text="%workflow.addStepButton" onAction="#handleAddStep"/>
+             				 	<Button fx:id="deleteStepBtn" mnemonicParsing="false" text="%workflow.deleteStepButton" onAction="#handleDeleteStep"/>
+             				 	<Button fx:id="editStepBtn" mnemonicParsing="false" text="%workflow.editStepButton" onAction="#handleEditStep"/>
+             				</buttons>
+                		</ButtonBar>
                      </children>
                   </StackPane>
                 <AnchorPane>

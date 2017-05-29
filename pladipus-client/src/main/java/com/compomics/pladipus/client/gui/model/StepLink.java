@@ -125,4 +125,12 @@ public class StepLink {
 	public WorkflowGuiStep getStartStep() {
 		return startStep;
 	}
+	public WorkflowGuiStep getEndStep() {
+		return endStep;
+	}
+	
+	public void toFront() {
+		line.toFront();
+		arrow.toFront();
+	}
 }
