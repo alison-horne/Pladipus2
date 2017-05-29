@@ -71,8 +71,9 @@ public class WorkflowController {
     	
     }
 
-    public void setWorkflow(Workflow workflow) {
-    	workflowGui = new WorkflowGui(workflow, canvasPane);
+    public void setWorkflowGui(WorkflowGui workflow) {
+    	this.workflowGui = workflow;
+    	workflowGui.setCanvas(canvasPane);
     	bindButtons();
     	legendTable.setItems(workflowGui.getLegendData());
     }

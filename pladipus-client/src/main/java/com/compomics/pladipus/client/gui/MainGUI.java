@@ -184,29 +184,27 @@ public class MainGUI extends Application {
  //   	initWorkflowDialog(editWorkflow, editWorkflow.getName());
     }
     
-    public void initWorkflowDialog(Workflow workflow, String name, Stage wfStage) {
-    	// TODO make this WorkflowGUI passed in, so can go straight to edit? Check the step dependency getting method already in Workflow...
+    public void initWorkflowDialog(WorkflowGui workflowGui, Stage wfStage) {
+    	// TODO Check the step dependency getting method already in Workflow...
     	try {
 	    	FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(WORKFLOW_FXML));
 	    	loader.setResources(ResourceBundle.getBundle(WORKFLOW_TEXTS));
 			BorderPane workflowLayout = (BorderPane) loader.load();
 	        WorkflowController controller = loader.getController();
-	        controller.setWorkflow(workflow);
-
-	        Stage workflowStage = new Stage();
-	        setDefaultLook(workflowStage);
-	        workflowStage.initModality(Modality.NONE);
+	        controller.setWorkflowGui(workflowGui);
+	        
 	        Scene scene = new Scene(workflowLayout);
 	        scene.getStylesheets().add(getClass().getClassLoader().getResource(WORKFLOW_CSS).toExternalForm());
-	        workflowStage.setScene(scene);
-	        workflowStage.setResizable(false);
-	        controller.setStage(workflowStage);
+	        wfStage.setScene(scene);
+	        wfStage.centerOnScreen();
+	        wfStage.setResizable(false);
+	        controller.setStage(wfStage);
 	        controller.setMain(this);
-	        workflowStage.show();
-//	        if (workflow != null) {
+	        wfStage.show();
+	        if (workflowGui.getWorkflow() != null) {
 //	        	controller.displayWorkflow();
 //	        	controller.arrangeIcons();
-//	        }
+	        }
     	} catch (IOException e) {
 	    	// TODO how to handle scene loading errors
 			e.printStackTrace();
