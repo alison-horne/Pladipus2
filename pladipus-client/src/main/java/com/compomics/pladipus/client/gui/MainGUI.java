@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ResourceBundle;
 
 import com.compomics.pladipus.client.gui.controllers.DashboardController;
+import com.compomics.pladipus.client.gui.controllers.EditWorkflowController;
 import com.compomics.pladipus.client.gui.controllers.LoginController;
 import com.compomics.pladipus.client.gui.controllers.NewWorkflowController;
 import com.compomics.pladipus.client.gui.controllers.ToolChoiceController;
@@ -55,6 +56,8 @@ public class MainGUI extends Application {
 	private static final String TOOLCHOICE_TEXTS = "guiTexts/toolchoice";
 	private static final String NEWWORKFLOW_FXML = "fxml/NewWorkflow.fxml";
 	private static final String NEWWORKFLOW_TEXTS = "guiTexts/newworkflow";
+	private static final String EDITWORKFLOW_FXML = "fxml/EditWorkflow.fxml";
+	private static final String EDITWORKFLOW_TEXTS = "guiTexts/editworkflow";
 
 	public MainGUI(){}
 	public MainGUI(GuiTaskProcessor proc) {
@@ -177,11 +180,31 @@ public class MainGUI extends Application {
     	}
     }
     
-    public void initEditWorkflow(Workflow editWorkflow) {
+    public void initEditWorkflow(WorkflowGui editWorkflow) {
+        Stage wfStage = new Stage();
+        setDefaultLook(wfStage);
+        wfStage.initModality(Modality.NONE);
+        
     	if (editWorkflow == null) {
-    		// TODO select workflow from drop-down list pop-up (or choice to open 'new' dialog - only choice if existing workflows list empty)
+    		try {
+		    	FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(EDITWORKFLOW_FXML));
+		    	loader.setResources(ResourceBundle.getBundle(EDITWORKFLOW_TEXTS));
+				AnchorPane editLayout = (AnchorPane) loader.load();
+		        EditWorkflowController controller = loader.getController();
+		        
+		        Scene scene = new Scene(editLayout);
+		        wfStage.setScene(scene);
+		        wfStage.centerOnScreen();
+		        controller.setStage(wfStage);
+		        controller.setMain(this);
+		        wfStage.show();
+    		} catch (IOException e) {
+    	    	// TODO how to handle scene loading errors
+    			e.printStackTrace();
+        	}
+    	} else {
+    		initWorkflowDialog(editWorkflow, wfStage);
     	}
- //   	initWorkflowDialog(editWorkflow, editWorkflow.getName());
     }
     
     public void initWorkflowDialog(WorkflowGui workflowGui, Stage wfStage) {

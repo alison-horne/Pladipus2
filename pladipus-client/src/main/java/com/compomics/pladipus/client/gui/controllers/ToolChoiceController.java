@@ -21,7 +21,7 @@ public class ToolChoiceController {
     	toolChoices.setConverter(new StringConverter<ToolInformation>() {
 			@Override
 			public ToolInformation fromString(String toolName) {
-				return new ToolInformation(toolName);
+				return null;
 			}
 			@Override
 			public String toString(ToolInformation toolInfo) {

@@ -30,7 +30,7 @@
           <Menu mnemonicParsing="true" text="%dashboard.menuWorkflow">
             <items>
               <MenuItem mnemonicParsing="true" onAction="#handleNewWorkflow" text="%dashboard.optionNewWorkflow" />
-              <MenuItem mnemonicParsing="true" text="%dashboard.optionEditWorkflow" />
+              <MenuItem mnemonicParsing="true" onAction="#handleEditWorkflow" text="%dashboard.optionEditWorkflow" />
               <MenuItem mnemonicParsing="true" text="%dashboard.optionDeleteWorkflow" />
             </items>
           </Menu>
@@ -94,10 +94,10 @@
                 		</TableView>
                 		<HBox prefHeight="40" spacing="10" GridPane.rowIndex="2">
                				<children>
-               					<Button mnemonicParsing="false" text="%dashboard.editWorkflowBtn" />
+               					<Button mnemonicParsing="false" text="%dashboard.editWorkflowBtn" onAction="#handleEditWorkflow"/>
                					<Button mnemonicParsing="false" text="%dashboard.deleteWorkflowBtn"/>
                   				<Pane HBox.hgrow="SOMETIMES" />           				
-                  				<Button mnemonicParsing="false" text="%dashboard.newWorkflowBtn" />
+                  				<Button mnemonicParsing="false" text="%dashboard.newWorkflowBtn" onAction="#handleNewWorkflow"/>
                				</children>
             			</HBox>
                      </children>

@@ -67,7 +67,7 @@ public class DashboardController {
     @FXML
     public void handleEditWorkflow() {
     	WorkflowGui selected = workflowTable.getSelectionModel().getSelectedItem();
-    	main.initEditWorkflow((selected != null) ? selected.getWorkflow() : null);
+    	main.initEditWorkflow((selected != null) ? selected : null);
     }
     
     @FXML
