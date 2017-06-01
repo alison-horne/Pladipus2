@@ -1,11 +1,17 @@
 package com.compomics.pladipus.client.gui.model;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.compomics.pladipus.client.gui.MainGUI;
 import com.compomics.pladipus.model.core.ToolInformation;
+import com.compomics.pladipus.model.persist.Step;
 import com.compomics.pladipus.model.persist.Workflow;
+import com.compomics.pladipus.shared.PladipusReportableException;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -32,12 +38,13 @@ public class WorkflowGui {
 	private Set<StepLink> links = new HashSet<StepLink>();
 	private StepLink drawingLink;
 	private ObjectProperty<WorkflowGuiStep> selectedStep;
+	private MainGUI main;
 	
 	// TODO - thoughts on links...want to be able to draw twice, for ease of user adding another out->in param link, but only want one actual arrow on screen
 	public WorkflowGui(Workflow workflow) {
 		this.originalWorkflow = workflow;
 		this.workflowName = new SimpleStringProperty(null);
-		populateWorkflow();
+		if (workflow != null) setWorkflowName(workflow.getName());
 		selectedStep = new SimpleObjectProperty<WorkflowGuiStep>(null);
 	} 
 	
@@ -67,22 +74,30 @@ public class WorkflowGui {
     public StringProperty workflowNameProperty() {
         return workflowName;
     }
+    
+    public void setMain(MainGUI main) {
+    	this.main = main;
+    }
 
 	public ObservableList<LegendItem> getLegendData() {
 		return toolLegend.getLegendData();
 	}
 	
-	public void addStep(ToolInformation toolInfo, String stepId, boolean show) {
+	public void addStep(ToolInformation toolInfo, String stepId) {
 		if ((stepId == null) || stepId.isEmpty()) {
 			stepId = "step" + stepIdDefault;
 			stepIdDefault++;
 		}
 		WorkflowGuiStep step = new WorkflowGuiStep(this, toolInfo, stepId);
 		guiSteps.add(step);
-		if (show) {
-			showStep(step);
-			setSelectedStep(step);
-		}
+		showStep(step);
+		setSelectedStep(step);
+	}
+	
+	private void addStep(Step step) throws PladipusReportableException {
+		WorkflowGuiStep guiStep = new WorkflowGuiStep(this, step);
+		guiStep.validate();
+		guiSteps.add(guiStep);
 	}
 	
 	public void showStep(WorkflowGuiStep step) {
@@ -98,9 +113,12 @@ public class WorkflowGui {
     	return Math.min(canvas.getBoundsInParent().getHeight(), canvas.getBoundsInParent().getWidth()) * iconSizeScale / 10;
     }
     
-    private void populateWorkflow() {
+    private void populateWorkflow() throws PladipusReportableException {
     	if (originalWorkflow != null) {
     		setWorkflowName(originalWorkflow.getName());
+    		for (Step step: originalWorkflow.getSteps().getStep()) {
+    			addStep(step);
+    		}
     	}
     }
     
@@ -207,5 +225,21 @@ public class WorkflowGui {
 				setSelectedStep(null);
 			}
 		});
+    }
+    
+    public void displayWorkflow() throws PladipusReportableException {
+    	populateWorkflow();
+    	for (WorkflowGuiStep step: guiSteps) {
+    		showStep(step);
+    	}
+    }
+    
+    public void arrangeIcons() {
+    	// TODO
+    }
+    
+    // TODO sort out structure.  move into controller...stop having to pass main through layers
+    public ToolInformation getTool(String toolName) throws PladipusReportableException {
+    	return main.getTool(toolName);
     }
 }

@@ -1,6 +1,8 @@
 package com.compomics.pladipus.client.gui;
 
 import java.io.IOException;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import com.compomics.pladipus.client.gui.controllers.DashboardController;
@@ -15,6 +17,7 @@ import com.compomics.pladipus.client.gui.model.WorkflowGui;
 import com.compomics.pladipus.model.core.ToolInformation;
 import com.compomics.pladipus.model.persist.Default;
 import com.compomics.pladipus.model.persist.Workflow;
+import com.compomics.pladipus.shared.PladipusReportableException;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -45,6 +48,7 @@ public class MainGUI extends Application {
 	private Stage primaryStage;
 	private static final String PLADIPUS_NAME = "Pladipus 2.0";
 	private static final String PLADIPUS_ICON = "images/pladipus_icon.gif";
+	private static final String ALERT_TEXTS = "guiTexts/alerts";
 	private static final String LOGIN_FXML = "fxml/Login.fxml";
 	private static final String LOGIN_TEXTS = "guiTexts/login";
 	private static final String DASHBOARD_FXML = "fxml/Dashboard.fxml";
@@ -225,12 +229,15 @@ public class MainGUI extends Application {
 	        controller.setMain(this);
 	        wfStage.show();
 	        if (workflowGui.getWorkflow() != null) {
-//	        	controller.displayWorkflow();
-//	        	controller.arrangeIcons();
+	        	controller.displayWorkflow();
+	        	controller.arrangeIcons();
 	        }
     	} catch (IOException e) {
 	    	// TODO how to handle scene loading errors
 			e.printStackTrace();
+    	} catch (PladipusReportableException e) {
+    		wfStage.close();
+    		doErrorAlert(e.getMessage());
     	}
     }
     
@@ -295,9 +302,26 @@ public class MainGUI extends Application {
         };
     }
     
+    private void doErrorAlert(String errorMsg) {
+    	Alert alert = new Alert(AlertType.ERROR, errorMsg);
+    	alert.initOwner(primaryStage);
+    	alert.setTitle(getTitle());
+//    	alert.setHeaderText(resources.getString("alerts.workflowLoadError"));
+    	alert.show();
+    }
+    
     private void initTestData(String username) {
     	toolInfo.addAll(TestData.getTools());
     	userWorkflows.addAll(TestData.getWorkflows(username));
     	userDefaults.addAll(TestData.getDefaults(username));
+    }
+    // TODO separate out into task controllers for tools/defaults/etc - replace MainGUI in WorkflowGui etc, separate Alert class...
+    // If separate into controller, can then autowire things together.
+    public ToolInformation getTool(String toolName) {//throws PladipusReportableException {
+    	try {
+    		return toolInfo.stream().filter(o -> o.getToolName().equals(toolName)).findFirst().get();
+    	} catch (NoSuchElementException e) { return null;
+//    		throw new PladipusReportableException(resources.getString(""));
+    	}
     }
 }

@@ -6,7 +6,7 @@ import com.compomics.pladipus.client.gui.MainGUI;
 import com.compomics.pladipus.client.gui.model.LegendItem;
 import com.compomics.pladipus.client.gui.model.WorkflowGui;
 import com.compomics.pladipus.model.core.ToolInformation;
-import com.compomics.pladipus.model.persist.Workflow;
+import com.compomics.pladipus.shared.PladipusReportableException;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -20,7 +20,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -48,7 +47,7 @@ public class WorkflowController {
 	
     // TODO warnings on edit/delete about existing runs
     @FXML
-    public void initialize() { // TODO Flag somewhere to say if editing or new workflow.  Will then check do checks on name if necessary
+    public void initialize() {
         toolNameColumn.setCellValueFactory(cellData -> cellData.getValue().toolNameProperty());
         colorColumn.setCellValueFactory(cellData -> cellData.getValue().colorProperty());
     }
@@ -57,7 +56,7 @@ public class WorkflowController {
     public void handleAddStep() {// TODO Edit menu option to change size of icons
     	ToolInformation toolInfo = main.getToolChoice(stage);
     	if (toolInfo != null) {
-    		workflowGui.addStep(toolInfo, null, true);
+    		workflowGui.addStep(toolInfo, null);
     	}
     }
     
@@ -74,6 +73,7 @@ public class WorkflowController {
     public void setWorkflowGui(WorkflowGui workflow) {
     	this.workflowGui = workflow;
     	workflowGui.setCanvas(canvasPane);
+    	workflowGui.setMain(main);
     	bindButtons();
     	legendTable.setItems(workflowGui.getLegendData());
     }
@@ -83,13 +83,17 @@ public class WorkflowController {
         deleteStepBtn.disableProperty().bind(stepSelected);
         editStepBtn.disableProperty().bind(stepSelected);
     }
-// 
-//    public void arrangeIcons() {
-//    	Alert loading = new Alert(AlertType.INFORMATION);
-//    	loading.initOwner(stage);
-//    	loading.show(); // TODO make nice "your workflow has loaded" info message
-////    	workflowGui.arrangeIcons();
-//    }
+ 
+    public void displayWorkflow() throws PladipusReportableException {
+    	workflowGui.displayWorkflow();
+    }
+    
+    public void arrangeIcons() {
+    	Alert loading = new Alert(AlertType.INFORMATION);
+    	loading.initOwner(stage);
+    	loading.show(); // TODO make nice "your workflow has loaded" info message
+    	workflowGui.arrangeIcons();
+    }
     
     public void setStage(Stage stage) {
     	this.stage = stage;

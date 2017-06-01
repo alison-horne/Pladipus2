@@ -22,9 +22,20 @@ import com.compomics.pladipus.client.cmdline.CliTaskProcessorImpl;
 import com.compomics.pladipus.client.cmdline.CommandLineIO;
 import com.compomics.pladipus.client.cmdline.CommandLineImpl;
 import com.compomics.pladipus.client.cmdline.MainCLI;
+import com.compomics.pladipus.client.gui.GuiControl;
+import com.compomics.pladipus.client.gui.GuiMain;
 import com.compomics.pladipus.client.gui.GuiTaskProcessor;
 import com.compomics.pladipus.client.gui.GuiTaskProcessorImpl;
 import com.compomics.pladipus.client.gui.MainGUI;
+import com.compomics.pladipus.client.gui.PopupControl;
+import com.compomics.pladipus.client.gui.SceneControl;
+import com.compomics.pladipus.client.gui.UserControl;
+import com.compomics.pladipus.client.gui.UserWorkflowControl;
+import com.compomics.pladipus.client.gui.impl.GuiControlImpl;
+import com.compomics.pladipus.client.gui.impl.PopupControlImpl;
+import com.compomics.pladipus.client.gui.impl.SceneControlImpl;
+import com.compomics.pladipus.client.gui.impl.UserControlImpl;
+import com.compomics.pladipus.client.gui.impl.UserWorkflowControlImpl;
 import com.compomics.pladipus.client.queue.ClientListener;
 import com.compomics.pladipus.client.queue.ClientMessageProducer;
 import com.compomics.pladipus.client.queue.ClientMessageTask;
@@ -81,10 +92,46 @@ public class ClientConfiguration {
 		return new MainCLI();
 	}
 	
+//	@Lazy
+//	@Bean
+//	public MainGUI gui() {
+//		return new MainGUI(guiTaskProcessor());
+//	}
+	
 	@Lazy
 	@Bean
-	public MainGUI gui() {
-		return new MainGUI(guiTaskProcessor());
+	public GuiMain gui() {
+		return new GuiMain(sceneControl());
+	}
+	
+	@Lazy
+	@Bean
+	public GuiControl guiControl() {
+		return new GuiControlImpl();
+	}
+	
+	@Lazy
+	@Bean
+	public SceneControl sceneControl() {
+		return new SceneControlImpl();
+	}
+	
+	@Lazy
+	@Bean
+	public UserControl userControl() {
+		return new UserControlImpl();
+	}
+	
+	@Lazy
+	@Bean
+	public UserWorkflowControl userWorkflowControl() {
+		return new UserWorkflowControlImpl();
+	}
+	
+	@Lazy
+	@Bean
+	public PopupControl popupControl() {
+		return new PopupControlImpl();
 	}
 	
 	@Bean

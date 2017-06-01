@@ -5,6 +5,7 @@ import org.springframework.context.support.AbstractApplicationContext;
 
 import com.compomics.pladipus.client.cmdline.MainCLI;
 import com.compomics.pladipus.client.config.ClientConfiguration;
+import com.compomics.pladipus.client.gui.GuiMain;
 import com.compomics.pladipus.client.gui.MainGUI;
 import com.compomics.pladipus.client.queue.MessageMap;
 
@@ -18,10 +19,10 @@ public class PladipusMain {
 	public void init(String[] args) {
 		Runtime.getRuntime().addShutdownHook(new Logout());
 		if (args.length == 0) {
-			((MainGUI)context.getBean("gui")).guiMain();
+			context.getBean("gui", GuiMain.class).guiMain();
 		}
 		else {
-			((MainCLI)context.getBean("cli")).cliMain(args);
+			context.getBean("cli", MainCLI.class).cliMain(args);
 		}
 		System.exit(0);
 	}

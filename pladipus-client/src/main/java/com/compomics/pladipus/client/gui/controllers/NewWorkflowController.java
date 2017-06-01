@@ -15,6 +15,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
@@ -175,7 +176,7 @@ public class NewWorkflowController {
     private Existing handleExisting() {
     	ButtonType editBtn = new ButtonType(resources.getString("newworkflow.editBtn"));
     	ButtonType renameBtn = new ButtonType(resources.getString("newworkflow.renameBtn"));
-    	ButtonType cancelBtn = new ButtonType(resources.getString("newworkflow.cancelBtn"));
+    	ButtonType cancelBtn = new ButtonType(resources.getString("newworkflow.cancelBtn"), ButtonData.CANCEL_CLOSE);
     	Alert alert = new Alert(AlertType.CONFIRMATION, resources.getString("newworkflow.editExisting"), editBtn, renameBtn, cancelBtn);
     	alert.initOwner(stage);
     	alert.setTitle(stage.getTitle());
