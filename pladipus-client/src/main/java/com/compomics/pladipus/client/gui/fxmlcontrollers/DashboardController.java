@@ -56,16 +56,16 @@ public class DashboardController extends FxmlController {
     
     @FXML
     public void handleNewWorkflow() {
-    	nextScene(PladipusScene.NEW_WORKFLOW);
+    	nextScene(PladipusScene.NEW_WORKFLOW, true);
     }
     
     @FXML
     public void handleEditWorkflow() {
     	WorkflowGui selected = workflowTable.getSelectionModel().getSelectedItem();
     	if (selected == null) {
-    		nextScene(PladipusScene.EDIT_WORKFLOW);
+    		nextScene(PladipusScene.EDIT_WORKFLOW, true);
     	} else {
-    		nextScene(PladipusScene.WORKFLOW, selected);
+    		nextScene(PladipusScene.WORKFLOW, selected, true);
     	}
     }
     
@@ -73,7 +73,7 @@ public class DashboardController extends FxmlController {
     public void logoutConfirm() {
     	if (alert("logout")) {
     		guiControl.logout();
-    	    nextScene(PladipusScene.LOGIN);
+    	    nextScene(PladipusScene.LOGIN, false);
     	}
     }
 	

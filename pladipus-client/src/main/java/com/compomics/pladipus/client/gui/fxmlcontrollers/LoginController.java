@@ -44,7 +44,7 @@ public class LoginController extends FxmlController {
     	} else {
     		try {
 	    		guiControl.login(username, password);
-	    		nextScene(PladipusScene.DASHBOARD);
+	    		nextScene(PladipusScene.DASHBOARD, false);
     		} catch (PladipusReportableException e) {
     			error(e.getMessage());
     			close();

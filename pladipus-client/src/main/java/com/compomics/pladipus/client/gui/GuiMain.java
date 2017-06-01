@@ -10,7 +10,7 @@ public class GuiMain extends Application {
 	public GuiMain(){}
 	public GuiMain(SceneControl control) {
 		super();
-		this.control = control;
+		GuiMain.control = control;
 	}
 	
     public void guiMain() {
@@ -20,6 +20,5 @@ public class GuiMain extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		control.initPrimaryStage(primaryStage);
-		control.openFirstScene();
 	}
 }

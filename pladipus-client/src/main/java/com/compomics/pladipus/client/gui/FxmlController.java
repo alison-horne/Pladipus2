@@ -18,11 +18,17 @@ public abstract class FxmlController {
 	public void setSceneControl(SceneControl sceneControl) {
 		this.sceneControl = sceneControl;
 	}
-	protected void nextScene(PladipusScene scene) {
-		sceneControl.openScene(scene, null);
+	protected void nextScene(PladipusScene scene, boolean newStage) {
+		sceneControl.openScene(scene, null, newStage ? null : stage);
 	}
-	protected void nextScene(PladipusScene scene, Object object) {
-		sceneControl.openScene(scene, object);
+	protected void nextScene(PladipusScene scene, Object object, boolean newStage) {
+		sceneControl.openScene(scene, object, newStage ? null : stage);
+	}
+	protected Object getFromScene(PladipusScene scene) {
+		return sceneControl.getOwnedSceneContent(scene, null, stage);
+	}
+	protected Object getFromScene(PladipusScene scene, Object initObject) {
+		return sceneControl.getOwnedSceneContent(scene, initObject, stage);
 	}
 	protected void close() {
 		stage.close();
@@ -33,6 +39,7 @@ public abstract class FxmlController {
 	protected boolean alert(String text) {
 		return guiControl.showAlert(text, stage);
 	}
+	public Object returnObject() {return null;}
 	public void setup(Object object) throws PladipusReportableException {setupController();}
 	protected void setupController() throws PladipusReportableException {}
 	public void postShow() throws PladipusReportableException {}

@@ -11,6 +11,7 @@ import com.compomics.pladipus.client.gui.PopupControl;
 import com.compomics.pladipus.client.gui.SceneControl;
 import com.compomics.pladipus.client.gui.UserControl;
 import com.compomics.pladipus.client.gui.model.PladipusScene;
+import com.compomics.pladipus.shared.PladipusMessages;
 import com.compomics.pladipus.shared.PladipusReportableException;
 
 import javafx.application.Platform;
@@ -34,51 +35,63 @@ public class SceneControlImpl implements SceneControl {
 	private UserControl userControl;
 	@Autowired
 	private PopupControl popupControl;
+	@Autowired
+	private PladipusMessages exceptionMessages;
 	
 	private static final String PLADIPUS_NAME = "Pladipus 2.0";
 	private static final String PLADIPUS_ICON = "images/pladipus_icon.gif";
 	
 	private Stage primaryStage;
-	private Stage workflowStage;
-	private Stage toolChoiceStage;
 	
 	@Override
-	public void openScene(PladipusScene scene, Object object) {
-		Stage stage = getStage(scene);
+	public void openScene(PladipusScene scene, Object initObject, Stage stage) {
+		if (stage == null) {
+			if (scene.isPrimary()) {
+				stage = primaryStage;
+			} else {
+				stage = getNewStage();
+				stage.initOwner(primaryStage);
+			}
+		}
 		try {
-        	FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(scene.getFxml()));
-        	loader.setResources(ResourceBundle.getBundle(scene.getTexts()));
-			Region layout = loader.load();
-            FxmlController controller = loader.getController();
-            controller.setGuiControl(guiControl);
-            controller.setSceneControl(this);
-            controller.setStage(stage);
-            controller.setup(object);
-	        Scene newScene = new Scene(layout);
-	        if (scene.getCss() != null) {
-	        	newScene.getStylesheets().add(getClass().getClassLoader().getResource(scene.getCss()).toExternalForm());
-	        }
-	        stage.setScene(newScene);
-	        stage.centerOnScreen();
-	        stage.setResizable(scene.canResize());
-	        stage.show();
-	        controller.postShow();
-	    } catch (IOException e) {
-	    	// TODO how to handle scene loading errors
-			e.printStackTrace();
-	    } catch (PladipusReportableException e) {
-	    	popupControl.doError(e.getMessage(), stage);
-	    }
+			FxmlController controller = setupScene(stage, scene); 
+			controller.setup(initObject);
+			stage.show();
+			controller.postShow();
+		} catch (PladipusReportableException e) {
+			sceneLoadError(stage, e.getMessage());
+		}
 	}
 	
 	@Override
-	public void openFirstScene() {
+	public Object getOwnedSceneContent(PladipusScene scene, Object initObject, Stage owner) {
+		Stage stage = getNewStage();
+		stage.initOwner(owner);
+    	stage.initModality(Modality.WINDOW_MODAL);
+		try {
+			FxmlController controller = setupScene(stage, scene); 
+			controller.setup(initObject);
+			stage.showAndWait();
+			return controller.returnObject();
+		} catch (PladipusReportableException e) {
+			sceneLoadError(stage, e.getMessage());
+			return null;
+		}
+	}
+	
+	private Stage getNewStage() {
+		Stage stage = new Stage();
+		initStage(stage);
+		return stage;
+	}
+
+	private void openFirstScene() {
 		// TODO check setup...
 		boolean setup = true;
 		if (!setup) {
-			openScene(PladipusScene.SETUP, null);
+			openScene(PladipusScene.SETUP, null, primaryStage);
 		} else {
-			openScene(PladipusScene.LOGIN, null);
+			openScene(PladipusScene.LOGIN, null, primaryStage);
 		}
 	}
 
@@ -87,43 +100,12 @@ public class SceneControlImpl implements SceneControl {
 		this.primaryStage = primaryStage;
 		initStage(primaryStage);
 		primaryStage.setOnCloseRequest(sureCloseHandler()); 
+		openFirstScene();
 	}
 	
 	private void initStage(Stage stage) {
 		stage.setTitle(PLADIPUS_NAME);
 		stage.getIcons().add(new Image(PLADIPUS_ICON));
-	}
-
-	private Stage getStage(PladipusScene scene) {
-		switch (scene.getStage()) {
-			case WORKFLOW:
-				return getWorkflowStage();
-			case TOOL:
-				return getToolChoiceStage();
-			case PRIMARY:
-				return primaryStage;
-			default:
-				return primaryStage;
-		}
-	}
-	
-	private Stage getWorkflowStage() {
-		if (workflowStage == null) {
-			workflowStage = new Stage();
-			initStage(workflowStage);
-			workflowStage.initModality(Modality.NONE);
-		}
-		return workflowStage;
-	}
-	
-	private Stage getToolChoiceStage() {
-		if (toolChoiceStage == null) {
-			toolChoiceStage = new Stage();
-			initStage(toolChoiceStage);
-			toolChoiceStage.initModality(Modality.WINDOW_MODAL);
-			toolChoiceStage.initOwner(workflowStage);
-		}
-		return toolChoiceStage;
 	}
 	
     private EventHandler<WindowEvent> sureCloseHandler() {
@@ -139,5 +121,33 @@ public class SceneControlImpl implements SceneControl {
 				}
 			}
         };
+    }
+    
+    private FxmlController setupScene(Stage stage, PladipusScene scene) throws PladipusReportableException {
+    	try {
+	    	FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(scene.getFxml()));
+	    	loader.setResources(ResourceBundle.getBundle(scene.getTexts()));
+			Region layout = loader.load();
+	        FxmlController controller = loader.getController();
+	        controller.setGuiControl(guiControl);
+	        controller.setSceneControl(this);
+	        controller.setStage(stage);
+	        
+	        Scene newScene = new Scene(layout);
+	        if (scene.getCss() != null) {
+	        	newScene.getStylesheets().add(getClass().getClassLoader().getResource(scene.getCss()).toExternalForm());
+	        }
+	        stage.setScene(newScene);
+	        stage.centerOnScreen();
+	        stage.setResizable(scene.canResize());
+	        return controller;
+    	} catch (IOException e) {
+    		throw new PladipusReportableException(exceptionMessages.getMessage("client.sceneLoadError", scene.name(), e.getMessage()));
+    	}
+    }
+    
+    private void sceneLoadError(Stage stage, String errorMsg) {
+    	popupControl.doError(errorMsg, stage);
+    	stage.close();
     }
 }
