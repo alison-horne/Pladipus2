@@ -1,13 +1,10 @@
 package com.compomics.pladipus.client.gui.model;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.compomics.pladipus.client.gui.MainGUI;
+import com.compomics.pladipus.client.gui.GuiControl;
 import com.compomics.pladipus.model.core.ToolInformation;
 import com.compomics.pladipus.model.persist.Step;
 import com.compomics.pladipus.model.persist.Workflow;
@@ -38,7 +35,7 @@ public class WorkflowGui {
 	private Set<StepLink> links = new HashSet<StepLink>();
 	private StepLink drawingLink;
 	private ObjectProperty<WorkflowGuiStep> selectedStep;
-	private MainGUI main;
+	private GuiControl guiControl;
 	
 	// TODO - thoughts on links...want to be able to draw twice, for ease of user adding another out->in param link, but only want one actual arrow on screen
 	public WorkflowGui(Workflow workflow) {
@@ -47,6 +44,10 @@ public class WorkflowGui {
 		if (workflow != null) setWorkflowName(workflow.getName());
 		selectedStep = new SimpleObjectProperty<WorkflowGuiStep>(null);
 	} 
+	
+	public void setGuiController(GuiControl guiControl) {
+		this.guiControl = guiControl;
+	}
 	
 	public Workflow getWorkflow() {
 		return originalWorkflow;
@@ -73,10 +74,6 @@ public class WorkflowGui {
 
     public StringProperty workflowNameProperty() {
         return workflowName;
-    }
-    
-    public void setMain(MainGUI main) {
-    	this.main = main;
     }
 
 	public ObservableList<LegendItem> getLegendData() {
@@ -238,8 +235,7 @@ public class WorkflowGui {
     	// TODO
     }
     
-    // TODO sort out structure.  move into controller...stop having to pass main through layers
     public ToolInformation getTool(String toolName) throws PladipusReportableException {
-    	return main.getTool(toolName);
+    	return guiControl.getToolInfo(toolName);
     }
 }

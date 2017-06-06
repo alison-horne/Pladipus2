@@ -24,16 +24,15 @@ import com.compomics.pladipus.client.cmdline.CommandLineImpl;
 import com.compomics.pladipus.client.cmdline.MainCLI;
 import com.compomics.pladipus.client.gui.GuiControl;
 import com.compomics.pladipus.client.gui.GuiMain;
-import com.compomics.pladipus.client.gui.GuiTaskProcessor;
-import com.compomics.pladipus.client.gui.GuiTaskProcessorImpl;
-import com.compomics.pladipus.client.gui.MainGUI;
 import com.compomics.pladipus.client.gui.PopupControl;
 import com.compomics.pladipus.client.gui.SceneControl;
+import com.compomics.pladipus.client.gui.ToolControl;
 import com.compomics.pladipus.client.gui.UserControl;
 import com.compomics.pladipus.client.gui.UserWorkflowControl;
 import com.compomics.pladipus.client.gui.impl.GuiControlImpl;
 import com.compomics.pladipus.client.gui.impl.PopupControlImpl;
 import com.compomics.pladipus.client.gui.impl.SceneControlImpl;
+import com.compomics.pladipus.client.gui.impl.ToolControlImpl;
 import com.compomics.pladipus.client.gui.impl.UserControlImpl;
 import com.compomics.pladipus.client.gui.impl.UserWorkflowControlImpl;
 import com.compomics.pladipus.client.queue.ClientListener;
@@ -76,12 +75,6 @@ public class ClientConfiguration {
 	
 	@Lazy
 	@Bean
-	public GuiTaskProcessor guiTaskProcessor() {
-		return new GuiTaskProcessorImpl();
-	}
-	
-	@Lazy
-	@Bean
 	public ResourceBundle cmdLine() {
 		return ResourceBundle.getBundle("cli_options");
 	}
@@ -91,12 +84,6 @@ public class ClientConfiguration {
 	public MainCLI cli() {
 		return new MainCLI();
 	}
-	
-//	@Lazy
-//	@Bean
-//	public MainGUI gui() {
-//		return new MainGUI(guiTaskProcessor());
-//	}
 	
 	@Lazy
 	@Bean
@@ -126,6 +113,12 @@ public class ClientConfiguration {
 	@Bean
 	public UserWorkflowControl userWorkflowControl() {
 		return new UserWorkflowControlImpl();
+	}
+	
+	@Lazy
+	@Bean
+	public ToolControl toolControl() {
+		return new ToolControlImpl();
 	}
 	
 	@Lazy

@@ -1,7 +1,6 @@
 package com.compomics.pladipus.client.gui.fxmlcontrollers;
 
 import java.io.File;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 import com.compomics.pladipus.client.gui.FxmlController;
@@ -17,7 +16,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 

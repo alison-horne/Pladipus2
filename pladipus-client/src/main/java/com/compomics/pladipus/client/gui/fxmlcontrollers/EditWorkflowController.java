@@ -1,21 +1,20 @@
-package com.compomics.pladipus.client.gui.controllers;
+package com.compomics.pladipus.client.gui.fxmlcontrollers;
 
 import java.util.ResourceBundle;
 
-import com.compomics.pladipus.client.gui.MainGUI;
+import com.compomics.pladipus.client.gui.FxmlController;
+import com.compomics.pladipus.client.gui.model.PladipusScene;
 import com.compomics.pladipus.client.gui.model.WorkflowGui;
+import com.compomics.pladipus.shared.PladipusReportableException;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
-import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
-public class EditWorkflowController {
+public class EditWorkflowController extends FxmlController {
 
-	private MainGUI main;
-	private Stage stage;
 	@FXML
 	private Label instructionLabel;
 	@FXML
@@ -41,27 +40,24 @@ public class EditWorkflowController {
     	editBtn.disableProperty().bind(choiceBox.valueProperty().isNull());
 	}
 	
-	public void setMain(MainGUI main) {
-		this.main = main;
-		choiceBox.setItems(main.getUserWorkflows());
+	@Override
+	protected void setupController() throws PladipusReportableException {
+		choiceBox.setItems(guiControl.getUserWorkflows());
 		if (choiceBox.getItems().size() == 0) instructionLabel.setText(resources.getString("editworkflow.noneExist"));
-	}
-	public void setStage(Stage stage) {
-		this.stage = stage;
 	}
 	
 	@FXML
 	public void handleEdit() {
-		main.initWorkflowDialog(choiceBox.getValue(), stage);
+		nextScene(PladipusScene.WORKFLOW, choiceBox.getValue(), false);
 	}
 	
 	@FXML
 	public void handleNew() {
-		main.initNewWorkflow(stage);
+		nextScene(PladipusScene.NEW_WORKFLOW, false);
 	}
 	
 	@FXML
 	public void handleCancel() {
-		stage.close();
+		close();
 	}
 }

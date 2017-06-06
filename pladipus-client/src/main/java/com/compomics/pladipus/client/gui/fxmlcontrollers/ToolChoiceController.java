@@ -1,17 +1,16 @@
-package com.compomics.pladipus.client.gui.controllers;
+package com.compomics.pladipus.client.gui.fxmlcontrollers;
 
+import com.compomics.pladipus.client.gui.FxmlController;
 import com.compomics.pladipus.model.core.ToolInformation;
+import com.compomics.pladipus.shared.PladipusReportableException;
 
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
-import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
-public class ToolChoiceController {
+public class ToolChoiceController extends FxmlController {
 
 	private ToolInformation selectedTool = null;
-	private Stage stage;
 	
 	@FXML
 	private ChoiceBox<ToolInformation> toolChoices;
@@ -29,28 +28,25 @@ public class ToolChoiceController {
 			}   		
     	});
     }
-    
-    public void setStage(Stage stage) {
-    	this.stage = stage;
-    }
 
-	public void setToolChoices(ObservableList<ToolInformation> toolInfo) {
-		toolChoices.setItems(toolInfo);
+	protected void setupController() throws PladipusReportableException {
+		toolChoices.setItems(guiControl.getToolInfoList());
 	}
 	
 	@FXML
 	public void handleOK() {
 		selectedTool = toolChoices.getValue();
-		stage.close();
+		close();
 	}
 	
 	@FXML
 	public void handleCancel() {
 		selectedTool = null;
-		stage.close();
+		close();
 	}
-
-	public ToolInformation getSelectedTool() {
+	
+	@Override
+	public ToolInformation returnObject() {
 		return selectedTool;
 	}
 }

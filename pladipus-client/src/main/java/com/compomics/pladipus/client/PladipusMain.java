@@ -6,7 +6,6 @@ import org.springframework.context.support.AbstractApplicationContext;
 import com.compomics.pladipus.client.cmdline.MainCLI;
 import com.compomics.pladipus.client.config.ClientConfiguration;
 import com.compomics.pladipus.client.gui.GuiMain;
-import com.compomics.pladipus.client.gui.MainGUI;
 import com.compomics.pladipus.client.queue.MessageMap;
 
 public class PladipusMain {

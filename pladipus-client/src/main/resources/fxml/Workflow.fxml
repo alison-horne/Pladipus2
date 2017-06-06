@@ -18,7 +18,7 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="${screen.visualBounds.height*0.8}" prefWidth="${screen.visualBounds.width*0.8}" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.compomics.pladipus.client.gui.controllers.WorkflowController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="${screen.visualBounds.height*0.8}" prefWidth="${screen.visualBounds.width*0.8}" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.compomics.pladipus.client.gui.fxmlcontrollers.WorkflowController">
     <fx:define>
   	  <Screen fx:factory="getPrimary" fx:id="screen" />
 	</fx:define>

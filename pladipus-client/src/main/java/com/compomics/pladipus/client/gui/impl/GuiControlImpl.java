@@ -8,9 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.compomics.pladipus.client.BatchCsvIO;
 import com.compomics.pladipus.client.gui.GuiControl;
 import com.compomics.pladipus.client.gui.PopupControl;
+import com.compomics.pladipus.client.gui.ToolControl;
 import com.compomics.pladipus.client.gui.UserControl;
 import com.compomics.pladipus.client.gui.UserWorkflowControl;
 import com.compomics.pladipus.client.gui.model.WorkflowGui;
+import com.compomics.pladipus.model.core.ToolInformation;
 import com.compomics.pladipus.model.persist.Workflow;
 import com.compomics.pladipus.shared.PladipusReportableException;
 import com.compomics.pladipus.shared.XMLHelper;
@@ -26,6 +28,8 @@ public class GuiControlImpl implements GuiControl {
 	private UserControl userControl;
 	@Autowired
 	private UserWorkflowControl userWorkflowControl;
+	@Autowired
+	private ToolControl toolControl;
 	@Autowired
 	private BatchCsvIO batchCsvIO;	
 	@Autowired
@@ -90,6 +94,16 @@ public class GuiControlImpl implements GuiControl {
 	@Override
 	public ObservableList<WorkflowGui> getUserWorkflows() throws PladipusReportableException {
 		return userWorkflowControl.getUserWorkflows();
+	}
+	
+	@Override
+	public ObservableList<ToolInformation> getToolInfoList() throws PladipusReportableException {
+		return toolControl.getToolInfoList();
+	}
+	
+	@Override
+	public ToolInformation getToolInfo(String name) {
+		return toolControl.getToolInfo(name);
 	}
 
 	@Override
