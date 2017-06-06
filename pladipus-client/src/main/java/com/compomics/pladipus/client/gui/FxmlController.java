@@ -39,6 +39,9 @@ public abstract class FxmlController {
 	protected boolean alert(String text) {
 		return guiControl.showAlert(text, stage);
 	}
+	protected String customAlert(String text, String[] buttons) {
+		return guiControl.customAlert(text, stage, buttons);
+	}
 	public Object returnObject() {return null;}
 	public void setup(Object object) throws PladipusReportableException {setupController();}
 	protected void setupController() throws PladipusReportableException {}

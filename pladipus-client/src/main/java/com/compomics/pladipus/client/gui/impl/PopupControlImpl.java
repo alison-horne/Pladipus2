@@ -1,16 +1,21 @@
 package com.compomics.pladipus.client.gui.impl;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.MissingResourceException;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import com.compomics.pladipus.client.gui.PopupControl;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 public class PopupControlImpl implements PopupControl {
@@ -71,4 +76,24 @@ public class PopupControlImpl implements PopupControl {
     	alert.showAndWait();
     	return alert.getResult();
     }
+
+	@Override
+	public File fileBrowse(Stage stage, ExtensionFilter[] filters) {
+    	FileChooser browser = new FileChooser();
+    	browser.getExtensionFilters().addAll(filters);
+    	return browser.showOpenDialog(stage);
+	}
+
+	@Override
+	public String getText(Stage stage, String header, String original) {
+		TextInputDialog dialog = new TextInputDialog(original);
+		dialog.setHeaderText(header);
+		dialog.initOwner(stage);
+		dialog.setTitle(stage.getTitle());
+		Optional<String> result = dialog.showAndWait();
+		if (result.isPresent()) {
+			return result.get();
+		}
+		return null;
+	}
 }

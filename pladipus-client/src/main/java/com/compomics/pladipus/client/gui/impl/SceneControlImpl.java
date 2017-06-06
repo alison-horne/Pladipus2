@@ -142,7 +142,8 @@ public class SceneControlImpl implements SceneControl {
 	        stage.setResizable(scene.canResize());
 	        return controller;
     	} catch (IOException e) {
-    		throw new PladipusReportableException(exceptionMessages.getMessage("client.sceneLoadError", scene.name(), e.getMessage()));
+    		e.printStackTrace(); return null;
+ //   		throw new PladipusReportableException(exceptionMessages.getMessage("client.sceneLoadError", scene.name(), e.getMessage()));
     	}
     }
     

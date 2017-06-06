@@ -8,5 +8,6 @@ import javafx.collections.ObservableList;
 public interface UserWorkflowControl {
 
 	public ObservableList<WorkflowGui> getUserWorkflows() throws PladipusReportableException;
+	public WorkflowGui getWorkflowGui(String name);
 	public void logout();
 }

@@ -1,5 +1,6 @@
 package com.compomics.pladipus.client.gui.impl;
 
+import com.compomics.pladipus.client.gui.TestData;
 import com.compomics.pladipus.client.gui.UserWorkflowControl;
 import com.compomics.pladipus.client.gui.model.WorkflowGui;
 import com.compomics.pladipus.shared.PladipusReportableException;
@@ -20,6 +21,18 @@ public class UserWorkflowControlImpl implements UserWorkflowControl {
 	}
 	
 	@Override
+	public WorkflowGui getWorkflowGui(String name) {
+    	WorkflowGui existing = null;
+    	for (WorkflowGui wf : userWorkflows) {
+    		if (wf.getWorkflowName().equalsIgnoreCase(name)) {
+    			existing = wf;
+    			break;
+    		}
+    	}
+    	return existing;
+    }
+	
+	@Override
 	public void logout() {
 		userWorkflows.clear();
 		loaded = false;
@@ -27,6 +40,7 @@ public class UserWorkflowControlImpl implements UserWorkflowControl {
 	
 	private void loadWorkflows() throws PladipusReportableException {
 		// TODO - get workflows from control
+		userWorkflows.addAll(TestData.getWorkflows("test1"));
 		loaded = true;
 	}
 }
