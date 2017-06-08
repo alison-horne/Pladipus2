@@ -3,27 +3,26 @@ package com.compomics.pladipus.client.gui.model;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.effect.Effect;
 import javafx.scene.effect.InnerShadow;
-import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
-import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.scene.transform.Rotate;
 
 public class StepIcon extends StackPane {
 	
 	private WorkflowGuiStep step;
 	private WorkflowGui workflow;
+	private ContextMenu contextMenu;
 	private String id;
 	private double size;
 	private Text labelText;
@@ -60,6 +59,7 @@ public class StepIcon extends StackPane {
 		getChildren().add(labelText);
 		setStyle("-fx-border-color:black; -fx-background-color:" + color.toString().replaceFirst("0x", "#"));
 		StackPane.setAlignment(this, Pos.TOP_LEFT);
+		initContextMenu();
 		addIconListeners();
 		addCircleListeners();
 	}
@@ -184,6 +184,13 @@ public class StepIcon extends StackPane {
 		StackPane.setAlignment(labelText, Pos.CENTER);
 	}
 	
+	private void initContextMenu() {
+		contextMenu = new ContextMenu();
+		MenuItem edit = step.getWorkflowGui().getController().getEditMenuItem(step);
+		MenuItem delete = step.getWorkflowGui().getController().getDeleteMenuItem(step);
+		contextMenu.getItems().addAll(edit, delete);
+	}
+	
 	private void addIconListeners() {
 		
 		setOnMouseEntered(new EventHandler<MouseEvent>() {
@@ -197,10 +204,14 @@ public class StepIcon extends StackPane {
 			@Override 
 			public void handle(MouseEvent mouseEvent) {
 				mouseEvent.consume();
-				workflow.setSelectedStep(step);
-				ii.xDrag = getLayoutX() - mouseEvent.getSceneX();
-				ii.yDrag = getLayoutY() - mouseEvent.getSceneY();
-				setCursor(Cursor.MOVE);
+		        if (mouseEvent.isSecondaryButtonDown()) {
+		            contextMenu.show((Node) mouseEvent.getSource(), mouseEvent.getScreenX(), mouseEvent.getScreenY());
+		        } else {
+					workflow.setSelectedStep(step);
+					ii.xDrag = getLayoutX() - mouseEvent.getSceneX();
+					ii.yDrag = getLayoutY() - mouseEvent.getSceneY();
+					setCursor(Cursor.MOVE);
+		        }
 			}
 		});
 		

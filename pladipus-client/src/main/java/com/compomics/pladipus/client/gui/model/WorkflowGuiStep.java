@@ -24,6 +24,7 @@ public class WorkflowGuiStep {
 	public WorkflowGuiStep(WorkflowGui workflowGui, Step step) {
 		this.workflowGui = workflowGui;
 		this.step = step;
+		stepId = step.getId();
 	}
 	
 	public void validate() throws PladipusReportableException {
@@ -46,11 +47,25 @@ public class WorkflowGuiStep {
 		}
 	}
 	
-	public void setStepId(String stepId) {
-		this.stepId = stepId; // TODO if icon not null, update label
+	public void setStepId(String stepId) { // TODO check for unique / valid type?
+		this.stepId = stepId;
+		if (icon != null) {
+			icon.updateLabel(stepId);
+		}
+	}
+	public String getStepId() {
+		return stepId;
 	}
 	
 	public WorkflowGui getWorkflowGui() {
 		return workflowGui;
+	}
+	
+	public boolean isParamChange() { //TODO
+		return true;
+	}
+	
+	public void clearParamChanges() {
+		//TODO
 	}
 }

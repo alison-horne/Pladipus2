@@ -7,7 +7,8 @@ public enum PladipusScene {
 	NEW_WORKFLOW("NewWorkflow", "newworkflow", null, true, false),
 	EDIT_WORKFLOW("EditWorkflow", "editworkflow", null, true, false),
 	WORKFLOW("Workflow", "workflow", "workflow", false, false),
-	TOOL_CHOICE("ToolChoice", "toolchoice", null, true, false);
+	TOOL_CHOICE("ToolChoice", "toolchoice", null, true, false),
+	STEP_PARAM("StepParameters", "stepparameters", null, true, false);
 
     private String fxml;
     private String texts;

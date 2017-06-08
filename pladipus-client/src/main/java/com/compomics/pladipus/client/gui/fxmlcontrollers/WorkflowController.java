@@ -6,11 +6,14 @@ import com.compomics.pladipus.client.gui.FxmlController;
 import com.compomics.pladipus.client.gui.model.LegendItem;
 import com.compomics.pladipus.client.gui.model.PladipusScene;
 import com.compomics.pladipus.client.gui.model.WorkflowGui;
+import com.compomics.pladipus.client.gui.model.WorkflowGuiStep;
 import com.compomics.pladipus.model.core.ToolInformation;
 import com.compomics.pladipus.shared.PladipusReportableException;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -20,6 +23,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.stage.WindowEvent;
 
 public class WorkflowController extends FxmlController {
@@ -63,14 +68,14 @@ public class WorkflowController extends FxmlController {
     
     @FXML
     public void handleEditStep() {
-    	
+    	nextScene(PladipusScene.STEP_PARAM, workflowGui.getSelectedStep(), true);
     }
     
     @Override
     public void setup(Object workflow) {
     	this.workflowGui = (WorkflowGui) workflow;
     	workflowGui.setCanvas(canvasPane);
-    	workflowGui.setGuiController(guiControl);
+    	workflowGui.setController(this);
     	bindButtons();
     	legendTable.setItems(workflowGui.getLegendData());
     }
@@ -107,5 +112,27 @@ public class WorkflowController extends FxmlController {
     	loading.initOwner(stage);
     	loading.show(); // TODO make nice "your workflow has loaded" info message
     	workflowGui.arrangeIcons();
+    }
+    
+    public MenuItem getEditMenuItem(WorkflowGuiStep step) {
+    	MenuItem edit = new MenuItem(resources.getString("workflow.editStepButton"));
+		edit.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				nextScene(PladipusScene.STEP_PARAM, step, true);
+			}			
+		});
+		return edit;
+    }
+    
+    public MenuItem getDeleteMenuItem(WorkflowGuiStep step) {
+    	MenuItem delete = new MenuItem(resources.getString("workflow.deleteStepButton"));
+		delete.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				// TODO 
+			}			
+		});
+		return delete;
     }
 }

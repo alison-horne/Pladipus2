@@ -7,7 +7,7 @@ import javafx.stage.Stage;
 
 public abstract class FxmlController {
 	protected Stage stage;
-	protected GuiControl guiControl;
+	public GuiControl guiControl;
 	protected SceneControl sceneControl;
 	public void setStage(Stage stage) {
 		this.stage = stage;

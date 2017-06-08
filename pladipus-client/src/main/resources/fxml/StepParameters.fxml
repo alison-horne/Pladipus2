@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TreeTableColumn?>
+<?import javafx.scene.control.TreeTableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.102" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.compomics.pladipus.client.gui.fxmlcontrollers.StepParametersController">
+   <children>
+      <GridPane AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
+        <columnConstraints>
+          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" prefWidth="560.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints percentHeight="15.0" vgrow="SOMETIMES" />
+          <RowConstraints percentHeight="70.0" vgrow="SOMETIMES" />
+          <RowConstraints percentHeight="15.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <VBox alignment="CENTER_LEFT" prefWidth="560.0" spacing="10" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+               <children>
+                  <HBox spacing="20" alignment="CENTER">
+                     <children>
+                        <Label fx:id="stepIdLabel" alignment="CENTER" />
+                        <Pane HBox.hgrow="SOMETIMES" />
+                        <Button mnemonicParsing="false" onAction="#handleDelete" text="%stepparam.deleteBtn" />
+                     </children>
+                  </HBox>
+                  <Label fx:id="toolLabel" alignment="CENTER" />
+               </children>
+            </VBox>
+            <TreeTableView fx:id="paramTable" prefWidth="560.0" GridPane.rowIndex="1">
+              <columns>
+                <TreeTableColumn fx:id="mandatoryColumn" text="" />
+                <TreeTableColumn fx:id="perRunColumn" text="%stepparam.perRunColumn" />
+                <TreeTableColumn fx:id="paramNameColumn" text="%stepparam.nameColumn" />
+                <TreeTableColumn fx:id="paramValueColumn" text="%stepparam.valueColumn" />
+                <TreeTableColumn fx:id="editColumn" text="" />
+              </columns>
+            </TreeTableView>
+            <HBox alignment="CENTER" prefWidth="560.0" spacing="20" GridPane.rowIndex="2">
+               <children>
+                  <Button fx:id="applyBtn" mnemonicParsing="false" onAction="#handleApply" text="%stepparam.applyBtn" />
+                  <Button mnemonicParsing="false" onAction="#handleCancel" text="%stepparam.cancelBtn" />
+               </children>
+            </HBox>
+         </children>
+      </GridPane>
+   </children>
+</AnchorPane>

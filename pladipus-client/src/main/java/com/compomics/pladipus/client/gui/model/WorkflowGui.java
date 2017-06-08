@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.compomics.pladipus.client.gui.GuiControl;
+import com.compomics.pladipus.client.gui.fxmlcontrollers.WorkflowController;
 import com.compomics.pladipus.model.core.ToolInformation;
 import com.compomics.pladipus.model.persist.Step;
 import com.compomics.pladipus.model.persist.Workflow;
@@ -35,7 +35,7 @@ public class WorkflowGui {
 	private Set<StepLink> links = new HashSet<StepLink>();
 	private StepLink drawingLink;
 	private ObjectProperty<WorkflowGuiStep> selectedStep;
-	private GuiControl guiControl;
+	private WorkflowController controller;
 	
 	// TODO - thoughts on links...want to be able to draw twice, for ease of user adding another out->in param link, but only want one actual arrow on screen
 	public WorkflowGui(Workflow workflow) {
@@ -45,8 +45,11 @@ public class WorkflowGui {
 		selectedStep = new SimpleObjectProperty<WorkflowGuiStep>(null);
 	} 
 	
-	public void setGuiController(GuiControl guiControl) {
-		this.guiControl = guiControl;
+	public void setController(WorkflowController controller) {
+		this.controller = controller;
+	}
+	public WorkflowController getController() {
+		return controller;
 	}
 	
 	public Workflow getWorkflow() {
@@ -236,6 +239,6 @@ public class WorkflowGui {
     }
     
     public ToolInformation getTool(String toolName) throws PladipusReportableException {
-    	return guiControl.getToolInfo(toolName);
+    	return controller.guiControl.getToolInfo(toolName);
     }
 }
