@@ -31,6 +31,9 @@ public class WorkflowXMLHelper implements XMLHelper<Workflow> {
 	
 	@Override
 	public Workflow parseXml(String content) throws PladipusReportableException {
+		if (content == null || content.isEmpty()) {
+			throw new PladipusReportableException(exceptionMessages.getMessage("template.invalidXml", ""));
+		}
 		try {
 			JAXBContext Jcontext = JAXBContext.newInstance(Workflow.class);
 			Unmarshaller unmarshaller = Jcontext.createUnmarshaller();
