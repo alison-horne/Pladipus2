@@ -18,9 +18,6 @@ import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Region;
 import javafx.stage.Modality;
@@ -44,18 +41,23 @@ public class SceneControlImpl implements SceneControl {
 	private Stage primaryStage;
 	
 	@Override
-	public void openScene(PladipusScene scene, Object initObject, Stage stage) {
+	public void openScene(PladipusScene scene, Stage stage, Object... initObjects) {
+		openOwnedScene(scene, stage, null, initObjects);
+	}
+	
+	@Override
+	public void openOwnedScene(PladipusScene scene, Stage stage, Stage owner, Object... initObjects) {
 		if (stage == null) {
 			if (scene.isPrimary()) {
 				stage = primaryStage;
 			} else {
 				stage = getNewStage();
-				stage.initOwner(primaryStage);
+				stage.initOwner((owner != null) ? owner : primaryStage);
 			}
 		}
 		try {
 			FxmlController controller = setupScene(stage, scene); 
-			controller.setup(initObject);
+			controller.setup(initObjects);
 			stage.show();
 			controller.postShow();
 		} catch (PladipusReportableException e) {
@@ -64,13 +66,13 @@ public class SceneControlImpl implements SceneControl {
 	}
 	
 	@Override
-	public Object getOwnedSceneContent(PladipusScene scene, Object initObject, Stage owner) {
+	public Object getOwnedSceneContent(PladipusScene scene, Stage owner, Object... initObjects) {
 		Stage stage = getNewStage();
 		stage.initOwner(owner);
     	stage.initModality(Modality.WINDOW_MODAL);
 		try {
-			FxmlController controller = setupScene(stage, scene); 
-			controller.setup(initObject);
+			FxmlController controller = setupScene(stage, scene);
+			controller.setup(initObjects);
 			stage.showAndWait();
 			return controller.returnObject();
 		} catch (PladipusReportableException e) {
@@ -89,9 +91,9 @@ public class SceneControlImpl implements SceneControl {
 		// TODO check setup...
 		boolean setup = true;
 		if (!setup) {
-			openScene(PladipusScene.SETUP, null, primaryStage);
+			openScene(PladipusScene.SETUP, primaryStage);
 		} else {
-			openScene(PladipusScene.LOGIN, null, primaryStage);
+			openScene(PladipusScene.LOGIN, primaryStage);
 		}
 	}
 
@@ -142,8 +144,7 @@ public class SceneControlImpl implements SceneControl {
 	        stage.setResizable(scene.canResize());
 	        return controller;
     	} catch (IOException e) {
-    		e.printStackTrace(); return null;
- //   		throw new PladipusReportableException(exceptionMessages.getMessage("client.sceneLoadError", scene.name(), e.getMessage()));
+    		throw new PladipusReportableException(exceptionMessages.getMessage("client.sceneLoadError", scene.name(), e.getMessage()));
     	}
     }
     

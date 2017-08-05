@@ -5,7 +5,7 @@ import java.util.ResourceBundle;
 
 import com.compomics.pladipus.client.gui.FxmlController;
 import com.compomics.pladipus.client.gui.model.PladipusScene;
-import com.compomics.pladipus.client.gui.model.WorkflowGui;
+import com.compomics.pladipus.model.persist.Workflow;
 import com.compomics.pladipus.shared.PladipusReportableException;
 
 import javafx.beans.binding.Bindings;
@@ -89,45 +89,44 @@ public class NewWorkflowController extends FxmlController {
     @FXML
     public void handleOpen() {
     	try {
-	    	WorkflowGui wfGui = null;
-	    	WorkflowGui existing = null;
+	    	Workflow wf = null;
+	    	Workflow existing = null;
 	    	if (toggle.getSelectedToggle().equals(radioNew)) {
 	    		String wfName = workflowIdentifier.getText();
-	    		wfGui = new WorkflowGui(null);
-	    		wfGui.setWorkflowName(wfName);
-	    		if ((existing = guiControl.getWorkflowGui(wfName)) != null) {
+	    		wf = new Workflow();
+	    		wf.setName(wfName);
+	    		if ((existing = guiControl.getWorkflow(wfName)) != null) {
 	    			String exist = customAlert("editExisting", new String[]{EDIT_BTN, RENAME_BTN, CANCEL_BTN});
 	    			if (exist.equals(CANCEL_BTN)) {
 	    				return;
 	    			} else if (exist.equals(EDIT_BTN)) {
-	    				wfGui = existing;
+	    				wf = existing;
 	    			} else {
 	    				String newName = getNewName(wfName);
 	    				if (newName != null) {
-	    					wfGui.setWorkflowName(newName);
+	    					wf.setName(newName);
 	    				} else {
 	    					return;
 	    				}
 	    			}
 	    		} 
 	    	} else if (toggle.getSelectedToggle().equals(radioFile)) {
-	    		wfGui = new WorkflowGui(guiControl.getWorkflowFromFilePath(workflowIdentifier.getText()));
-	    		if ((existing = guiControl.getWorkflowGui(wfGui.getWorkflowName())) != null) {
+	    		wf = guiControl.getWorkflowFromFilePath(workflowIdentifier.getText());
+	    		if ((existing = guiControl.getWorkflow(wf.getName())) != null) {
 	    			String exist = customAlert("editExisting", new String[]{EDIT_BTN, RENAME_BTN, CANCEL_BTN});
 	    			if (exist.equals(CANCEL_BTN)) {
 	    				return;
 	    			} else if (exist.equals(RENAME_BTN)) {
-	    				String newName = getNewName(wfGui.getWorkflowName());
+	    				String newName = getNewName(wf.getName());
 	    				if (newName != null) {
-	    					wfGui.setWorkflowName(newName);
-	    					wfGui.getWorkflow().setName(newName);
+	    					wf.setName(newName);
 	    				} else {
 	    					return;
 	    				}
 	    			}
 	    		}
 	    	}
-	    	nextScene(PladipusScene.WORKFLOW, wfGui, false);
+	    	nextScene(PladipusScene.WORKFLOW, wf, false);
     	} catch (PladipusReportableException e) {
     		error(resources.getString("newworkflow.fileReadError") + "\n" + e.getMessage());
     	}
@@ -147,7 +146,7 @@ public class NewWorkflowController extends FxmlController {
 		while (!unique) {
 			newName = guiControl.getText(stage, header, oldName);
 			if (newName != null) {
-				unique = (guiControl.getWorkflowGui(newName) == null);
+				unique = (guiControl.getWorkflow(newName) == null);
 				header = resources.getString("newworkflow.existsWarning");
 			} else {
 				unique = true;

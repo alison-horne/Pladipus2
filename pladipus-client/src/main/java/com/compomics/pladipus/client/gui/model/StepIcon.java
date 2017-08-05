@@ -1,5 +1,7 @@
 package com.compomics.pladipus.client.gui.model;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -20,8 +22,6 @@ import javafx.scene.text.Text;
 
 public class StepIcon extends StackPane {
 	
-	private WorkflowGuiStep step;
-	private WorkflowGui workflow;
 	private ContextMenu contextMenu;
 	private String id;
 	private double size;
@@ -31,16 +31,18 @@ public class StepIcon extends StackPane {
 	private Circle inCirc;
 	private Circle outCirc;
 	final IconInteract ii = new IconInteract();
+	BooleanProperty startLink = new SimpleBooleanProperty(false);
+	BooleanProperty endLink = new SimpleBooleanProperty(false);
+	BooleanProperty finishLink = new SimpleBooleanProperty(false);
+	BooleanProperty selected = new SimpleBooleanProperty(false);
 	
 	class IconInteract {
 		double xDrag;
 		double yDrag;
 	}
 	
-	public StepIcon (WorkflowGuiStep step, double iconSize, Color color, String id) {
+	public StepIcon (double iconSize, Color color, String id) {
 		super();
-		this.step = step;
-		this.workflow = step.getWorkflowGui();
 		this.size = Math.max(iconSize, 50.0);
 		this.id = id;
 		
@@ -62,6 +64,28 @@ public class StepIcon extends StackPane {
 		initContextMenu();
 		addIconListeners();
 		addCircleListeners();
+	}
+	
+	public BooleanProperty startLinkProperty() {
+		return startLink;
+	}
+	public BooleanProperty endLinkProperty() {
+		return endLink;
+	}
+	public BooleanProperty finishLinkProperty() {
+		return finishLink;
+	}
+	public BooleanProperty selectedProperty() {
+		return selected;
+	}
+	public void dropLink() {
+		startLink.set(false);
+		endLink.set(false);
+		finishLink.set(false);
+	}
+	public void setSelected(boolean selected) {
+		this.selected.set(selected);
+		highlightIcon(selected);
 	}
 	
 	private DropShadow getHighlight(Color color) {
@@ -184,11 +208,9 @@ public class StepIcon extends StackPane {
 		StackPane.setAlignment(labelText, Pos.CENTER);
 	}
 	
-	private void initContextMenu() {
+	public void initContextMenu(MenuItem... menuItems) {
 		contextMenu = new ContextMenu();
-		MenuItem edit = step.getWorkflowGui().getController().getEditMenuItem(step);
-		MenuItem delete = step.getWorkflowGui().getController().getDeleteMenuItem(step);
-		contextMenu.getItems().addAll(edit, delete);
+		contextMenu.getItems().addAll(menuItems);
 	}
 	
 	private void addIconListeners() {
@@ -204,10 +226,12 @@ public class StepIcon extends StackPane {
 			@Override 
 			public void handle(MouseEvent mouseEvent) {
 				mouseEvent.consume();
+				setSelected(true);
 		        if (mouseEvent.isSecondaryButtonDown()) {
-		            contextMenu.show((Node) mouseEvent.getSource(), mouseEvent.getScreenX(), mouseEvent.getScreenY());
+		        	if (contextMenu != null && contextMenu.getItems().size() != 0) {
+		        		contextMenu.show((Node) mouseEvent.getSource(), mouseEvent.getScreenX(), mouseEvent.getScreenY());
+		        	}
 		        } else {
-					workflow.setSelectedStep(step);
 					ii.xDrag = getLayoutX() - mouseEvent.getSceneX();
 					ii.yDrag = getLayoutY() - mouseEvent.getSceneY();
 					setCursor(Cursor.MOVE);
@@ -218,7 +242,7 @@ public class StepIcon extends StackPane {
 		setOnMouseDragged(new EventHandler<MouseEvent>() {
 			@Override 
 			public void handle(MouseEvent mouseEvent) {
-				if (workflow.getDrawingLink() == null) {
+				if (!isStartLinkIcon()) {
 					mouseEvent.consume();
 					setManaged(false);
 	
@@ -256,7 +280,7 @@ public class StepIcon extends StackPane {
 			public void handle(MouseDragEvent event) {
 				if (!isStartLinkIcon()) {
 					event.consume();
-				    workflow.endDrawingLink(step);
+				    endLink.set(true);
 			}}
 		});
 		
@@ -273,7 +297,7 @@ public class StepIcon extends StackPane {
 			public void handle(MouseDragEvent event) {
 				if (!isStartLinkIcon()) {
 					event.consume();
-					workflow.finaliseDrawingLink();
+					finishLink.set(true);
 			}}
 		});
 		
@@ -282,7 +306,7 @@ public class StepIcon extends StackPane {
 			public void handle(MouseDragEvent event) {
 				if (!isStartLinkIcon()) {
 					event.consume();
-					workflow.endDrawingLink(null);
+					endLink.set(false);
 				}
 			}
 		});
@@ -303,7 +327,7 @@ public class StepIcon extends StackPane {
 			@Override 
 			public void handle(MouseEvent mouseEvent) {
 				mouseEvent.consume();
-				workflow.startDrawingLink(step);
+				startLink.set(true);
 			}
 		});
 		
@@ -324,8 +348,8 @@ public class StepIcon extends StackPane {
 		outCirc.setOnMouseReleased(new EventHandler<MouseEvent>() {
 			@Override 
 			public void handle(MouseEvent mouseEvent) {
-				workflow.clearDrawingLink();
 				outCirc.setEffect(null);
+				startLink.set(false);
 			}
 		});
 
@@ -340,6 +364,6 @@ public class StepIcon extends StackPane {
 	}
 
 	private boolean isStartLinkIcon() {
-		return ((workflow.getDrawingLink() != null) && (workflow.getDrawingLink().getStartStep().equals(step)));
+		return startLink.get();
 	}
 }

@@ -3,9 +3,9 @@ package com.compomics.pladipus.client.gui;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.compomics.pladipus.client.gui.model.BatchGui;
+import com.compomics.pladipus.client.gui.model.BatchOverview;
 import com.compomics.pladipus.client.gui.model.DefaultGui;
-import com.compomics.pladipus.client.gui.model.WorkflowGui;
+import com.compomics.pladipus.client.gui.model.WorkflowOverview;
 import com.compomics.pladipus.model.core.ToolInformation;
 import com.compomics.pladipus.model.persist.Workflow;
 
@@ -14,7 +14,7 @@ public class TestData {
 	private final static String USER2 = "test2";
 	private final static String PW1 = "password1";
 	private final static String PW2 = "password2";
-	private static Set<WorkflowGui> USER1_WORKFLOWS = new HashSet<WorkflowGui>();
+	private static Set<WorkflowOverview> USER1_WORKFLOWS = new HashSet<WorkflowOverview>();
 	private static Set<ToolInformation> TOOLS = new HashSet<ToolInformation>();
 	private static Set<DefaultGui> DEFS = new HashSet<DefaultGui>();
 	private static ToolInformation TOOL1 = new ToolInformation("Tool1");
@@ -29,13 +29,13 @@ public class TestData {
 	private static Workflow WF1 = new Workflow();
 	private static Workflow WF2 = new Workflow();
 	private static Workflow WF3 = new Workflow();
-	private static WorkflowGui WG1;
-	private static WorkflowGui WG2;
-	private static WorkflowGui WG3;
-	private static BatchGui BATCH1_1 = new BatchGui("Batch_one");
-	private static BatchGui BATCH1_2 = new BatchGui("Batch_two");
-	private static BatchGui BATCH1_3 = new BatchGui("Batch_three");
-	private static BatchGui BATCH2_1 = new BatchGui("SuperBatch");
+	private static WorkflowOverview WG1;
+	private static WorkflowOverview WG2;
+	private static WorkflowOverview WG3;
+	private static BatchOverview BATCH1_1 = new BatchOverview("Batch_one");
+	private static BatchOverview BATCH1_2 = new BatchOverview("Batch_two");
+	private static BatchOverview BATCH1_3 = new BatchOverview("Batch_three");
+	private static BatchOverview BATCH2_1 = new BatchOverview("SuperBatch");
 	
 	public static boolean login(String user, String pw) {
 		if (user.equals(USER1)) {
@@ -46,14 +46,14 @@ public class TestData {
 		return false;
 	}
 	
-	public static Set<WorkflowGui> getWorkflows(String username) {
+	public static Set<WorkflowOverview> getWorkflows(String username) {
 		if (username.equals(USER1)) {
 			if (USER1_WORKFLOWS.isEmpty()) {
 				initWorkflows();			
 			}
 			return USER1_WORKFLOWS;
 		} 
-		return new HashSet<WorkflowGui>();
+		return new HashSet<WorkflowOverview>();
 	}
 	
 	public static Set<ToolInformation> getTools() {
@@ -80,13 +80,14 @@ public class TestData {
 		WF1.setName("wf1");
 		WF2.setName("wf2");
 		WF3.setName("wf3");
-		WG1 = new WorkflowGui(WF1);
+		WF1.setTemplateXml(getTestWfXml());
+		WG1 = new WorkflowOverview(WF1.getName(), WF1.getTemplateXml());
 		WG1.addBatch(BATCH1_1);
 		WG1.addBatch(BATCH1_2);
 		WG1.addBatch(BATCH1_3);
-		WG2 = new WorkflowGui(WF2);
+		WG2 = new WorkflowOverview(WF2.getName(), WF2.getTemplateXml());
 		WG2.addBatch(BATCH2_1);
-		WG3 = new WorkflowGui(WF3);
+		WG3 = new WorkflowOverview(WF3.getName(), WF3.getTemplateXml());
 		USER1_WORKFLOWS.add(WG1);
 		USER1_WORKFLOWS.add(WG2);
 		USER1_WORKFLOWS.add(WG3);
@@ -107,5 +108,22 @@ public class TestData {
 			DEFS.add(DEF1);
 			DEFS.add(DEF2);
 		}
+	}
+	
+	private static String getTestWfXml() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("<template name=\"wf1\">");
+		builder.append("<steps>");
+		builder.append("<step>");
+		builder.append("<id>s1</id>");
+		builder.append("<name>Tool1</name>");
+		builder.append("</step>");
+		builder.append("<step>");
+		builder.append("<id>s2</id>");
+		builder.append("<name>Tool3</name>");
+		builder.append("</step>");
+		builder.append("</steps>");
+		builder.append("</template>");
+		return builder.toString();
 	}
 }

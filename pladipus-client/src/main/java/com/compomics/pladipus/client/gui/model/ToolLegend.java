@@ -32,6 +32,12 @@ public class ToolLegend {
 		return toolColorMap.get(toolName);
 	}
 	
+	public int getToolColorId(String toolName) {
+		Integer colorId = toolColorMap.get(toolName);
+		if (colorId != null) return colorId;
+		return -1;
+	}
+	
 	public void removeTool(String toolName) {
 		Integer count = toolStepCount.get(toolName);
 		if (count != null) {

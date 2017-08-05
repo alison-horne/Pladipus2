@@ -22,6 +22,7 @@ import com.compomics.pladipus.client.cmdline.CliTaskProcessorImpl;
 import com.compomics.pladipus.client.cmdline.CommandLineIO;
 import com.compomics.pladipus.client.cmdline.CommandLineImpl;
 import com.compomics.pladipus.client.cmdline.MainCLI;
+import com.compomics.pladipus.client.gui.DefaultControl;
 import com.compomics.pladipus.client.gui.GuiControl;
 import com.compomics.pladipus.client.gui.GuiMain;
 import com.compomics.pladipus.client.gui.PopupControl;
@@ -29,6 +30,7 @@ import com.compomics.pladipus.client.gui.SceneControl;
 import com.compomics.pladipus.client.gui.ToolControl;
 import com.compomics.pladipus.client.gui.UserControl;
 import com.compomics.pladipus.client.gui.UserWorkflowControl;
+import com.compomics.pladipus.client.gui.impl.DefaultControlImpl;
 import com.compomics.pladipus.client.gui.impl.GuiControlImpl;
 import com.compomics.pladipus.client.gui.impl.PopupControlImpl;
 import com.compomics.pladipus.client.gui.impl.SceneControlImpl;
@@ -101,6 +103,12 @@ public class ClientConfiguration {
 	@Bean
 	public SceneControl sceneControl() {
 		return new SceneControlImpl();
+	}
+	
+	@Lazy
+	@Bean
+	public DefaultControl defaultControl() {
+		return new DefaultControlImpl();
 	}
 	
 	@Lazy

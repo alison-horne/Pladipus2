@@ -4,7 +4,7 @@ import java.util.ResourceBundle;
 
 import com.compomics.pladipus.client.gui.FxmlController;
 import com.compomics.pladipus.client.gui.model.PladipusScene;
-import com.compomics.pladipus.client.gui.model.WorkflowGui;
+import com.compomics.pladipus.client.gui.model.WorkflowOverview;
 import com.compomics.pladipus.shared.PladipusReportableException;
 
 import javafx.fxml.FXML;
@@ -18,7 +18,7 @@ public class EditWorkflowController extends FxmlController {
 	@FXML
 	private Label instructionLabel;
 	@FXML
-	private ChoiceBox<WorkflowGui> choiceBox;
+	private ChoiceBox<WorkflowOverview> choiceBox;
 	@FXML
 	private Button editBtn;
     @FXML
@@ -26,15 +26,15 @@ public class EditWorkflowController extends FxmlController {
 	
 	@FXML
 	public void initialize() {
-    	choiceBox.setConverter(new StringConverter<WorkflowGui>() {
+    	choiceBox.setConverter(new StringConverter<WorkflowOverview>() {
 			@Override
-			public WorkflowGui fromString(String string) {
+			public WorkflowOverview fromString(String string) {
 				return null;
 			}
 
 			@Override
-			public String toString(WorkflowGui wfGui) {
-				return wfGui.getWorkflowName();
+			public String toString(WorkflowOverview wf) {
+				return wf.getName();
 			}   		
     	});
     	editBtn.disableProperty().bind(choiceBox.valueProperty().isNull());
@@ -48,7 +48,7 @@ public class EditWorkflowController extends FxmlController {
 	
 	@FXML
 	public void handleEdit() {
-		nextScene(PladipusScene.WORKFLOW, choiceBox.getValue(), false);
+		nextScene(PladipusScene.WORKFLOW, guiControl.getWorkflow(choiceBox.getValue().getName()), false);
 	}
 	
 	@FXML

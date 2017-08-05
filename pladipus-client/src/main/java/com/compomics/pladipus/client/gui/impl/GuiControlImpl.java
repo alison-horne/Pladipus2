@@ -6,12 +6,14 @@ import java.util.ResourceBundle;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.compomics.pladipus.client.BatchCsvIO;
+import com.compomics.pladipus.client.gui.DefaultControl;
 import com.compomics.pladipus.client.gui.GuiControl;
 import com.compomics.pladipus.client.gui.PopupControl;
 import com.compomics.pladipus.client.gui.ToolControl;
 import com.compomics.pladipus.client.gui.UserControl;
 import com.compomics.pladipus.client.gui.UserWorkflowControl;
-import com.compomics.pladipus.client.gui.model.WorkflowGui;
+import com.compomics.pladipus.client.gui.model.DefaultGui;
+import com.compomics.pladipus.client.gui.model.WorkflowOverview;
 import com.compomics.pladipus.model.core.ToolInformation;
 import com.compomics.pladipus.model.persist.Workflow;
 import com.compomics.pladipus.shared.PladipusReportableException;
@@ -30,6 +32,8 @@ public class GuiControlImpl implements GuiControl {
 	private UserWorkflowControl userWorkflowControl;
 	@Autowired
 	private ToolControl toolControl;
+	@Autowired
+	private DefaultControl defaultControl;
 	@Autowired
 	private BatchCsvIO batchCsvIO;	
 	@Autowired
@@ -92,7 +96,7 @@ public class GuiControlImpl implements GuiControl {
 	}
 	
 	@Override
-	public ObservableList<WorkflowGui> getUserWorkflows() throws PladipusReportableException {
+	public ObservableList<WorkflowOverview> getUserWorkflows() throws PladipusReportableException {
 		return userWorkflowControl.getUserWorkflows();
 	}
 	
@@ -107,8 +111,16 @@ public class GuiControlImpl implements GuiControl {
 	}
 
 	@Override
-	public WorkflowGui getWorkflowGui(String name) {
-		return userWorkflowControl.getWorkflowGui(name);
+	public Workflow getWorkflow(String name) {
+		WorkflowOverview wfo= userWorkflowControl.getWorkflowOverview(name);
+		if (wfo != null) {
+			try {
+				return getWorkflowFromXml(wfo.getXml());
+			} catch (PladipusReportableException e) {
+				return null;
+			}
+		}
+		return null;
 	}
 	
 	@Override
@@ -125,5 +137,20 @@ public class GuiControlImpl implements GuiControl {
 	public String getText(Stage stage, String header, String original) {
 		if (original == null) original = "";
 		return popupControl.getText(stage, header, original);
+	}
+
+	@Override
+	public ObservableList<DefaultGui> getUserDefaults() {
+		return defaultControl.getUserDefaults();
+	}
+
+	@Override
+	public ObservableList<String> getDefaultTypes() {
+		return defaultControl.getDefaultTypes();
+	}
+	
+	@Override
+	public void addDefault(DefaultGui def) throws PladipusReportableException {
+		defaultControl.addDefault(def);
 	}
 }

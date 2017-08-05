@@ -2,18 +2,18 @@ package com.compomics.pladipus.client.gui.impl;
 
 import com.compomics.pladipus.client.gui.TestData;
 import com.compomics.pladipus.client.gui.UserWorkflowControl;
-import com.compomics.pladipus.client.gui.model.WorkflowGui;
+import com.compomics.pladipus.client.gui.model.WorkflowOverview;
 import com.compomics.pladipus.shared.PladipusReportableException;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class UserWorkflowControlImpl implements UserWorkflowControl {
-	private ObservableList<WorkflowGui> userWorkflows = FXCollections.observableArrayList();
+	private ObservableList<WorkflowOverview> userWorkflows = FXCollections.observableArrayList();
 	private boolean loaded = false;
 	
 	@Override
-	public ObservableList<WorkflowGui> getUserWorkflows() throws PladipusReportableException {
+	public ObservableList<WorkflowOverview> getUserWorkflows() throws PladipusReportableException {
 		if (!loaded) {
 			loadWorkflows();
 		}
@@ -21,10 +21,10 @@ public class UserWorkflowControlImpl implements UserWorkflowControl {
 	}
 	
 	@Override
-	public WorkflowGui getWorkflowGui(String name) {
-    	WorkflowGui existing = null;
-    	for (WorkflowGui wf : userWorkflows) {
-    		if (wf.getWorkflowName().equalsIgnoreCase(name)) {
+	public WorkflowOverview getWorkflowOverview(String name) {
+    	WorkflowOverview existing = null;
+    	for (WorkflowOverview wf : userWorkflows) {
+    		if (wf.getName().equalsIgnoreCase(name)) {
     			existing = wf;
     			break;
     		}

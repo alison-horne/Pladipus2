@@ -36,14 +36,16 @@
                   <Label fx:id="toolLabel" alignment="CENTER" />
                </children>
             </VBox>
-            <TreeTableView fx:id="paramTable" prefWidth="560.0" GridPane.rowIndex="1">
+            <TreeTableView fx:id="paramTable" style="-fx-fixed-cell-size: 40.0;" prefWidth="560.0" GridPane.rowIndex="1">
               <columns>
-                <TreeTableColumn fx:id="mandatoryColumn" text="" />
-                <TreeTableColumn fx:id="perRunColumn" text="%stepparam.perRunColumn" />
-                <TreeTableColumn fx:id="paramNameColumn" text="%stepparam.nameColumn" />
+              	<TreeTableColumn fx:id="paramNameColumn" text="%stepparam.nameColumn" />
+                <TreeTableColumn fx:id="perRunColumn" minWidth="80.0" maxWidth="80.0" style="-fx-alignment: CENTER;" text="%stepparam.perRunColumn" />
                 <TreeTableColumn fx:id="paramValueColumn" text="%stepparam.valueColumn" />
-                <TreeTableColumn fx:id="editColumn" text="" />
+                <TreeTableColumn fx:id="editButtonColumn" minWidth="80.0" maxWidth="80.0" style="-fx-alignment: CENTER;" text="" />
               </columns>
+              <columnResizePolicy>
+              	<TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+              </columnResizePolicy>
             </TreeTableView>
             <HBox alignment="CENTER" prefWidth="560.0" spacing="20" GridPane.rowIndex="2">
                <children>

@@ -9,16 +9,16 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-public class BatchGui {
+public class BatchOverview {
 	StringProperty batchName;
 	SimpleListProperty<RunGui> runs = new SimpleListProperty<RunGui>(FXCollections.observableArrayList());
 	IntegerProperty runSize;
 	
-	public BatchGui() {
+	public BatchOverview() {
 		this(null);
 	}
 	
-	public BatchGui(String batchName) {
+	public BatchOverview(String batchName) {
 		this.batchName = new SimpleStringProperty(batchName);
 		this.runSize = new SimpleIntegerProperty();
 		runSize.bind(runs.sizeProperty());

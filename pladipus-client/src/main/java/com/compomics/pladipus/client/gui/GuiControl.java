@@ -2,7 +2,8 @@ package com.compomics.pladipus.client.gui;
 
 import java.io.File;
 
-import com.compomics.pladipus.client.gui.model.WorkflowGui;
+import com.compomics.pladipus.client.gui.model.DefaultGui;
+import com.compomics.pladipus.client.gui.model.WorkflowOverview;
 import com.compomics.pladipus.model.core.ToolInformation;
 import com.compomics.pladipus.model.persist.Workflow;
 import com.compomics.pladipus.shared.PladipusReportableException;
@@ -17,10 +18,13 @@ public interface GuiControl {
 	public void login(String username, String password) throws PladipusReportableException;
 	public void logout();
 	public String getUserName();
-	public ObservableList<WorkflowGui> getUserWorkflows() throws PladipusReportableException;
+	public ObservableList<WorkflowOverview> getUserWorkflows() throws PladipusReportableException;
 	public ObservableList<ToolInformation> getToolInfoList() throws PladipusReportableException;
 	public ToolInformation getToolInfo(String name);
-	public WorkflowGui getWorkflowGui(String name);
+	public ObservableList<DefaultGui> getUserDefaults();
+	public ObservableList<String> getDefaultTypes();
+	public void addDefault(DefaultGui def) throws PladipusReportableException;
+	public Workflow getWorkflow(String name);
 	public Workflow getWorkflowFromFilePath(String path) throws PladipusReportableException;
 	public Workflow getWorkflowFromXml(String xml) throws PladipusReportableException;
 	public File getCsvFile(Stage stage);

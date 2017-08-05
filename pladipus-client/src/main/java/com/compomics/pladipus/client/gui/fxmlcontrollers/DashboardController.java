@@ -3,9 +3,9 @@ package com.compomics.pladipus.client.gui.fxmlcontrollers;
 import java.util.ResourceBundle;
 
 import com.compomics.pladipus.client.gui.FxmlController;
-import com.compomics.pladipus.client.gui.model.BatchGui;
+import com.compomics.pladipus.client.gui.model.BatchOverview;
 import com.compomics.pladipus.client.gui.model.PladipusScene;
-import com.compomics.pladipus.client.gui.model.WorkflowGui;
+import com.compomics.pladipus.client.gui.model.WorkflowOverview;
 import com.compomics.pladipus.shared.PladipusReportableException;
 
 import javafx.collections.FXCollections;
@@ -18,15 +18,15 @@ import javafx.scene.control.TableView;
 public class DashboardController extends FxmlController {
 
     @FXML
-    private TableView<WorkflowGui> workflowTable;
+    private TableView<WorkflowOverview> workflowTable;
     @FXML
-    private TableColumn<WorkflowGui, String> workflowColumn;
+    private TableColumn<WorkflowOverview, String> workflowColumn;
     @FXML
-    private TableView<BatchGui> batchTable;
+    private TableView<BatchOverview> batchTable;
     @FXML
-    private TableColumn<BatchGui, String> batchNameColumn;
+    private TableColumn<BatchOverview, String> batchNameColumn;
     @FXML
-    private TableColumn<BatchGui, Number> batchRunsColumn;
+    private TableColumn<BatchOverview, Number> batchRunsColumn;
     
     @FXML
     private ResourceBundle resources;
@@ -35,7 +35,7 @@ public class DashboardController extends FxmlController {
 	
     @FXML
     public void initialize() {
-    	workflowColumn.setCellValueFactory(cellData -> cellData.getValue().workflowNameProperty());
+    	workflowColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
     	batchNameColumn.setCellValueFactory(cellData -> cellData.getValue().batchNameProperty());
     	batchRunsColumn.setCellValueFactory(cellData -> cellData.getValue().runSizeProperty());
         showBatchDetails(null);
@@ -44,7 +44,7 @@ public class DashboardController extends FxmlController {
                 (observable, oldWorkflow, newWorkflow) -> showBatchDetails(newWorkflow));
     }
     
-    private void showBatchDetails(WorkflowGui workflow) {
+    private void showBatchDetails(WorkflowOverview workflow) {
     	if (workflow == null) {
     		batchTable.setPlaceholder(new Label(resources.getString("dashboard.batchPlaceholder")));
     		batchTable.setItems(FXCollections.emptyObservableList());
@@ -61,11 +61,11 @@ public class DashboardController extends FxmlController {
     
     @FXML
     public void handleEditWorkflow() {
-    	WorkflowGui selected = workflowTable.getSelectionModel().getSelectedItem();
+    	WorkflowOverview selected = workflowTable.getSelectionModel().getSelectedItem();
     	if (selected == null) {
     		nextScene(PladipusScene.EDIT_WORKFLOW, true);
     	} else {
-    		nextScene(PladipusScene.WORKFLOW, selected, true);
+    		nextScene(PladipusScene.WORKFLOW, guiControl.getWorkflow(selected.getName()), true);
     	}
     }
     

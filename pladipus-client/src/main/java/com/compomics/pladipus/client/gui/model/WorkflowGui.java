@@ -4,136 +4,93 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.compomics.pladipus.client.gui.fxmlcontrollers.WorkflowController;
 import com.compomics.pladipus.model.core.ToolInformation;
 import com.compomics.pladipus.model.persist.Step;
-import com.compomics.pladipus.model.persist.Workflow;
 import com.compomics.pladipus.shared.PladipusReportableException;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 
 public class WorkflowGui {
-	private Workflow originalWorkflow;
-	private StringProperty workflowName;
-	private StackPane canvas;
+	private String workflowName;
 	private ToolLegend toolLegend;
 	private boolean changed = false;
-	private double iconSizeScale = 1.0;
 	private int stepIdDefault = 1;
+	private final static String STEP_NAME = "step";
 	private Set<WorkflowGuiStep> guiSteps = new HashSet<WorkflowGuiStep>();
-	private ObservableList<BatchGui> batches = FXCollections.observableArrayList();
 	private Set<StepLink> links = new HashSet<StepLink>();
 	private StepLink drawingLink;
 	private ObjectProperty<WorkflowGuiStep> selectedStep;
-	private WorkflowController controller;
 	
 	// TODO - thoughts on links...want to be able to draw twice, for ease of user adding another out->in param link, but only want one actual arrow on screen
-	public WorkflowGui(Workflow workflow) {
-		this.originalWorkflow = workflow;
-		this.workflowName = new SimpleStringProperty(null);
-		if (workflow != null) setWorkflowName(workflow.getName());
-		selectedStep = new SimpleObjectProperty<WorkflowGuiStep>(null);
-	} 
-	
-	public void setController(WorkflowController controller) {
-		this.controller = controller;
-	}
-	public WorkflowController getController() {
-		return controller;
-	}
-	
-	public Workflow getWorkflow() {
-		return originalWorkflow;
-	}
-	
-	public void setCanvas(StackPane canvas) {
-		this.canvas = canvas;
-		addCanvasListeners();
+	public WorkflowGui(String name) {
+		this.workflowName = name;
 		this.toolLegend = new ToolLegend();
-	}
-	
-	public WorkflowGui(Workflow workflow, StackPane canvas) {
-		this(workflow);
-		setCanvas(canvas);
+		selectedStep = new SimpleObjectProperty<WorkflowGuiStep>(null);
 	}
 	
     public String getWorkflowName() {
-        return workflowName.get();
+        return workflowName;
     }
 
     public void setWorkflowName(String workflowName) {
-        this.workflowName.set(workflowName);
-    }
-
-    public StringProperty workflowNameProperty() {
-        return workflowName;
+        this.workflowName = workflowName;
     }
 
 	public ObservableList<LegendItem> getLegendData() {
 		return toolLegend.getLegendData();
 	}
 	
-	public void addStep(ToolInformation toolInfo, String stepId) {
+	public WorkflowGuiStep addStep(ToolInformation toolInfo, String stepId) {
 		if ((stepId == null) || stepId.isEmpty()) {
-			stepId = "step" + stepIdDefault;
-			stepIdDefault++;
+			stepId = getNextUniqueStepId();
 		}
-		WorkflowGuiStep step = new WorkflowGuiStep(this, toolInfo, stepId);
+		WorkflowGuiStep step = new WorkflowGuiStep(toolInfo, stepId);
 		guiSteps.add(step);
-		showStep(step);
-		setSelectedStep(step);
+		return step;
 	}
 	
-	private void addStep(Step step) throws PladipusReportableException {
-		WorkflowGuiStep guiStep = new WorkflowGuiStep(this, step);
+	public void addStep(Step step, ToolInformation toolInfo) throws PladipusReportableException {
+		WorkflowGuiStep guiStep = new WorkflowGuiStep(toolInfo, step);
 		guiStep.validate();
 		guiSteps.add(guiStep);
 	}
 	
-	public void showStep(WorkflowGuiStep step) {
-		step.initIcon(getIconSize(), ToolColors.getColor(toolLegend.addTool(step.getToolName())));
-		canvas.getChildren().add(step.getIcon());
+	public Set<WorkflowGuiStep> getGuiSteps() {
+		return guiSteps;
+	}
+	
+	public void initStepIcon(WorkflowGuiStep step, double size) {
+		step.initIcon(size, ToolColors.getColor(toolLegend.addTool(step.getToolName())));
+	}
+	
+	public Color getStepColor(String stepId) {
+		for (WorkflowGuiStep guiStep: guiSteps) {
+			if (guiStep.getStepId().equals(stepId)) {
+				int colorId = toolLegend.getToolColorId(guiStep.getToolName());
+				if (colorId > -1) return ToolColors.getColor(colorId);
+			}
+		}
+		return null;
 	}
 	
 	public boolean changesMade() {
 		return changed;
 	}
-	
-    private double getIconSize() {
-    	return Math.min(canvas.getBoundsInParent().getHeight(), canvas.getBoundsInParent().getWidth()) * iconSizeScale / 10;
-    }
-    
-    private void populateWorkflow() throws PladipusReportableException {
-    	if (originalWorkflow != null) {
-    		setWorkflowName(originalWorkflow.getName());
-    		for (Step step: originalWorkflow.getSteps().getStep()) {
-    			addStep(step);
-    		}
-    	}
-    }
-    
-    public ObservableList<BatchGui> getBatches() {
-    	return batches;
-    }
-    public void addBatch(BatchGui batch) {
-    	batches.add(batch);
-    }
     
     public void setDrawingLink(StepLink drawingLink) {
     	this.drawingLink = drawingLink;
     	if (drawingLink == null) {
     		for (WorkflowGuiStep step: guiSteps) {
     			step.getIcon().highlightInCircle(false);
+        		step.getIcon().dropLink();
     		}
     	}
     }
@@ -142,8 +99,6 @@ public class WorkflowGui {
     }
     public void startDrawingLink(WorkflowGuiStep step) {
     	setDrawingLink(new StepLink(step));
-    	canvas.getChildren().add(drawingLink.getLine());
-    	canvas.getChildren().add(drawingLink.getArrow());
     	for (WorkflowGuiStep otherStep: guiSteps) {
     		if (!otherStep.equals(step)) {
     			otherStep.getIcon().highlightInCircle(true);
@@ -157,16 +112,44 @@ public class WorkflowGui {
     }
     public void clearDrawingLink() {
     	if (drawingLink != null) {
-    		canvas.getChildren().remove(drawingLink.getLine());
-    		canvas.getChildren().remove(drawingLink.getArrow());
     		setDrawingLink(null);
     	}
     }
-    public void finaliseDrawingLink() {
+    public boolean finaliseDrawingLink() {
+    	boolean exists = true;
     	if (drawingLink != null) {
-	    	links.add(drawingLink);
+    		exists = linkExists(drawingLink);
+    		if (!exists) {
+    			links.add(drawingLink);
+    		}
 	    	setDrawingLink(null);
     	}
+    	return exists;
+    }
+    private boolean linkExists(StepLink link) {
+    	for (StepLink exist: links) {
+    		if (exist.getStartStep() == link.getStartStep() &&
+    			exist.getEndStep() == link.getEndStep()) {
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+    
+    public boolean stepIdExists(String id) {
+    	for (WorkflowGuiStep step: guiSteps) {
+    		if (step.getStepId().equals(id)) return true;
+    	}
+    	return false;
+    }
+    
+    private String getNextUniqueStepId() {
+    	String id;
+    	do {
+    		id = STEP_NAME + stepIdDefault;
+    		stepIdDefault++;
+    	} while (stepIdExists(id));
+    	return id;
     }
     
     public Set<StepLink> getLinksToStep(WorkflowGuiStep endStep) {
@@ -176,11 +159,13 @@ public class WorkflowGui {
     	return links.stream().filter( l -> l.getStartStep().equals(startStep) ).collect(Collectors.<StepLink>toSet());
     }
 
-    public void addLink(WorkflowGuiStep start, WorkflowGuiStep end) {
+    public StepLink addLink(WorkflowGuiStep start, WorkflowGuiStep end) {
     	StepLink link = new StepLink(start, end);
-    	links.add(link);
-    	canvas.getChildren().add(link.getLine());
-    	canvas.getChildren().add(link.getArrow());
+    	if (!linkExists(link)){
+    		links.add(link);
+    		return link;
+    	}
+    	return null;
     }
     
     public void linksToFront(WorkflowGuiStep step) {
@@ -192,10 +177,10 @@ public class WorkflowGui {
 	    if (step != null) {
 	    	step.getIcon().toFront();
 	    	linksToFront(step);
-	    	step.getIcon().highlightIcon(true);
+	    	step.getIcon().setSelected(true);
 	    }
 	    if (getSelectedStep() != null && (step == null || !step.equals(getSelectedStep()))) {
-	    	getSelectedStep().getIcon().highlightIcon(false);
+	    	getSelectedStep().getIcon().setSelected(false);
 	    }
 	    selectedStep.set(step);
     }
@@ -204,41 +189,5 @@ public class WorkflowGui {
     }
     public ObjectProperty<WorkflowGuiStep> selectedStepProperty() {
     	return selectedStep;
-    }
-    
-    private void addCanvasListeners() {
-		canvas.setOnMouseDragOver(new EventHandler<MouseDragEvent>() {
-			@Override
-			public void handle(MouseDragEvent event) {
-				if (getDrawingLink() != null) {
-					event.consume();
-					Point2D canvasBounds = canvas.localToScene(0, 0, true);
-					double x = event.getSceneX() - canvasBounds.getX();
-					double y = event.getSceneY() - canvasBounds.getY();				
-					getDrawingLink().updateLink(x, y);
-				}
-			}		
-		});
-		canvas.setOnMousePressed(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				setSelectedStep(null);
-			}
-		});
-    }
-    
-    public void displayWorkflow() throws PladipusReportableException {
-    	populateWorkflow();
-    	for (WorkflowGuiStep step: guiSteps) {
-    		showStep(step);
-    	}
-    }
-    
-    public void arrangeIcons() {
-    	// TODO
-    }
-    
-    public ToolInformation getTool(String toolName) throws PladipusReportableException {
-    	return controller.guiControl.getToolInfo(toolName);
     }
 }

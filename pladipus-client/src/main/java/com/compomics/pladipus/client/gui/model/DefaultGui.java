@@ -16,6 +16,7 @@ public class DefaultGui {
 	}
 	
 	public DefaultGui(String name, String value, String type, Boolean global) {
+		if (type != null && type.isEmpty()) type = null;
 		this.name = new SimpleStringProperty(name);
 		this.value = new SimpleStringProperty(value);
 		this.type = new SimpleStringProperty(type);
@@ -51,6 +52,7 @@ public class DefaultGui {
     }
 
     public void setType(String type) {
+    	if (type != null && type.isEmpty()) type = null;
         this.type.set(type);
     }
 

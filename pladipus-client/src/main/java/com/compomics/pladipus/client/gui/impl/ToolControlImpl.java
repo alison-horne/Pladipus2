@@ -29,8 +29,12 @@ public class ToolControlImpl implements ToolControl {
 	
 	@Override
 	public ToolInformation getToolInfo(String name) {
-		for (ToolInformation tool: toolInfoList) {
-			if (tool.getToolName().equals(name)) return tool;
+		try {
+			for (ToolInformation tool: getToolInfoList()) {
+				if (tool.getToolName().equals(name)) return tool;
+			}
+		} catch (PladipusReportableException e) {
+			// TODO what if no tools?
 		}
 		return null;
 	}

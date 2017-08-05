@@ -1,7 +1,5 @@
 package com.compomics.pladipus.client.gui.model;
 
-import java.util.NoSuchElementException;
-
 import com.compomics.pladipus.model.core.ToolInformation;
 import com.compomics.pladipus.model.persist.Step;
 import com.compomics.pladipus.shared.PladipusReportableException;
@@ -10,26 +8,24 @@ import javafx.scene.paint.Color;
 
 public class WorkflowGuiStep {
 	private StepIcon icon;
-	private WorkflowGui workflowGui;
 	private ToolInformation toolInfo;
 	private String stepId;
 	private Step step;
 	
-	public WorkflowGuiStep(WorkflowGui workflowGui, ToolInformation toolInfo, String stepId) {
-		this.workflowGui = workflowGui;
+	public WorkflowGuiStep(ToolInformation toolInfo, String stepId) {
 		this.toolInfo = toolInfo;
 		this.stepId = stepId;
 	}
 	
-	public WorkflowGuiStep(WorkflowGui workflowGui, Step step) {
-		this.workflowGui = workflowGui;
+	public WorkflowGuiStep(ToolInformation toolInfo, Step step) {
+		this.toolInfo = toolInfo;
 		this.step = step;
 		stepId = step.getId();
 	}
-	
+
 	public void validate() throws PladipusReportableException {
 		if (step != null) {
-			toolInfo = workflowGui.getTool(step.getName());
+			// Get parameters sorted
 		}
 	}
 	
@@ -43,7 +39,7 @@ public class WorkflowGuiStep {
 	
 	public void initIcon(double size, Color color) {
 		if (icon == null) {
-			icon = new StepIcon(this, size, color, stepId);
+			icon = new StepIcon(size, color, stepId);
 		}
 	}
 	
@@ -55,10 +51,6 @@ public class WorkflowGuiStep {
 	}
 	public String getStepId() {
 		return stepId;
-	}
-	
-	public WorkflowGui getWorkflowGui() {
-		return workflowGui;
 	}
 	
 	public boolean isParamChange() { //TODO

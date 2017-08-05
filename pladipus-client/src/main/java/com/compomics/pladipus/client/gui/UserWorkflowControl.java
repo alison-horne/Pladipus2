@@ -1,13 +1,13 @@
 package com.compomics.pladipus.client.gui;
 
-import com.compomics.pladipus.client.gui.model.WorkflowGui;
+import com.compomics.pladipus.client.gui.model.WorkflowOverview;
 import com.compomics.pladipus.shared.PladipusReportableException;
 
 import javafx.collections.ObservableList;
 
 public interface UserWorkflowControl {
 
-	public ObservableList<WorkflowGui> getUserWorkflows() throws PladipusReportableException;
-	public WorkflowGui getWorkflowGui(String name);
+	public ObservableList<WorkflowOverview> getUserWorkflows() throws PladipusReportableException;
+	public WorkflowOverview getWorkflowOverview(String name);
 	public void logout();
 }
