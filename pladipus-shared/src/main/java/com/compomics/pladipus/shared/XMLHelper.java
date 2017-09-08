@@ -7,6 +7,11 @@ import com.compomics.pladipus.shared.PladipusReportableException;
  *
  * @param <T> Type of object to parse XML document into
  */
+/**
+ * @author alhor
+ *
+ * @param <T>
+ */
 public interface XMLHelper<T> {
 	
 	/**
@@ -16,4 +21,12 @@ public interface XMLHelper<T> {
 	 * @throws PladipusReportableException
 	 */
 	T parseXml(String content) throws PladipusReportableException;
+	
+	/**
+	 * Converts Object to XML string
+	 * @param Object
+	 * @return XML string
+	 * @throws PladipusReportableException
+	 */
+	String objectToXML(T t) throws PladipusReportableException;
 }
