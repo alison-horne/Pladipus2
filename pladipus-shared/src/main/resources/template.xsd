@@ -13,6 +13,7 @@
 <xs:complexType name="step">
 <xs:sequence>
 <xs:element name="id" type="xs:ID" />
+<xs:element name="runAfter" type="xs:IDREF" minOccurs='0' maxOccurs="unbounded" />
 <xs:element name="name" type="xs:string" />
 <xs:element name="parameters" type="parameters" minOccurs='0' />
 </xs:sequence>

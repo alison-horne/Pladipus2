@@ -235,8 +235,15 @@ public class WorkflowValidator implements ValidationChecker<Workflow> {
 	private boolean isValid(String valueString) {
 		int startCount = StringUtils.countOccurrencesOf(valueString, Substitution.getPrefix());
 		int endCount = StringUtils.countOccurrencesOf(valueString, Substitution.getEnd());
-		return ((startCount == endCount) && 
-				(valueString.indexOf(Substitution.getPrefix()) < valueString.indexOf(Substitution.getEnd())));
+		if (startCount != endCount) return false;
+		int subStart = 0;
+		int subEnd = 0;
+        for (int i = 0; i < startCount; i++) {
+        	subStart = valueString.indexOf(Substitution.getPrefix(), subEnd);
+        	subEnd = valueString.indexOf(Substitution.getEnd(), subStart);
+        	if (subStart < 0 || subEnd < 0) return false;
+        }
+        return true;
 	}
 
 	private void checkToolNamesValid(Workflow workflow) throws PladipusReportableException {

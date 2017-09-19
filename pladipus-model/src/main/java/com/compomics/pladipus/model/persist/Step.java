@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
@@ -53,6 +54,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "step", propOrder = {
     "id",
+    "runAfter",
     "name",
     "parameters"
 })
@@ -65,6 +67,8 @@ public class Step {
     @XmlID
     @XmlSchemaType(name = "ID")
     protected String id;
+    @XmlIDREF
+    protected Set<Step> runAfter;
     @XmlElement(required = true)
     protected String name;
     protected Parameters parameters;
@@ -114,6 +118,17 @@ public class Step {
      */
     public void setId(String value) {
         this.id = value;
+    }
+    
+    @Transient
+    public Set<Step> getRunAfter ()
+    {
+        return runAfter;
+    }
+
+    public void setRunAfter (Set<Step> runAfter)
+    {
+        this.runAfter = runAfter;
     }
 
     /**
@@ -185,6 +200,11 @@ public class Step {
 		joinColumns={@JoinColumn(name="dependent_step")},
 		inverseJoinColumns={@JoinColumn(name="prerequisite_step")})
 	public Set<Step> getPrereqs(){
+		if (runAfter != null) {
+			for (Step after: runAfter) {
+				prereqs.add(after);
+			}
+		}
 		return prereqs;
 	}
 	public void setPrereqs(Set<Step> steps) {
