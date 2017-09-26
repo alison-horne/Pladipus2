@@ -46,12 +46,12 @@
    <bottom>
       <ToolBar prefHeight="40.0" BorderPane.alignment="CENTER">
          <items>
-            <Label text="Label" />
-            <TextField />
-            <Button mnemonicParsing="false" text="Button" />
+            <Label text="%workflow.nameLabel" />
+            <TextField fx:id="nameField" editable="false"/>
+            <Button mnemonicParsing="false" text="%workflow.editNameBtn" onAction="#handleRename"/>
             <Pane HBox.hgrow="SOMETIMES"/>
-            <Button mnemonicParsing="false" text="Button" />
-            <Button mnemonicParsing="false" text="Button" />
+            <Button mnemonicParsing="false" text="%workflow.saveBtn" onAction="#handleSave" />
+            <Button mnemonicParsing="false" text="%workflow.cancelBtn" onAction="#handleCancel" />
          </items>
       </ToolBar>
    </bottom>
@@ -79,10 +79,11 @@
                             <AnchorPane>
                             	<children>
                             		<Label prefHeight="30.0" text="%workflow.globals" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0" />
-                            		<TableView fx:id="globalsTable" AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="40.0">
+                            		<TableView fx:id="globalsTable" style="-fx-fixed-cell-size: 40.0;" AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="40.0">
                     					<columns>
                      						<TableColumn fx:id="globalNameColumn" text="%workflow.columnName" />
                       						<TableColumn fx:id="globalValueColumn" text="%workflow.columnValue" />
+                      						<TableColumn fx:id="globalPerRunColumn" minWidth="80.0" maxWidth="80.0" style="-fx-alignment: CENTER;" text="%workflow.columnPerRun" />
                     					</columns>
                     					<placeholder>
        		 								<Label text="%workflow.globalPlaceholder"/>
@@ -94,9 +95,9 @@
                 				  	<HBox prefHeight="35" spacing="10" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0">
                							<children>
                   							<Pane HBox.hgrow="SOMETIMES" />
-                  							<Button mnemonicParsing="false" text="Add" />
-                  							<Button mnemonicParsing="false" text="Edit" />
-                  							<Button mnemonicParsing="false" text="Delete"/>
+                  							<Button mnemonicParsing="false" text="%workflow.addGlobalBtn" onAction="#handleAddGlobal"/>
+                  							<Button mnemonicParsing="false" text="%workflow.editGlobalBtn" onAction="#handleEditGlobal"/>
+                  							<Button mnemonicParsing="false" text="%workflow.removeGlobalBtn" onAction="#handleRemoveGlobal"/>
                   							<Pane HBox.hgrow="SOMETIMES" />
                							</children>
             						</HBox>

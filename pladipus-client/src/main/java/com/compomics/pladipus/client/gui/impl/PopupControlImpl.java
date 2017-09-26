@@ -15,6 +15,7 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -49,7 +50,7 @@ public class PopupControlImpl implements PopupControl {
 		Alert alert = new Alert(AlertType.ERROR, errorMsg);
     	alert.initOwner(stage);
     	alert.setTitle(stage.getTitle());
-    	alert.show();
+    	alert.showAndWait();
 	}
 
     private String getContent(String text) {
@@ -76,12 +77,41 @@ public class PopupControlImpl implements PopupControl {
     	alert.showAndWait();
     	return alert.getResult();
     }
+    
+    @Override
+    public void showInfo(String text, Stage stage) {
+    	Alert alert = new Alert(AlertType.INFORMATION);
+    	alert.initOwner(stage);
+    	alert.setContentText(getContent(text));
+    	alert.setTitle(stage.getTitle());
+    	alert.setHeaderText(getHeader(text));
+    	alert.show();
+    }
 
 	@Override
 	public File fileBrowse(Stage stage, ExtensionFilter[] filters) {
     	FileChooser browser = new FileChooser();
-    	browser.getExtensionFilters().addAll(filters);
+    	if (filters != null) {
+    		browser.getExtensionFilters().addAll(filters);
+    	}
     	return browser.showOpenDialog(stage);
+	}
+	
+	@Override
+	public File directoryBrowse(Stage stage) {
+		DirectoryChooser browser = new DirectoryChooser();
+		return browser.showDialog(stage);
+	}
+	
+	@Override
+	public File fileOrDirectoryBrowse(Stage stage) {
+		ButtonType fileBtn = new ButtonType(resources.getString("popup.fileBtn"));
+		ButtonType dirBtn = new ButtonType(resources.getString("popup.dirBtn"));
+		if (doAlert("fileOrDir", stage, new ButtonType[]{fileBtn, dirBtn}) == fileBtn) {
+			return fileBrowse(stage, null);
+		} else {
+			return directoryBrowse(stage);
+		}
 	}
 
 	@Override

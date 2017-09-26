@@ -24,6 +24,7 @@ public class StepIcon extends StackPane {
 	
 	private ContextMenu contextMenu;
 	private String id;
+	private Color color;
 	private double size;
 	private Text labelText;
 	private Rectangle inner;
@@ -45,6 +46,7 @@ public class StepIcon extends StackPane {
 		super();
 		this.size = Math.max(iconSize, 50.0);
 		this.id = id;
+		this.color = color;
 		
 		Rectangle rect = new Rectangle(0, 0, size, size);
 		rect.setArcHeight(size * 0.3);
@@ -86,6 +88,9 @@ public class StepIcon extends StackPane {
 	public void setSelected(boolean selected) {
 		this.selected.set(selected);
 		highlightIcon(selected);
+	}
+	public Color getColor() {
+		return color;
 	}
 	
 	private DropShadow getHighlight(Color color) {
@@ -138,6 +143,14 @@ public class StepIcon extends StackPane {
 			inCirc.setEffect(getGlow(Color.BLUE));
 		} else {
 			inCirc.setEffect(null);
+		}
+	}
+	
+	public void highlightOutCircle(boolean highlightOn) {
+		if (highlightOn) {
+			outCirc.setEffect(getGlow(Color.BLUE));
+		} else {
+			outCirc.setEffect(null);
 		}
 	}
 	
@@ -319,7 +332,7 @@ public class StepIcon extends StackPane {
 			public void handle(MouseEvent mouseEvent) {
 				mouseEvent.consume();
 				setCursor(Cursor.DEFAULT);
-				outCirc.setEffect(getGlow(Color.BLUE));
+				highlightOutCircle(true);
 			}
 		});
 		
@@ -348,7 +361,7 @@ public class StepIcon extends StackPane {
 		outCirc.setOnMouseReleased(new EventHandler<MouseEvent>() {
 			@Override 
 			public void handle(MouseEvent mouseEvent) {
-				outCirc.setEffect(null);
+				highlightOutCircle(false);
 				startLink.set(false);
 			}
 		});
@@ -357,7 +370,7 @@ public class StepIcon extends StackPane {
 			@Override 
 			public void handle(MouseEvent mouseEvent) {
 				if (!isStartLinkIcon()) {
-					outCirc.setEffect(null);
+					highlightOutCircle(false);
 				}
 			}
 		});

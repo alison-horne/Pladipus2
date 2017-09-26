@@ -1,5 +1,7 @@
 package com.compomics.pladipus.client.gui.model;
 
+import com.compomics.pladipus.model.parameters.Substitution;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -71,4 +73,8 @@ public class DefaultGui {
     public BooleanProperty globalProperty() {
         return global;
     }
+    
+	public String getFullDefaultName() {
+		return Substitution.getPrefix() + Substitution.getDefault() + "." + name.get() + Substitution.getEnd();
+	}
 }

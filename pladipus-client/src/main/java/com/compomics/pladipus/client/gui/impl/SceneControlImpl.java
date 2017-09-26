@@ -47,12 +47,13 @@ public class SceneControlImpl implements SceneControl {
 	
 	@Override
 	public void openOwnedScene(PladipusScene scene, Stage stage, Stage owner, Object... initObjects) {
+		if (owner == null) owner = primaryStage;
 		if (stage == null) {
 			if (scene.isPrimary()) {
 				stage = primaryStage;
 			} else {
 				stage = getNewStage();
-				stage.initOwner((owner != null) ? owner : primaryStage);
+				stage.initOwner(owner);
 			}
 		}
 		try {
@@ -61,12 +62,13 @@ public class SceneControlImpl implements SceneControl {
 			stage.show();
 			controller.postShow();
 		} catch (PladipusReportableException e) {
-			sceneLoadError(stage, e.getMessage());
+			sceneLoadError(owner, e.getMessage());
 		}
 	}
 	
 	@Override
 	public Object getOwnedSceneContent(PladipusScene scene, Stage owner, Object... initObjects) {
+		if (owner == null) owner = primaryStage;
 		Stage stage = getNewStage();
 		stage.initOwner(owner);
     	stage.initModality(Modality.WINDOW_MODAL);
@@ -76,7 +78,7 @@ public class SceneControlImpl implements SceneControl {
 			stage.showAndWait();
 			return controller.returnObject();
 		} catch (PladipusReportableException e) {
-			sceneLoadError(stage, e.getMessage());
+			sceneLoadError(owner, e.getMessage());
 			return null;
 		}
 	}
@@ -150,6 +152,5 @@ public class SceneControlImpl implements SceneControl {
     
     private void sceneLoadError(Stage stage, String errorMsg) {
     	popupControl.doError(errorMsg, stage);
-    	stage.close();
     }
 }

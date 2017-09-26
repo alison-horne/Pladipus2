@@ -41,7 +41,7 @@
           </Menu>
           <Menu mnemonicParsing="true" text="%dashboard.menuDefault">
             <items>
-              <MenuItem mnemonicParsing="true" text="Close" />
+              <MenuItem mnemonicParsing="true" text="%dashboard.viewDefaults" onAction="#handleViewDefaults" />
             </items>
           </Menu>
           <Menu mnemonicParsing="true" text="%dashboard.menuUser">

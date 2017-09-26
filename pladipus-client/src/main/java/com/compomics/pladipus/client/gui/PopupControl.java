@@ -13,5 +13,8 @@ public interface PopupControl {
 	public String doAlertCustom(String text, Stage stage, String[] buttons);
 	public void doError(String errorMsg, Stage stage);
 	public File fileBrowse(Stage stage, ExtensionFilter[] filters);
+	public File directoryBrowse(Stage stage);
+	public File fileOrDirectoryBrowse(Stage stage);
 	public String getText(Stage stage, String header, String original);
+	public void showInfo(String text, Stage stage);
 }

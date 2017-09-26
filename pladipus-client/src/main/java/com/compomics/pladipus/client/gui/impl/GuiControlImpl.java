@@ -1,6 +1,7 @@
 package com.compomics.pladipus.client.gui.impl;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ResourceBundle;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +65,17 @@ public class GuiControlImpl implements GuiControl {
 	}
 	
 	@Override
+	public String getFileDirPath(Stage stage) {
+		File file = popupControl.fileOrDirectoryBrowse(stage);
+		if (file != null) {
+			try {
+				return file.getCanonicalPath();
+			} catch (IOException e) {}
+		}
+		return null;
+	}
+	
+	@Override
 	public void showError(String errorMsg, Stage stage) {
 		popupControl.doError(errorMsg, stage);
 	}
@@ -76,6 +88,11 @@ public class GuiControlImpl implements GuiControl {
 	@Override
 	public String customAlert(String text, Stage stage, String[] buttons) {
 		return popupControl.doAlertCustom(text, stage, buttons);
+	}
+	
+	@Override
+	public void infoAlert(String text, Stage stage) {
+		popupControl.showInfo(text, stage);
 	}
 
 	@Override
@@ -131,6 +148,12 @@ public class GuiControlImpl implements GuiControl {
 	@Override
 	public Workflow getWorkflowFromXml(String xml) throws PladipusReportableException {
 		return workflowXMLHelper.parseXml(xml);
+	}
+	
+	@Override
+	public void saveWorkflow(Workflow workflow) throws PladipusReportableException {
+		workflow.setTemplateXml(workflowXMLHelper.objectToXML(workflow));
+		userWorkflowControl.saveWorkflow(workflow);
 	}
 
 	@Override

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.TextArea?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.102" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.compomics.pladipus.client.gui.fxmlcontrollers.ParamEditController">
+   <children>
+      <GridPane AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" percentHeight="15.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" percentHeight="5.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" percentHeight="60.0" vgrow="NEVER" />
+          <RowConstraints minHeight="10.0" percentHeight="5.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" percentHeight="15.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <VBox alignment="CENTER" GridPane.halignment="CENTER">
+               <children>
+                  <Label fx:id="paramName" />
+                  <TextArea fx:id="paramDescription" style="-fx-text-fill: firebrick" editable="false" wrapText="true" />
+               </children>
+            </VBox>
+            <ScrollPane fitToWidth="true" GridPane.rowIndex="2">
+              <content>
+                <VBox fx:id="valueList" spacing="10">
+                	<padding>
+           				<Insets bottom="5" left="5" right="5" top="5" />
+         			</padding>
+                </VBox>
+              </content>
+            </ScrollPane>
+            <HBox spacing="10" GridPane.rowIndex="4">
+               <children>
+                  <Button mnemonicParsing="false" text="%paramEdit.addBtn" onAction="#addValue"/>
+                  <Button mnemonicParsing="false" text="%paramEdit.removeBtn" onAction="#removeValue"/>
+                  <Pane HBox.hgrow="SOMETIMES" />
+                  <Button mnemonicParsing="false" text="%paramEdit.saveBtn" onAction="#saveValues"/>
+                  <Button fx:id="cancelBtn" mnemonicParsing="false" text="%paramEdit.cancelBtn" onAction="#doCancel"/>
+               </children>
+            </HBox>
+         </children>
+      </GridPane>
+   </children>
+</AnchorPane>

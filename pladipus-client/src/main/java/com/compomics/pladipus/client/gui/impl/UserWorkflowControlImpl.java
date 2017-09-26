@@ -3,6 +3,7 @@ package com.compomics.pladipus.client.gui.impl;
 import com.compomics.pladipus.client.gui.TestData;
 import com.compomics.pladipus.client.gui.UserWorkflowControl;
 import com.compomics.pladipus.client.gui.model.WorkflowOverview;
+import com.compomics.pladipus.model.persist.Workflow;
 import com.compomics.pladipus.shared.PladipusReportableException;
 
 import javafx.collections.FXCollections;
@@ -42,5 +43,17 @@ public class UserWorkflowControlImpl implements UserWorkflowControl {
 		// TODO - get workflows from control
 		userWorkflows.addAll(TestData.getWorkflows("test1"));
 		loaded = true;
+	}
+
+	@Override
+	public void saveWorkflow(Workflow workflow) {
+		// TODO save workflow to db...force flag if wo exists
+		WorkflowOverview wo = getWorkflowOverview(workflow.getName());
+		if (wo == null) {
+			wo = new WorkflowOverview(workflow.getName(), workflow.getTemplateXml());
+			userWorkflows.add(wo);
+		} else {
+			wo.setXml(workflow.getTemplateXml());
+		}
 	}
 }

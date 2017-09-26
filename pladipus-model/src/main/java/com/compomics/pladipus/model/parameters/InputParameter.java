@@ -83,4 +83,7 @@ public class InputParameter {
 		//TODO - validation of supplied value against InputType
 		return true;
 	}
+	public boolean hasDefaultValue() {
+		return ((defaultValue != null) && !defaultValue.isEmpty()); 
+	}
 }

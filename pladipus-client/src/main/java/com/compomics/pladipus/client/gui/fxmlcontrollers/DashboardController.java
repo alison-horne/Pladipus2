@@ -65,7 +65,7 @@ public class DashboardController extends FxmlController {
     	if (selected == null) {
     		nextScene(PladipusScene.EDIT_WORKFLOW, true);
     	} else {
-    		nextScene(PladipusScene.WORKFLOW, guiControl.getWorkflow(selected.getName()), true);
+    		nextScene(PladipusScene.WORKFLOW, true, guiControl.getWorkflow(selected.getName()));
     	}
     }
     
@@ -82,4 +82,9 @@ public class DashboardController extends FxmlController {
 		workflowTable.setItems(guiControl.getUserWorkflows());
 		userLabel.setText(guiControl.getUserName());
 	}
+    
+    @FXML
+    public void handleViewDefaults() {
+    	nextScene(PladipusScene.USER_DEFAULTS, true, false);
+    }
 }

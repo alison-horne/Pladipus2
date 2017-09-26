@@ -1,35 +1,38 @@
 package com.compomics.pladipus.client.gui.model;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.compomics.pladipus.model.core.ToolInformation;
+import com.compomics.pladipus.model.persist.Parameter;
 import com.compomics.pladipus.model.persist.Step;
+import com.compomics.pladipus.model.persist.Steps;
+import com.compomics.pladipus.model.persist.Workflow;
 import com.compomics.pladipus.shared.PladipusReportableException;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
-import javafx.geometry.Point2D;
-import javafx.scene.input.MouseDragEvent;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
 
 public class WorkflowGui {
 	private String workflowName;
 	private ToolLegend toolLegend;
 	private boolean changed = false;
 	private int stepIdDefault = 1;
-	private final static String STEP_NAME = "step";
+	private final static String STEP_NAME = "s";
 	private Set<WorkflowGuiStep> guiSteps = new HashSet<WorkflowGuiStep>();
-	private Set<StepLink> links = new HashSet<StepLink>();
+	private ObservableList<StepLink> links = FXCollections.observableArrayList();
 	private StepLink drawingLink;
 	private ObjectProperty<WorkflowGuiStep> selectedStep;
+	private ObservableList<GlobalParameterGui> globals = FXCollections.observableArrayList();
+	private List<GlobalParameterGui> originalGlobals = new ArrayList<GlobalParameterGui>();
+	private ObservableList<DefaultGui> userDefaults;
 	
-	// TODO - thoughts on links...want to be able to draw twice, for ease of user adding another out->in param link, but only want one actual arrow on screen
 	public WorkflowGui(String name) {
 		this.workflowName = name;
 		this.toolLegend = new ToolLegend();
@@ -48,19 +51,50 @@ public class WorkflowGui {
 		return toolLegend.getLegendData();
 	}
 	
+	public ObservableList<GlobalParameterGui> getGlobals() {
+		return globals;
+	}
+	public void addGlobal(GlobalParameterGui glob) {
+		globals.add(glob);
+	}
+	public void removeGlobal(GlobalParameterGui glob) {
+		globals.remove(glob);
+	}
+	public void addOriginalGlobal(GlobalParameterGui glob) {
+		originalGlobals.add(glob);
+		globals.add(glob);
+	}
+	
+	public void deleteStep(WorkflowGuiStep step) {
+		guiSteps.remove(step);
+		refresh();
+		step.deleteStep();
+		toolLegend.removeTool(step.getToolName());
+	}
+	
 	public WorkflowGuiStep addStep(ToolInformation toolInfo, String stepId) {
 		if ((stepId == null) || stepId.isEmpty()) {
 			stepId = getNextUniqueStepId();
 		}
 		WorkflowGuiStep step = new WorkflowGuiStep(toolInfo, stepId);
 		guiSteps.add(step);
+		refresh();
 		return step;
 	}
 	
 	public void addStep(Step step, ToolInformation toolInfo) throws PladipusReportableException {
 		WorkflowGuiStep guiStep = new WorkflowGuiStep(toolInfo, step);
-		guiStep.validate();
 		guiSteps.add(guiStep);
+	}
+	
+	public void initLinks() {
+		for (WorkflowGuiStep step: guiSteps) {
+			checkStepLinks(step);
+		}
+	}
+	
+	public void arrangeIcons(double width, double height) {
+		// TODO
 	}
 	
 	public Set<WorkflowGuiStep> getGuiSteps() {
@@ -71,20 +105,113 @@ public class WorkflowGui {
 		step.initIcon(size, ToolColors.getColor(toolLegend.addTool(step.getToolName())));
 	}
 	
-	public Color getStepColor(String stepId) {
-		for (WorkflowGuiStep guiStep: guiSteps) {
-			if (guiStep.getStepId().equals(stepId)) {
-				int colorId = toolLegend.getToolColorId(guiStep.getToolName());
-				if (colorId > -1) return ToolColors.getColor(colorId);
-			}
+	public boolean changesMade() {
+		return changed || globalsChanged();
+	}
+	public void wfChanged() {
+		changed = true;
+	}
+	public boolean globalsChanged() {
+		for (GlobalParameterGui gpg: globals) {
+			if (gpg.valueChanged()) return true;
 		}
-		return null;
+		if (globals.size() != originalGlobals.size()) return true;
+		if (!globals.containsAll(originalGlobals)) return true;
+		return false;
+	}
+	public void refresh() {
+		wfChanged();
+		for (WorkflowGuiStep step: guiSteps) {
+			step.checkSubs();
+			checkGlobals(step);
+			checkDefaults(step);
+			checkStepLinks(step);
+		}
+		removeDeadLinks();
+		validIcons();
 	}
 	
-	public boolean changesMade() {
-		return changed;
+	private void checkStepLinks(WorkflowGuiStep step) {
+		for (String stepId: step.getStepLinkNoOutputs()) {
+			WorkflowGuiStep outStep = getStepById(stepId);
+			if (outStep == null) {
+				step.removeStepLinkNoOutput(stepId);
+			} else if (!linkExists(outStep, step)){
+				links.add(new StepLink(outStep, step));
+			}
+		}
+		for (String stepId: step.getSubStepOutputs().keySet()) {
+			WorkflowGuiStep outStep = getStepById(stepId);
+			if (outStep == null) {
+				step.setInvalidSub(true);
+			} else {
+				boolean validLink = false;
+				for (String output: step.getSubStepOutputs().get(stepId)) {
+					if (!outStep.getToolInfo().getOutputs().contains(output)) {
+						step.setInvalidSub(true);
+					} else {
+						validLink = true;
+					}
+				}
+				if (validLink) {
+					if (!linkExists(outStep, step)) {
+						links.add(new StepLink(outStep, step));
+					}
+				}
+			}
+		}
 	}
-    
+	private void checkGlobals(WorkflowGuiStep step) {
+		if (!step.isInvalidSub()) {
+			for (String subGlob: step.getSubGlobals()) {
+				boolean valid = false;
+				for (GlobalParameterGui global: globals) {
+					if (global.getGlobalName().equalsIgnoreCase(subGlob)) {
+						valid = true;
+						break;
+					}
+				}
+				if (!valid) {
+					step.setInvalidSub(true);
+					return;
+				}
+			}
+		}
+	}
+	private void checkDefaults(WorkflowGuiStep step) {
+		if (!step.isInvalidSub()) {
+			for (String def: step.getSubDefaults()) {
+				boolean valid = false;
+				for (DefaultGui userDef: userDefaults) {
+					if (userDef.getName().equalsIgnoreCase(def)) {
+						valid = true;
+						break;
+					}
+				}
+				if (!valid) {
+					step.setInvalidSub(true);
+					return;
+				}
+			}
+		}
+	}
+	private void removeDeadLinks() {
+		Iterator<StepLink> iter = links.iterator();
+		while (iter.hasNext()) {
+			StepLink link = iter.next();
+			if (!(guiSteps.contains(link.getStartStep()) && guiSteps.contains(link.getEndStep()) 
+					&& (link.getEndStep().getSubStepOutputs().keySet().contains(link.getStartStep().getStepId()) 
+						|| link.getEndStep().getStepLinkNoOutputs().contains(link.getStartStep().getStepId())))) {
+				iter.remove();
+			}
+		}
+	}
+	private void validIcons() {
+		for (WorkflowGuiStep step: guiSteps) {
+			step.setIconComplete();
+		}
+	}
+
     public void setDrawingLink(StepLink drawingLink) {
     	this.drawingLink = drawingLink;
     	if (drawingLink == null) {
@@ -118,6 +245,7 @@ public class WorkflowGui {
     public boolean finaliseDrawingLink() {
     	boolean exists = true;
     	if (drawingLink != null) {
+    		drawingLink.getStartStep().getIcon().highlightOutCircle(false);
     		exists = linkExists(drawingLink);
     		if (!exists) {
     			links.add(drawingLink);
@@ -135,12 +263,24 @@ public class WorkflowGui {
     	}
     	return false;
     }
+    private boolean linkExists(WorkflowGuiStep start, WorkflowGuiStep end) {
+    	for (StepLink exist: links) {
+    		if (exist.getStartStep() == start && exist.getEndStep() == end) return true;
+    	}
+    	return false;
+    }
     
     public boolean stepIdExists(String id) {
     	for (WorkflowGuiStep step: guiSteps) {
-    		if (step.getStepId().equals(id)) return true;
+    		if (step.getStepId().equalsIgnoreCase(id)) return true;
     	}
     	return false;
+    }
+    private WorkflowGuiStep getStepById(String id) {
+    	for (WorkflowGuiStep step: guiSteps) {
+    		if (step.getStepId().equalsIgnoreCase(id)) return step;
+    	}
+    	return null;
     }
     
     private String getNextUniqueStepId() {
@@ -150,6 +290,10 @@ public class WorkflowGui {
     		stepIdDefault++;
     	} while (stepIdExists(id));
     	return id;
+    }
+    
+    public ObservableList<StepLink> getLinks() {
+    	return links;
     }
     
     public Set<StepLink> getLinksToStep(WorkflowGuiStep endStep) {
@@ -190,4 +334,52 @@ public class WorkflowGui {
     public ObjectProperty<WorkflowGuiStep> selectedStepProperty() {
     	return selectedStep;
     }
+    public Workflow toWorkflow() {
+    	refresh();
+    	Workflow wf = new Workflow();
+    	wf.setName(workflowName);
+    	for (GlobalParameterGui global: globals) {
+    		Parameter globalParam = new Parameter();
+    		globalParam.setName(global.getGlobalName());
+    		if (!global.isPerRun()) {
+    			for (String value: global.getValues()) {
+    				globalParam.getValue().add(value);
+    			}
+    		}
+    		wf.getGlobal().getParameters().getParameter().add(globalParam);
+    	}
+    	for (WorkflowGuiStep wgStep: guiSteps) {
+    		if (wf.getSteps() == null) {
+    			wf.setSteps(new Steps());
+    		}
+    		wf.getSteps().getStep().add(wgStep.toStep());
+    	}
+    	for (WorkflowGuiStep wgStep: guiSteps) {
+    		if (!wgStep.getStepLinkNoOutputs().isEmpty()) {
+    			Step depStep = wf.getSteps().getStepMap().get(wgStep.getStepId());
+    			Set<Step> prereqs = new HashSet<Step>();
+    			for (String preStepId: wgStep.getStepLinkNoOutputs()) {
+    				prereqs.add(wf.getSteps().getStepMap().get(preStepId));
+    			}
+    			depStep.setRunAfter(prereqs);
+    		}
+    	}
+    	return wf;
+    }
+
+	public void setDefaults(ObservableList<DefaultGui> userDefaults) {
+		this.userDefaults = userDefaults;
+	}
+	
+	public boolean isValid() {
+		refresh();
+		if (workflowName == null || workflowName.isEmpty()) return false;
+		for (WorkflowGuiStep step: guiSteps) {
+			if (!step.isComplete()) return false;
+		}
+		for (GlobalParameterGui global: globals) {
+			if (!global.isValid()) return false;
+		}
+		return true;
+	}
 }

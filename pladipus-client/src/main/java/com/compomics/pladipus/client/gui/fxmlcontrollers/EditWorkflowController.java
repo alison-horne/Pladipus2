@@ -48,7 +48,7 @@ public class EditWorkflowController extends FxmlController {
 	
 	@FXML
 	public void handleEdit() {
-		nextScene(PladipusScene.WORKFLOW, guiControl.getWorkflow(choiceBox.getValue().getName()), false);
+		nextScene(PladipusScene.WORKFLOW, false, guiControl.getWorkflow(choiceBox.getValue().getName()));
 	}
 	
 	@FXML

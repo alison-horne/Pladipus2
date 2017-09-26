@@ -30,10 +30,17 @@
                      <children>
                         <Label fx:id="stepIdLabel" alignment="CENTER" />
                         <Pane HBox.hgrow="SOMETIMES" />
+                        <Button mnemonicParsing="false" onAction="#handleRename" text="%stepparam.renameBtn" />
                         <Button mnemonicParsing="false" onAction="#handleDelete" text="%stepparam.deleteBtn" />
                      </children>
                   </HBox>
-                  <Label fx:id="toolLabel" alignment="CENTER" />
+                  <HBox spacing="20" alignment="CENTER">
+                  	 <children>
+                  	  	<Label fx:id="toolLabel" alignment="CENTER" />
+                  	  	<Pane HBox.hgrow="SOMETIMES" />
+                        <Button fx:id="removeLinkBtn" mnemonicParsing="false" onAction="#handleRemoveLinks" text="%stepparam.removeLinksBtn" />
+                  	 </children>
+                  </HBox>
                </children>
             </VBox>
             <TreeTableView fx:id="paramTable" style="-fx-fixed-cell-size: 40.0;" prefWidth="560.0" GridPane.rowIndex="1">

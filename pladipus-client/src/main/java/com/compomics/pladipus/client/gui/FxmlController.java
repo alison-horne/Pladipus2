@@ -21,9 +21,6 @@ public abstract class FxmlController {
 	protected void nextScene(PladipusScene scene, boolean newStage) {
 		sceneControl.openScene(scene, newStage ? null : stage);
 	}
-	protected void nextScene(PladipusScene scene, Object object, boolean newStage) {
-		nextScene(scene, newStage, object);
-	}
 	protected void nextScene(PladipusScene scene, boolean newStage, Object...objects) {
 		sceneControl.openOwnedScene(scene, newStage ? null : stage, newStage ? stage : null, objects);
 	}
@@ -41,6 +38,9 @@ public abstract class FxmlController {
 	}
 	protected boolean alert(String text) {
 		return guiControl.showAlert(text, stage);
+	}
+	protected void infoAlert(String text) {
+		guiControl.infoAlert(text, stage);
 	}
 	protected String customAlert(String text, String[] buttons) {
 		return guiControl.customAlert(text, stage, buttons);

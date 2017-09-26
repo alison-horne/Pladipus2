@@ -15,6 +15,7 @@ public interface GuiControl {
 	public void showError(String errorMsg, Stage stage);
 	public boolean showAlert(String text, Stage stage);
 	public String customAlert(String text, Stage stage, String[] buttons);
+	public void infoAlert(String text, Stage stage);
 	public void login(String username, String password) throws PladipusReportableException;
 	public void logout();
 	public String getUserName();
@@ -27,7 +28,9 @@ public interface GuiControl {
 	public Workflow getWorkflow(String name);
 	public Workflow getWorkflowFromFilePath(String path) throws PladipusReportableException;
 	public Workflow getWorkflowFromXml(String xml) throws PladipusReportableException;
+	public void saveWorkflow(Workflow workflow) throws PladipusReportableException;
 	public File getCsvFile(Stage stage);
 	public File getXmlFile(Stage stage);
+	public String getFileDirPath(Stage stage);
 	public String getText(Stage stage, String header, String original);
 }

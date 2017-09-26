@@ -126,7 +126,7 @@ public class NewWorkflowController extends FxmlController {
 	    			}
 	    		}
 	    	}
-	    	nextScene(PladipusScene.WORKFLOW, wf, false);
+	    	nextScene(PladipusScene.WORKFLOW, false, wf);
     	} catch (PladipusReportableException e) {
     		error(resources.getString("newworkflow.fileReadError") + "\n" + e.getMessage());
     	}

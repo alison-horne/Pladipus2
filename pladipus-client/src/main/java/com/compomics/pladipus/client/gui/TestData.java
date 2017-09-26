@@ -7,6 +7,7 @@ import com.compomics.pladipus.client.gui.model.BatchOverview;
 import com.compomics.pladipus.client.gui.model.DefaultGui;
 import com.compomics.pladipus.client.gui.model.WorkflowOverview;
 import com.compomics.pladipus.model.core.ToolInformation;
+import com.compomics.pladipus.model.parameters.InputParameter;
 import com.compomics.pladipus.model.persist.Workflow;
 
 public class TestData {
@@ -94,6 +95,33 @@ public class TestData {
 	}
 	
 	private static void initTools() {
+		InputParameter mandNoDef1 = new InputParameter("mand1", "Describe mand1", true);
+		InputParameter mandNoDef2 = new InputParameter("mand2", "Describe mand2", true);
+		InputParameter mandWithDef1 = new InputParameter("mand3", "Describe mand3", true, "mand3Default");
+		InputParameter mandWithDef2 = new InputParameter("mand4", "Describe mand4", true, "mand4Default");
+		InputParameter optNoDef1 = new InputParameter("opt1", "Describe opt1", false);
+		InputParameter optNoDef2 = new InputParameter("opt2", "Describe opt2", false);
+		InputParameter optWithDef1 = new InputParameter("opt3", "Describe opt3", false, "opt3Default");
+		InputParameter optWithDef2 = new InputParameter("opt4", "Describe opt4", false, "opt4Default");
+		Set<InputParameter> paramSet = new HashSet<InputParameter>() {{
+			  add(mandNoDef1); add(mandNoDef2); add(mandWithDef1); add(mandWithDef2);
+			  add(optNoDef1); add(optNoDef2); add(optWithDef1); add(optWithDef2);
+			}};
+		String out1 = "output1";
+		String out2 = "output2";
+		Set<String> toolOutputs = new HashSet<String>() {{
+			add(out1); add(out2);
+		}};
+		TOOL1.setParameters(paramSet);
+		TOOL2.setParameters(paramSet);
+		TOOL3.setParameters(paramSet);
+		TOOL4.setParameters(paramSet);
+		TOOL5.setParameters(paramSet);
+		TOOL1.setOutputs(toolOutputs);
+		TOOL2.setOutputs(toolOutputs);
+		TOOL3.setOutputs(toolOutputs);
+		TOOL4.setOutputs(toolOutputs);
+		TOOL5.setOutputs(toolOutputs);
 		TOOLS.add(TOOL1);
 		TOOLS.add(TOOL2);
 		TOOLS.add(TOOL3);

@@ -15,9 +15,11 @@ public class StepLink {
 	private Line line;
 	private Polygon arrow;
 	private Rotate rotate;
+	private boolean drawn = false;
 	
 	public StepLink(WorkflowGuiStep startStep) {
 		this.startStep = startStep;
+		drawn = true;
 		initLink();
 	}
 	
@@ -132,5 +134,9 @@ public class StepLink {
 	public void toFront() {
 		line.toFront();
 		arrow.toFront();
+	}
+	
+	public boolean isDrawn() {
+		return drawn;
 	}
 }
