@@ -259,7 +259,7 @@ public class WorkflowController extends FxmlController {
     
     public void arrangeIcons() {
     	infoAlert("workflowEdit");
-    	workflowGui.arrangeIcons(canvasPane.getBoundsInLocal().getWidth(), canvasPane.getBoundsInLocal().getHeight());
+    	workflowGui.arrangeIcons(canvasPane.getBoundsInLocal().getWidth(), canvasPane.getBoundsInLocal().getHeight(), getIconSize());
     }
     
     private void initWorkflowGui() throws PladipusReportableException {

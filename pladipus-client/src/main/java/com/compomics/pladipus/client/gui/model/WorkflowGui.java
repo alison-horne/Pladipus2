@@ -1,9 +1,11 @@
 package com.compomics.pladipus.client.gui.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -93,8 +95,54 @@ public class WorkflowGui {
 		}
 	}
 	
-	public void arrangeIcons(double width, double height) {
-		// TODO
+	public void arrangeIcons(double width, double height, double iconSize) {
+		Map<Integer, Set<WorkflowGuiStep>> rankMap = getRanks();
+		if (rankMap.isEmpty()) {
+			setupCircle(width, height, iconSize);
+		} else {
+			setupRanks(width, height, iconSize, rankMap);
+		}
+	}
+	
+	private void setupCircle(double width, double height, double iconSize) {
+		double xcenter = (width - iconSize) / 2;
+		double xradius = (width - (3 * iconSize)) / 2;
+		double ycenter = (height - iconSize) / 2;
+		double yradius = (height - (3 * iconSize)) / 2;
+		double angleInc = Math.PI * 2 / guiSteps.size();
+		double angle = 0;
+		for (WorkflowGuiStep step: guiSteps) {
+			double xpos = xcenter - (xradius * Math.cos(angle));
+			double ypos = ycenter - (yradius * Math.sin(angle));
+			step.getIcon().setInitPosition(xpos, ypos);
+			angle += angleInc;
+		}
+	}
+	
+	private void setupRanks(double width, double height, double iconSize, Map<Integer, Set<WorkflowGuiStep>> rankMap) {
+		double xmin = iconSize;
+		double xmax = width - (2 * iconSize);
+		double ymin = iconSize;
+		double ymax = height - (2 * iconSize);
+		double xdiff = xmax - xmin;
+		if (rankMap.size() > 1) xdiff /= (rankMap.size() - 1);
+		for (int rank: rankMap.keySet()) {
+			double xpos = xmin + (rank * xdiff);
+			Set<WorkflowGuiStep> steps = rankMap.get(rank);
+			if (steps != null && !steps.isEmpty()) {
+				double ypos = ymin;
+				double ydiff = 0;
+				if (steps.size() == 1) {
+					ypos = (ymax - ymin) / 2;
+				} else {
+					ydiff = (ymax - ymin) / (steps.size() - 1);
+				}
+				for (WorkflowGuiStep step: steps) {
+					step.getIcon().setInitPosition(xpos, ypos);
+					ypos += ydiff;
+				}
+			}
+		}
 	}
 	
 	public Set<WorkflowGuiStep> getGuiSteps() {
@@ -381,5 +429,52 @@ public class WorkflowGui {
 			if (!global.isValid()) return false;
 		}
 		return true;
+	}
+	
+	private Map<Integer, Set<WorkflowGuiStep>> getRanks() {
+		Set<WorkflowGuiStep> checked = new HashSet<WorkflowGuiStep>();
+		checked.addAll(guiSteps);
+		int loops = checked.size();
+		boolean invalid = false;
+		while (!checked.isEmpty() && loops > 0) {
+			loops--;
+			invalid = false;
+			Iterator<WorkflowGuiStep> iter = checked.iterator();
+			while (iter.hasNext()) {
+				WorkflowGuiStep step = iter.next();
+				if (step.allPrereqStepIds().isEmpty()) {
+					step.setRank(0);
+					iter.remove();
+				} else {
+					int max = -1;
+					for (String id: step.allPrereqStepIds()) {
+						WorkflowGuiStep prereq = getStepById(id);
+						if (prereq != null) {
+							int prRank = prereq.getRank();
+							if (prRank < 0) {
+								invalid = true;
+								break;
+							}
+							if (prRank > max) max = prRank;
+						}
+					}
+					if (max > -1) {
+						step.setRank(max + 1);
+						iter.remove();
+					}
+				}
+			}
+		}
+		Map<Integer, Set<WorkflowGuiStep>> rankMap = new HashMap<Integer, Set<WorkflowGuiStep>>();
+		if (!invalid) {
+			for (WorkflowGuiStep step: guiSteps) {
+				int rank = step.getRank();
+				Set<WorkflowGuiStep> stepsWithRank = rankMap.get(rank);
+				if (stepsWithRank == null) stepsWithRank = new HashSet<WorkflowGuiStep>();
+				stepsWithRank.add(step);
+				rankMap.put(rank, stepsWithRank);
+			}
+		}
+		return rankMap;
 	}
 }

@@ -28,6 +28,7 @@ public class WorkflowGuiStep {
 	private Set<String> stepLinkNoOutputs = new HashSet<String>();
 	private boolean invalidSub = false;
 	private BooleanProperty deleted = new SimpleBooleanProperty(false);
+	private int startRank = -1;
 	
 	public WorkflowGuiStep(ToolInformation toolInfo, String stepId) {
 		this.toolInfo = toolInfo;
@@ -82,6 +83,12 @@ public class WorkflowGuiStep {
 	}
 	public void clearStepLinkNoOutput() {
 		stepLinkNoOutputs.clear();
+	}
+	public Set<String> allPrereqStepIds() {
+		Set<String> allIds = new HashSet<String>();
+		allIds.addAll(stepLinkNoOutputs);
+		allIds.addAll(subStepOutputs.keySet());
+		return allIds;
 	}
 	
 	public void checkSubs() {
@@ -237,5 +244,12 @@ public class WorkflowGuiStep {
 			s.getParameters().getParameter().add(p);
 		}
 		return s;
+	}
+	
+	public void setRank(int rank) {
+		this.startRank = rank;
+	}
+	public int getRank() {
+		return startRank;
 	}
 }
