@@ -12,6 +12,7 @@ import com.compomics.pladipus.client.BatchCsvIO;
 import com.compomics.pladipus.client.queue.MessageSender;
 import com.compomics.pladipus.model.queue.messages.client.ClientTask;
 import com.compomics.pladipus.model.queue.messages.client.ClientToControlMessage;
+import com.compomics.pladipus.model.queue.messages.client.ControlToClientMessage;
 import com.compomics.pladipus.shared.PladipusMessages;
 import com.compomics.pladipus.shared.PladipusReportableException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -134,7 +135,21 @@ public class CliTaskProcessorImpl implements CliTaskProcessor {
 	}
 	
 	private String makeRequest(ClientToControlMessage msg) throws PladipusReportableException {
-		return messageSender.makeRequest(msg);
+		ControlToClientMessage responseMessage = messageSender.makeRequest(msg);
+    	checkResponseStatus(responseMessage);
+    	return responseMessage.getContent();
 	}
 	
+	private void checkResponseStatus(ControlToClientMessage msg) throws PladipusReportableException {
+		switch (msg.getStatus()) {
+			case ERROR:
+				throw new PladipusReportableException(msg.getErrorMsg());
+			case NO_LOGIN:
+				throw new PladipusReportableException(exceptionMessages.getMessage("clierror.login"));
+			case OK:
+				return;
+			case TIMEOUT:
+				throw new PladipusReportableException(exceptionMessages.getMessage("clierror.timeout"));
+		}	
+	}
 }

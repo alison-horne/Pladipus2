@@ -72,6 +72,7 @@ public class DashboardController extends FxmlController {
     @FXML
     public void logoutConfirm() {
     	if (alert("logout")) {
+    		sceneControl.logout();
     		guiControl.logout();
     	    nextScene(PladipusScene.LOGIN, false);
     	}

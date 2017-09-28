@@ -1,7 +1,9 @@
 package com.compomics.pladipus.client.gui.impl;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -39,12 +41,21 @@ public class SceneControlImpl implements SceneControl {
 	private static final String PLADIPUS_ICON = "images/pladipus_icon.gif";
 	
 	private Stage primaryStage;
+	private Set<Stage> openedStages = new HashSet<Stage>();
 	
 	@Override
 	public void openScene(PladipusScene scene, Stage stage, Object... initObjects) {
 		openOwnedScene(scene, stage, null, initObjects);
 	}
 	
+	@Override
+	public void logout() {
+		for (Stage stage: openedStages) {
+			stage.close();
+		}
+		openedStages.clear();
+	}
+
 	@Override
 	public void openOwnedScene(PladipusScene scene, Stage stage, Stage owner, Object... initObjects) {
 		if (owner == null) owner = primaryStage;
@@ -86,6 +97,7 @@ public class SceneControlImpl implements SceneControl {
 	private Stage getNewStage() {
 		Stage stage = new Stage();
 		initStage(stage);
+		openedStages.add(stage);
 		return stage;
 	}
 

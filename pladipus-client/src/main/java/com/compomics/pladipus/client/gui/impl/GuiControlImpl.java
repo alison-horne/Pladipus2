@@ -98,13 +98,12 @@ public class GuiControlImpl implements GuiControl {
 	@Override
 	public void login(String username, String password) throws PladipusReportableException {
 		userControl.login(username, password);
+		initialize();
 	}
 	
 	@Override
 	public void logout() {
-		// TODO Stop any current messages.  send logout message?  Clear other lists...
 		userControl.logout();
-		userWorkflowControl.logout();
 	}
 	
 	@Override
@@ -175,5 +174,9 @@ public class GuiControlImpl implements GuiControl {
 	@Override
 	public void addDefault(DefaultGui def) throws PladipusReportableException {
 		defaultControl.addDefault(def);
+	}
+	
+	private void initialize() {
+		// TODO
 	}
 }

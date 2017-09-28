@@ -19,11 +19,12 @@
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
         </columnConstraints>
         <rowConstraints>
-          <RowConstraints minHeight="10.0" percentHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" percentHeight="40.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" percentHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" percentHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" percentHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" percentHeight="20.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" percentHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" percentHeight="10.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" percentHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" percentHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" percentHeight="10.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
             <Label text="%login.header" GridPane.halignment="CENTER" />
@@ -43,17 +44,10 @@
                   <PasswordField fx:id="passwordField" GridPane.columnIndex="1" GridPane.rowIndex="1" onKeyPressed="#enterListener"/>                  
                </children>
             </GridPane>
-            <ButtonBar prefHeight="40.0" prefWidth="172.0" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
-              <buttons>
-                <Button fx:id="loginButton" mnemonicParsing="false" onAction="#handleLogin" text="%login.login" />
-                  <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#handleCancel" text="%login.cancel" />
-              </buttons>
-               <GridPane.margin>
-                  <Insets />
-               </GridPane.margin>
-            </ButtonBar>
-            <Hyperlink onAction="#handleCreate" text="%login.create" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
-            <Hyperlink onAction="#handleForgot" text="%login.forgot" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
+            <Label fx:id="loginWaitLabel" text="" GridPane.halignment="CENTER" GridPane.rowIndex="2"/>
+            <Button fx:id="loginButton" mnemonicParsing="false" onAction="#handleLogin" text="%login.login" GridPane.halignment="CENTER" GridPane.rowIndex="3"/>
+            <Hyperlink onAction="#handleCreate" text="%login.create" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
+            <Hyperlink onAction="#handleForgot" text="%login.forgot" GridPane.halignment="CENTER" GridPane.rowIndex="5" />
          </children>
       </GridPane>
    </children>

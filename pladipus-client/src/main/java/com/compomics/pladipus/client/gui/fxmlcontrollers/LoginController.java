@@ -6,17 +6,17 @@ import com.compomics.pladipus.client.gui.FxmlController;
 import com.compomics.pladipus.client.gui.model.PladipusScene;
 import com.compomics.pladipus.shared.PladipusReportableException;
 
+import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 public class LoginController extends FxmlController {
-	
-	// TODO issues with login screen...disabling of buttons while logging in.  Alert disappearing instantly if click done before alert appears
-	// Allow cancel after login button hit but before return from control
 
 	@FXML
 	private TextField usernameField;
@@ -25,7 +25,7 @@ public class LoginController extends FxmlController {
 	@FXML
 	private Button loginButton;
 	@FXML
-	private Button cancelButton;
+	private Label loginWaitLabel;
     @FXML
     private ResourceBundle resources;
 	
@@ -34,27 +34,44 @@ public class LoginController extends FxmlController {
     
     @FXML
     public void handleLogin() {
+    	activeBtn(false);
     	String username = usernameField.getText();
     	String password = passwordField.getText();
     	
     	if ((username == null) || username.isEmpty()) {
-    		error(resources.getString("login.noUsername"));
+    		loginError(resources.getString("login.noUsername"));
     	} else if ((password == null) || password.isEmpty()) {
-    		error(resources.getString("login.noPassword"));
+    		loginError(resources.getString("login.noPassword"));
     	} else {
-    		try {
-	    		guiControl.login(username, password);
-	    		nextScene(PladipusScene.DASHBOARD, false);
-    		} catch (PladipusReportableException e) {
-    			error(e.getMessage());
-    			close();
-    		}
+			Task<String> loginTask = new Task<String>() {
+	            @Override protected String call() throws Exception {
+	            	try {
+	            		guiControl.login(username, password);
+	            	} catch (PladipusReportableException e) {
+	            		return e.getMessage();
+	            	}
+	                return null;
+	            }
+	        };
+		    loginTask.setOnSucceeded((WorkerStateEvent event) -> {
+		        if (loginTask.getValue() != null) {
+		        	loginError(loginTask.getValue());
+		        } else {
+		        	nextScene(PladipusScene.DASHBOARD, false);
+		        }
+		    });
+		    new Thread(loginTask).start();
     	}
     }
     
-    @FXML
-    public void handleCancel() {
-    	close();
+    private void loginError(String errorMsg) {
+    	error(errorMsg);
+    	activeBtn(true);
+    }
+    
+    private void activeBtn(boolean active) {
+    	loginWaitLabel.setText(active ? "" : resources.getString("login.wait"));
+    	loginButton.setDisable(!active);
     }
     
     @FXML

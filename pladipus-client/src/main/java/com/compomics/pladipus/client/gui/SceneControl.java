@@ -9,4 +9,5 @@ public interface SceneControl {
 	public void openOwnedScene(PladipusScene scene, Stage stage, Stage owner, Object... initObjects);
 	public void initPrimaryStage(Stage primaryStage);
 	public Object getOwnedSceneContent(PladipusScene scene, Stage owner, Object... initObjects);
+	public void logout();
 }
