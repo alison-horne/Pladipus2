@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Lazy;
 import com.compomics.pladipus.model.queue.messages.worker.WorkerTaskMessage;
 import com.compomics.pladipus.worker.QueueProcessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 
 /**
  * Takes messages from the 'direct' ActiveMQ queue, and processes them.
@@ -35,7 +36,8 @@ public class WorkerDirectListener implements MessageListener {
 	public void onMessage(Message msg) {
 		if (msg instanceof TextMessage) {
 			try {
-				WorkerTaskMessage taskMsg = jsonMapper.readValue(((TextMessage) msg).getText(), WorkerTaskMessage.class);
+				ObjectReader reader = jsonMapper.readerFor(WorkerTaskMessage.class);
+				WorkerTaskMessage taskMsg = reader.readValue(((TextMessage) msg).getText());
 				switch (taskMsg.getTask()) {
 					case ABORT_ALL:
 						workerTaskQueueProcessor.cancelAll();

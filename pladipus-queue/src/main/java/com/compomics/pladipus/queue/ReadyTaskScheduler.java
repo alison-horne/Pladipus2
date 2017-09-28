@@ -101,7 +101,7 @@ public class ReadyTaskScheduler {
     				WorkerTaskMessage message = new WorkerTaskMessage();
     				message.setTask(WorkerDirectTask.ABORT_JOB);
     				message.setJobId(step.getRunStepId());
-    				workerDirectProducer.sendMessage(jsonMapper.writeValueAsString(message), workerId);
+    				workerDirectProducer.sendMessage(jsonMapper.writer().writeValueAsString(message), workerId);
     			}
     		}
     	}	

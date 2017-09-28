@@ -106,7 +106,7 @@ public class CliTaskProcessorImpl implements CliTaskProcessor {
 		batchCsvIO.checkFileValid(filepath, force);
 		ClientToControlMessage msg = new ClientToControlMessage(ClientTask.GENERATE_HEADERS);
 		msg.setWorkflowName(workflowName);
-		String headers = makeRequest(msg);
+		String headers = makeRequest(msg); System.out.println(headers);
 		try {
 			batchCsvIO.writeHeaderFile(filepath, jsonMapper.readValue(headers, new TypeReference<List<String>>() {}));
 		} catch (IOException e) {

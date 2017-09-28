@@ -14,6 +14,7 @@ import com.compomics.pladipus.model.queue.messages.client.ControlToClientMessage
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 
 public class ClientTaskProcessor extends Thread {
 	
@@ -38,8 +39,9 @@ public class ClientTaskProcessor extends Thread {
 		try {
 			clientId = msg.getStringProperty(MessageSelector.CLIENT_ID.name());
 			corrId = msg.getJMSCorrelationID(); // TODO if either of these is null, do not process, just log error.
-			ControlToClientMessage response = clientTaskMapper.doMessageTask(jsonMapper.readValue(msg.getText(), ClientToControlMessage.class), clientId);
-			clientProducer.sendMessage(jsonMapper.writeValueAsString(response), corrId, clientId);
+			ObjectReader reader = jsonMapper.readerFor(ClientToControlMessage.class);
+			ControlToClientMessage response = clientTaskMapper.doMessageTask(reader.readValue(msg.getText()), clientId);
+			clientProducer.sendMessage(jsonMapper.writer().writeValueAsString(response), corrId, clientId);
 		} catch (JMSException e) {
 			// TODO log error, leave client to timeout
 		} catch (JsonParseException e) {

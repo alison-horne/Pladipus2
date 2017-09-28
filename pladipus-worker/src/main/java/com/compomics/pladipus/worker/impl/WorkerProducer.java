@@ -61,7 +61,7 @@ public class WorkerProducer implements MessageProducer {
 	
 	private void sendMessage(WorkerToControlMessage msg) {
 		try {
-			sendMessage(jsonMapper.writeValueAsString(msg));
+			sendMessage(jsonMapper.writer().writeValueAsString(msg));
 		} catch (JsonProcessingException e) {
 			// TODO Retry? Ignore?
 			e.printStackTrace();

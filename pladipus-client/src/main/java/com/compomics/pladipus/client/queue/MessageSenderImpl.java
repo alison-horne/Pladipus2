@@ -13,6 +13,7 @@ import com.compomics.pladipus.model.queue.messages.client.ControlToClientMessage
 import com.compomics.pladipus.shared.PladipusMessages;
 import com.compomics.pladipus.shared.PladipusReportableException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 
 public class MessageSenderImpl implements MessageSender {
 	
@@ -32,13 +33,14 @@ public class MessageSenderImpl implements MessageSender {
 		ControlToClientMessage responseMessage;
 		try {
 			ExecutorService es = Executors.newSingleThreadExecutor();
-			Future<String> response = es.submit(beanFactory.getBean(MessageTask.class, jsonMapper.writeValueAsString(message)));
+			Future<String> response = es.submit(beanFactory.getBean(MessageTask.class, jsonMapper.writer().writeValueAsString(message)));
 			messageMap.addFuture(response);
 			String responseText = response.get();
 			messageMap.removeFuture(response);
 			es.shutdown();
 		    if ((responseText != null) && !responseText.isEmpty()) {
-		    	responseMessage = jsonMapper.readValue(responseText, ControlToClientMessage.class);
+		    	ObjectReader reader = jsonMapper.readerFor(ControlToClientMessage.class);
+		    	responseMessage = reader.readValue(responseText);
 		    } else {
 			    responseMessage = new ControlToClientMessage();
 			    responseMessage.setStatus(ClientTaskStatus.TIMEOUT);

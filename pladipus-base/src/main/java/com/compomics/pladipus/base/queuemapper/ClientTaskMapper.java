@@ -108,7 +108,7 @@ public class ClientTaskMapper {
 	private void mapOutput(ControlToClientMessage response, Object output) throws PladipusReportableException {
 		if (output != null) {
 			try {
-				response.setContent(jsonMapper.writeValueAsString(output));
+				response.setContent(jsonMapper.writer().writeValueAsString(output));
 			} catch (JsonProcessingException e) {
 				throw new PladipusReportableException(exceptionMessages.getMessage("base.mapOutput"));
 			}

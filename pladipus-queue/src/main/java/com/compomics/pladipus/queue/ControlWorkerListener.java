@@ -16,6 +16,7 @@ import com.compomics.pladipus.shared.PladipusReportableException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 
 public class ControlWorkerListener implements MessageListener {
 
@@ -31,7 +32,8 @@ public class ControlWorkerListener implements MessageListener {
 			TextMessage message = (TextMessage)msg;
 			WorkerToControlMessage task;
 			try {
-				task = jsonMapper.readValue(message.getText(), WorkerToControlMessage.class);
+				ObjectReader reader = jsonMapper.readerFor(WorkerToControlMessage.class);
+				task = reader.readValue(message.getText());
 				String workerId = msg.getStringProperty(MessageSelector.WORKER_ID.toString());
 				workerResponseMapper.doResponseProcess(task, workerId);
 			} catch (JsonParseException e) {
