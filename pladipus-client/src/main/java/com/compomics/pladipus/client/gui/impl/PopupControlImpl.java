@@ -105,13 +105,16 @@ public class PopupControlImpl implements PopupControl {
 	
 	@Override
 	public File fileOrDirectoryBrowse(Stage stage) {
-		ButtonType fileBtn = new ButtonType(resources.getString("popup.fileBtn"));
-		ButtonType dirBtn = new ButtonType(resources.getString("popup.dirBtn"));
-		if (doAlert("fileOrDir", stage, new ButtonType[]{fileBtn, dirBtn}) == fileBtn) {
+		String fileBtn = resources.getString("popup.fileBtn");
+		String dirBtn = resources.getString("popup.dirBtn");
+		String cancelBtn = resources.getString("popup.cancelBtn");
+		String result = doAlertCustom("fileOrDir", stage, new String[]{fileBtn, dirBtn, cancelBtn});
+		if (result.equals(fileBtn)) {
 			return fileBrowse(stage, null);
-		} else {
+		} else if (result.equals(dirBtn)) {
 			return directoryBrowse(stage);
 		}
+		return null;
 	}
 
 	@Override

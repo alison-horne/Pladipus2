@@ -2,6 +2,7 @@ package com.compomics.pladipus.client.gui.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -163,7 +164,15 @@ public class GuiControlImpl implements GuiControl {
 	@Override
 	public void saveWorkflow(Workflow workflow) throws PladipusReportableException {
 		workflow.setTemplateXml(workflowXMLHelper.objectToXML(workflow));
-		userWorkflowControl.saveWorkflow(workflow);
+		ClientToControlMessage msg = new ClientToControlMessage(ClientTask.REPLACE_WORKFLOW);
+		msg.setFileContent(workflow.getTemplateXml());
+		String headerList = sendMessage(msg, 3);
+		ObjectReader reader = jsonMapper.readerFor(List.class);
+		try {
+			userWorkflowControl.saveWorkflow(workflow, reader.readValue(headerList));
+		} catch (IOException e) {
+			throw new PladipusReportableException(resources.getString("popup.noLogin") + "\n" + e.getMessage());
+		}
 	}
 
 	@Override

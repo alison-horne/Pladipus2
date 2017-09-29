@@ -1,5 +1,7 @@
 package com.compomics.pladipus.client.gui.impl;
 
+import java.util.List;
+
 import com.compomics.pladipus.client.gui.UserWorkflowControl;
 import com.compomics.pladipus.model.core.WorkflowOverview;
 import com.compomics.pladipus.model.persist.Workflow;
@@ -29,8 +31,7 @@ public class UserWorkflowControlImpl implements UserWorkflowControl {
     }
 
 	@Override
-	public void saveWorkflow(Workflow workflow) {
-		// TODO save workflow to db...force flag if wo exists
+	public void saveWorkflow(Workflow workflow, List<String> headers) {
 		WorkflowOverview wo = getWorkflowOverview(workflow.getName());
 		if (wo == null) {
 			wo = new WorkflowOverview(workflow.getName(), workflow.getTemplateXml());
@@ -38,6 +39,7 @@ public class UserWorkflowControlImpl implements UserWorkflowControl {
 		} else {
 			wo.setXml(workflow.getTemplateXml());
 		}
+		wo.setHeaders(headers);
 	}
 	
 	@Override

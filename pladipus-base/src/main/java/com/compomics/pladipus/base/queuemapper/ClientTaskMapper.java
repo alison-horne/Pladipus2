@@ -81,7 +81,7 @@ public class ClientTaskMapper {
 					doLogin(msg.getUsername(), msg.getPassword(), clientId);
 					break;
 				case REPLACE_WORKFLOW:
-					workflowControl.replaceWorkflow(msg.getFileContent(), getUser(clientId, msg.getUsername()));
+					mapOutput(response, batchControl.generateHeadersFromWorkflow(workflowControl.replaceWorkflow(msg.getFileContent(), getUser(clientId, msg.getUsername()))));
 					break;
 				case START_BATCH:
 					queueControl.process(msg.getBatchName(), getUser(clientId, msg.getUsername()));

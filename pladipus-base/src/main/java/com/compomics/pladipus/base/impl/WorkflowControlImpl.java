@@ -32,9 +32,10 @@ public class WorkflowControlImpl implements WorkflowControl {
 	}
 
 	@Override
-	public void replaceWorkflow(String content, User user) throws PladipusReportableException {
+	public Workflow replaceWorkflow(String content, User user) throws PladipusReportableException {
 		Workflow workflow = parseAndValidate(content, user);
 		workflowService.replaceWorkflow(workflow);
+		return workflow;
 	}
 	
 	@Override
