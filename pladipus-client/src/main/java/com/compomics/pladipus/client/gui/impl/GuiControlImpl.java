@@ -13,12 +13,19 @@ import com.compomics.pladipus.client.gui.PopupControl;
 import com.compomics.pladipus.client.gui.ToolControl;
 import com.compomics.pladipus.client.gui.UserControl;
 import com.compomics.pladipus.client.gui.UserWorkflowControl;
+import com.compomics.pladipus.client.queue.MessageSender;
 import com.compomics.pladipus.model.core.DefaultOverview;
+import com.compomics.pladipus.model.core.GuiSetup;
 import com.compomics.pladipus.model.core.WorkflowOverview;
 import com.compomics.pladipus.model.core.ToolInformation;
 import com.compomics.pladipus.model.persist.Workflow;
+import com.compomics.pladipus.model.queue.messages.client.ClientTask;
+import com.compomics.pladipus.model.queue.messages.client.ClientToControlMessage;
+import com.compomics.pladipus.model.queue.messages.client.ControlToClientMessage;
 import com.compomics.pladipus.shared.PladipusReportableException;
 import com.compomics.pladipus.shared.XMLHelper;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 
 import javafx.collections.ObservableList;
 import javafx.stage.Stage;
@@ -39,6 +46,10 @@ public class GuiControlImpl implements GuiControl {
 	private BatchCsvIO batchCsvIO;	
 	@Autowired
 	private XMLHelper<Workflow> workflowXMLHelper;
+	@Autowired
+	private MessageSender messageSender;
+	@Autowired
+	private ObjectMapper jsonMapper;
 	
 	private ResourceBundle resources = ResourceBundle.getBundle("guiTexts/popup");
 	
@@ -176,7 +187,41 @@ public class GuiControlImpl implements GuiControl {
 		defaultControl.addDefault(def);
 	}
 	
-	private void initialize() {
-		// TODO
+	private void initialize() throws PladipusReportableException {
+		ObjectReader reader = jsonMapper.readerFor(GuiSetup.class);
+		try {
+			GuiSetup setup = reader.readValue(sendMessage(new ClientToControlMessage(ClientTask.GUI_SETUP), 3));
+			for (DefaultOverview def: setup.getUserDefaults()) {
+				defaultControl.addDefault(def);
+			}
+			for (ToolInformation tool: setup.getTools()) {
+				toolControl.addTool(tool);
+			}
+			for (WorkflowOverview workflow: setup.getWorkflows()) {
+				userWorkflowControl.addWorkflow(workflow);
+			}
+		} catch (IOException e) {
+			throw new PladipusReportableException(resources.getString("popup.noLogin") + "\n" + e.getMessage());
+		}
+	}
+	
+	private String sendMessage(ClientToControlMessage msg, int retries) throws PladipusReportableException {
+		msg.setUsername(getUserName());
+		while (retries > 0) {
+			ControlToClientMessage response = messageSender.makeRequest(msg);
+			switch (response.getStatus()) {
+				case ERROR:
+					throw new PladipusReportableException(response.getErrorMsg());
+				case OK:
+					return response.getContent();
+				case TIMEOUT:
+					retries--;
+				case NO_LOGIN:
+					throw new PladipusReportableException(resources.getString("popup.noLogin"));
+				default:
+					break;
+			}
+		}
+		throw new PladipusReportableException(resources.getString("popup.requestTimeout"));
 	}
 }

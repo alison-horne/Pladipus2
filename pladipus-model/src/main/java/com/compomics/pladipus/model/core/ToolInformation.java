@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import com.compomics.pladipus.model.parameters.InputParameter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class ToolInformation {
 	private String toolName;
@@ -36,15 +37,19 @@ public class ToolInformation {
 	public void setOutputs(Set<String> outputs) {
 		this.outputs = outputs;
 	}
+	@JsonIgnore
 	public Set<InputParameter> getMandatoryParametersWithDefault() {
 		return filterParameters(ip -> (ip.isMandatory() && ip.hasDefaultValue()));
 	}
+	@JsonIgnore
 	public Set<InputParameter> getMandatoryParametersNoDefault() {
 		return filterParameters(ip -> (ip.isMandatory() && !ip.hasDefaultValue()));
 	}
+	@JsonIgnore
 	public Set<InputParameter> getOptionalParametersWithDefault() {
 		return filterParameters(ip -> (!ip.isMandatory() && ip.hasDefaultValue()));
 	}
+	@JsonIgnore
 	public Set<InputParameter> getOptionalParametersNoDefault() {
 		return filterParameters(ip -> (!ip.isMandatory() && !ip.hasDefaultValue()));
 	}
@@ -60,6 +65,7 @@ public class ToolInformation {
 		}
 		return filterParams;
 	}
+	@JsonIgnore
 	public InputParameter getParameterByName(String name) {
 		for (InputParameter param: parameters) {
 			if (param.getParamName().equalsIgnoreCase(name)) return param;

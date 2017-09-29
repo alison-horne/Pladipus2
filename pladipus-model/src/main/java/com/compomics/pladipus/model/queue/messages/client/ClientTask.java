@@ -11,5 +11,6 @@ public enum ClientTask {
 	RESTART_BATCH,
 	STATUS,
 	ADD_DEFAULT,
-	ABORT
+	ABORT,
+	GUI_SETUP
 }

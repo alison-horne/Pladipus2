@@ -1,5 +1,7 @@
 package com.compomics.pladipus.base.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
@@ -38,6 +40,11 @@ public class WorkflowControlImpl implements WorkflowControl {
 	@Override
 	public Workflow getNamedWorkflow(String name, User user) throws PladipusReportableException {
 		return workflowService.getActiveWorkflowByName(name, user);
+	}
+	
+	@Override
+	public List<Workflow> getActiveWorkflows(User user) throws PladipusReportableException {
+		return workflowService.getAllActiveWorkflowsForUser(user);
 	}
 	
 	private Workflow parseAndValidate(String content, User user) throws PladipusReportableException {

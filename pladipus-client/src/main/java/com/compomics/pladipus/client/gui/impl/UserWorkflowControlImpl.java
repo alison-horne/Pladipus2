@@ -10,13 +10,9 @@ import javafx.collections.ObservableList;
 
 public class UserWorkflowControlImpl implements UserWorkflowControl {
 	private ObservableList<WorkflowOverview> userWorkflows = FXCollections.observableArrayList();
-	private boolean loaded = false;
 	
 	@Override
 	public ObservableList<WorkflowOverview> getUserWorkflows() throws PladipusReportableException {
-		if (!loaded) {
-			loadWorkflows();
-		}
 		return userWorkflows;
 	}
 	
@@ -31,12 +27,6 @@ public class UserWorkflowControlImpl implements UserWorkflowControl {
     	}
     	return existing;
     }
-	
-	private void loadWorkflows() throws PladipusReportableException {
-		// TODO - get workflows from control
-//		userWorkflows.addAll(TestData.getWorkflows("test1"));
-		loaded = true;
-	}
 
 	@Override
 	public void saveWorkflow(Workflow workflow) {
@@ -48,5 +38,10 @@ public class UserWorkflowControlImpl implements UserWorkflowControl {
 		} else {
 			wo.setXml(workflow.getTemplateXml());
 		}
+	}
+	
+	@Override
+	public void addWorkflow(WorkflowOverview workflow) {
+		userWorkflows.add(workflow);
 	}
 }

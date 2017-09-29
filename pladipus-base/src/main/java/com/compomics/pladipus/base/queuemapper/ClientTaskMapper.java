@@ -1,5 +1,6 @@
 package com.compomics.pladipus.base.queuemapper;
 
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -8,15 +9,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.compomics.pladipus.base.BatchControl;
 import com.compomics.pladipus.base.DefaultsControl;
 import com.compomics.pladipus.base.QueueControl;
+import com.compomics.pladipus.base.ToolControl;
 import com.compomics.pladipus.base.UserControl;
 import com.compomics.pladipus.base.WorkflowControl;
+import com.compomics.pladipus.model.core.DefaultOverview;
+import com.compomics.pladipus.model.core.GuiSetup;
+import com.compomics.pladipus.model.core.ToolInformation;
+import com.compomics.pladipus.model.core.WorkflowOverview;
+import com.compomics.pladipus.model.persist.Default;
 import com.compomics.pladipus.model.persist.User;
+import com.compomics.pladipus.model.persist.Workflow;
 import com.compomics.pladipus.model.queue.LoginUser;
 import com.compomics.pladipus.model.queue.messages.client.ClientTaskStatus;
 import com.compomics.pladipus.model.queue.messages.client.ClientToControlMessage;
 import com.compomics.pladipus.model.queue.messages.client.ControlToClientMessage;
 import com.compomics.pladipus.shared.PladipusMessages;
 import com.compomics.pladipus.shared.PladipusReportableException;
+import com.compomics.pladipus.tools.core.ToolInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -38,6 +47,9 @@ public class ClientTaskMapper {
 	private DefaultsControl defaultsControl;
 	
 	@Autowired
+	private ToolControl toolControl;
+	
+	@Autowired
 	private ObjectMapper jsonMapper;
 	
 	@Autowired
@@ -45,10 +57,13 @@ public class ClientTaskMapper {
 	
 	private ConcurrentMap<String, LoginUser> clientLogins = new ConcurrentHashMap<String, LoginUser>();
 	
-	private User getUser(String clientId, String username) {
+	private LoginUser getLoginUser(String clientId, String username) {
 		LoginUser loggedIn = clientLogins.get(clientId);
-		if (loggedIn != null && loggedIn.getUser().getUserName().equalsIgnoreCase(username)) return loggedIn.getUser();
+		if (loggedIn != null && loggedIn.getUser().getUserName().equalsIgnoreCase(username)) return loggedIn;
 		throw new IllegalArgumentException();
+	}
+	private User getUser(String clientId, String username) {
+		return getLoginUser(clientId, username).getUser();
 	}
 	
 	private void doLogin(String username, String password, String clientId) throws PladipusReportableException {
@@ -92,6 +107,9 @@ public class ClientTaskMapper {
 				case STATUS:
 					// TODO
 					break;
+				case GUI_SETUP:
+					mapOutput(response, getGuiSetup(getLoginUser(clientId, msg.getUsername())));
+					break;
 				default:
 					break;
 			}
@@ -113,5 +131,22 @@ public class ClientTaskMapper {
 				throw new PladipusReportableException(exceptionMessages.getMessage("base.mapOutput"));
 			}
 		}
+	}
+	
+	private GuiSetup getGuiSetup(LoginUser user) throws PladipusReportableException {
+		GuiSetup setup = new GuiSetup();
+		for (Entry<String, ToolInfo> tool: toolControl.getAllToolInfo().entrySet()) {
+			setup.addTool(new ToolInformation(tool.getKey(), tool.getValue().getInputParams(), tool.getValue().getOutputs()));
+		}
+		for (Default def: defaultsControl.getDefaults(user.getUser())) {
+			setup.addDefault(new DefaultOverview(def.getName(), def.getValue(), def.getType(), (def.getUser()==null)));
+		}
+		for (Workflow wf: workflowControl.getActiveWorkflows(user.getUser())) {
+			WorkflowOverview wo = new WorkflowOverview(wf.getName(), wf.getTemplateXml());
+			wo.setHeaders(batchControl.generateHeadersFromWorkflow(wf));
+			setup.addWorkflow(wo);
+		}
+		user.setSetup(setup);
+		return setup;
 	}
 }

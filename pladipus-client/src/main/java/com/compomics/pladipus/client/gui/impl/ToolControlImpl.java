@@ -10,20 +10,10 @@ import javafx.collections.ObservableList;
 public class ToolControlImpl implements ToolControl {
 	
 	private ObservableList<ToolInformation> toolInfoList = FXCollections.observableArrayList();
-	private boolean loaded = false;
 
 	@Override
 	public ObservableList<ToolInformation> getToolInfoList() throws PladipusReportableException {
-		if (!loaded) {
-			loadToolList();
-		}
 		return toolInfoList;
-	}
-
-	private void loadToolList() throws PladipusReportableException {
-		// TODO get tools from controller
-//		toolInfoList.addAll(TestData.getTools());
-		loaded = true;
 	}
 	
 	@Override
@@ -36,5 +26,10 @@ public class ToolControlImpl implements ToolControl {
 			// TODO what if no tools?
 		}
 		return null;
+	}
+	
+	@Override
+	public void addTool(ToolInformation tool) {
+		toolInfoList.add(tool);
 	}
 }

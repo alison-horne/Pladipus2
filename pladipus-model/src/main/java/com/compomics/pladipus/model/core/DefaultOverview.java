@@ -1,6 +1,7 @@
 package com.compomics.pladipus.model.core;
 
 import com.compomics.pladipus.model.parameters.Substitution;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -14,7 +15,7 @@ public class DefaultOverview {
 	BooleanProperty global;
 	
 	public DefaultOverview() {
-		this(null, null, null, null);
+		this(null, null, null, false);
 	}
 	
 	public DefaultOverview(String name, String value, String type, Boolean global) {
@@ -73,7 +74,7 @@ public class DefaultOverview {
     public BooleanProperty globalProperty() {
         return global;
     }
-    
+    @JsonIgnore
 	public String getFullDefaultName() {
 		return Substitution.getPrefix() + Substitution.getDefault() + "." + name.get() + Substitution.getEnd();
 	}

@@ -43,9 +43,13 @@ public class BatchControlImpl implements BatchControl {
 
 	@Override
 	public List<String> generateHeaders(String workflowName, User user) throws PladipusReportableException {
-		List<String> headers = batchCsvParser.getHeaders(getNamedWorkflow(workflowName, user));
-		if (headers.size() < 2) {
-			// Only run ID present
+		return generateHeadersFromWorkflow(getNamedWorkflow(workflowName, user));
+	}
+	
+	@Override
+	public List<String> generateHeadersFromWorkflow(Workflow workflow) throws PladipusReportableException {
+		List<String> headers = batchCsvParser.getHeaders(workflow);
+		if (headers.isEmpty()) {
 			throw new PladipusReportableException(exceptionMessages.getMessage("batch.noHeaders"));
 		}
 		return headers;

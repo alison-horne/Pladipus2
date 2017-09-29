@@ -10,7 +10,6 @@ import javafx.collections.ObservableList;
 public class DefaultControlImpl implements DefaultControl {
 	private ObservableList<DefaultOverview> userDefaults = FXCollections.observableArrayList();
 	private ObservableList<String> defaultTypes = FXCollections.observableArrayList();
-	private boolean loaded = false;
 	
 	@Override
 	public void addDefault(DefaultOverview defGui) throws PladipusReportableException {
@@ -20,29 +19,12 @@ public class DefaultControlImpl implements DefaultControl {
 
 	@Override
 	public ObservableList<DefaultOverview> getUserDefaults() {
-		if (!loaded) {
-			loadDefaults();
-		}
 		return userDefaults;
 	}
 
 	@Override
 	public ObservableList<String> getDefaultTypes() {
-		if (!loaded) {
-			loadDefaults();
-		}
 		return defaultTypes;
-	}
-
-	@Override
-	public void logout() {
-		userDefaults.clear();
-		loaded = false;
-	}
-	
-	private void loadDefaults() {
-		// TODO get from control
-		loaded = true;
 	}
 	
 	private void addDefaultToLists(DefaultOverview def) {
