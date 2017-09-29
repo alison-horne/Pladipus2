@@ -3,6 +3,7 @@ package com.compomics.pladipus.client.gui.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.compomics.pladipus.model.core.DefaultOverview;
 import com.compomics.pladipus.model.parameters.Substitution;
 
 import javafx.collections.FXCollections;
@@ -11,15 +12,15 @@ import javafx.scene.paint.Color;
 
 public class GuiSubstitutions {
 	private ObservableList<GlobalParameterGui> globals;
-	private ObservableList<DefaultGui> defaults;
+	private ObservableList<DefaultOverview> defaults;
 	private ObservableList<StepOutput> stepOuts;
 	private Set<WorkflowGuiStep> steps;
 	
-	public GuiSubstitutions(ObservableList<DefaultGui> defaults) {
+	public GuiSubstitutions(ObservableList<DefaultOverview> defaults) {
 		this.defaults = defaults;
 	}
 	
-	public GuiSubstitutions(ObservableList<DefaultGui> defaults, ObservableList<GlobalParameterGui> globals) {
+	public GuiSubstitutions(ObservableList<DefaultOverview> defaults, ObservableList<GlobalParameterGui> globals) {
 		this.defaults = defaults;
 		this.globals = globals;
 		steps = new HashSet<WorkflowGuiStep>();
@@ -35,7 +36,7 @@ public class GuiSubstitutions {
 	public ObservableList<StepOutput> getStepOutputs() {
 		return stepOuts;
 	}
-	public ObservableList<DefaultGui> getDefaults() {
+	public ObservableList<DefaultOverview> getDefaults() {
 		return defaults;
 	}
 	public ObservableList<GlobalParameterGui> getGlobals() {
@@ -43,7 +44,7 @@ public class GuiSubstitutions {
 	}
 	
 	public boolean validDefault(String defaultName) {
-		for (DefaultGui def: defaults) {
+		for (DefaultOverview def: defaults) {
 			if (def.getName().equalsIgnoreCase(defaultName)) return true;
 		}
 		return false;

@@ -152,13 +152,13 @@ public class MainCLI {
 	}
 	
 	private void doTask() throws PladipusReportableException {
-		if (xmlFile != null) cliTaskProcessor.doTemplateTask(xmlFile, force);
-		if (batchFile != null) cliTaskProcessor.doBatchTask(batchFile, workflowName, batchName, force);
-		if (process) cliTaskProcessor.doProcessTask(batchName, force);
-		if (status) cliTaskProcessor.doStatusTask(batchName);
-		if (generateFile != null) cliTaskProcessor.doGenerateTask(generateFile, workflowName, force);
-		if (defaultName != null) cliTaskProcessor.doDefaultTask(defaultName, defaultValue, defaultType);
-		if (abort) cliTaskProcessor.doAbortTask(batchName);
+		if (xmlFile != null) cliTaskProcessor.doTemplateTask(xmlFile, force, userName);
+		if (batchFile != null) cliTaskProcessor.doBatchTask(batchFile, workflowName, batchName, force, userName);
+		if (process) cliTaskProcessor.doProcessTask(batchName, force, userName);
+		if (status) cliTaskProcessor.doStatusTask(batchName, userName);
+		if (generateFile != null) cliTaskProcessor.doGenerateTask(generateFile, workflowName, force, userName);
+		if (defaultName != null) cliTaskProcessor.doDefaultTask(defaultName, defaultValue, defaultType, userName);
+		if (abort) cliTaskProcessor.doAbortTask(batchName, userName);
 	}
 	
 	private class CliOption {

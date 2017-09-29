@@ -63,7 +63,7 @@ public class CliTest {
 	public void testTemplateCreate() {
 		try {
 			runCliWithUser("-t filename");
-			Mockito.verify(cliTaskProcessor).doTemplateTask("filename", false);
+			Mockito.verify(cliTaskProcessor).doTemplateTask("filename", false, USER);
 		} catch (PladipusReportableException e) {
 			Assert.fail("Failed template create: " + e.getMessage());
 		}
@@ -73,7 +73,7 @@ public class CliTest {
 	public void testTemplateReplace() {
 		try {
 			runCliWithUser("-t filename -f");
-			Mockito.verify(cliTaskProcessor).doTemplateTask("filename", true);
+			Mockito.verify(cliTaskProcessor).doTemplateTask("filename", true, USER);
 		} catch (PladipusReportableException e) {
 			Assert.fail("Failed template create: " + e.getMessage());
 		}
@@ -83,7 +83,7 @@ public class CliTest {
 	public void testBatchAdd() {
 		try {
 			runCliWithUser("-b file -w workflow");
-			Mockito.verify(cliTaskProcessor).doBatchTask("file", "workflow", null, false);
+			Mockito.verify(cliTaskProcessor).doBatchTask("file", "workflow", null, false, USER);
 		} catch (PladipusReportableException e) {
 			Assert.fail("Failed batch add: " + e.getMessage());
 		}
@@ -93,7 +93,7 @@ public class CliTest {
 	public void testBatchUpdate() {
 		try {
 			runCliWithUser("-b file -w workflow -B batchname -f");
-			Mockito.verify(cliTaskProcessor).doBatchTask("file", "workflow", "batchname", true);
+			Mockito.verify(cliTaskProcessor).doBatchTask("file", "workflow", "batchname", true, USER);
 		} catch (PladipusReportableException e) {
 			Assert.fail("Failed batch update: " + e.getMessage());
 		}
@@ -103,7 +103,7 @@ public class CliTest {
 	public void testGenerateHeaders() {
 		try {
 			runCliWithUser("-g file --workflow workflow");
-			Mockito.verify(cliTaskProcessor).doGenerateTask("file", "workflow", false);
+			Mockito.verify(cliTaskProcessor).doGenerateTask("file", "workflow", false, USER);
 		} catch (PladipusReportableException e) {
 			Assert.fail("Failed header generate: " + e.getMessage());
 		}
@@ -113,7 +113,7 @@ public class CliTest {
 	public void testProcessAll() {
 		try {
 			runCliWithUser("-p");
-			Mockito.verify(cliTaskProcessor).doProcessTask(null, false);
+			Mockito.verify(cliTaskProcessor).doProcessTask(null, false, USER);
 		} catch (PladipusReportableException e) {
 			Assert.fail("Failed process all: " + e.getMessage());
 		}
@@ -123,7 +123,7 @@ public class CliTest {
 	public void testProcessBatch() {
 		try {
 			runCliWithUser("-p batchname");
-			Mockito.verify(cliTaskProcessor).doProcessTask("batchname", false);
+			Mockito.verify(cliTaskProcessor).doProcessTask("batchname", false, USER);
 		} catch (PladipusReportableException e) {
 			Assert.fail("Failed process batch: " + e.getMessage());
 		}
@@ -133,7 +133,7 @@ public class CliTest {
 	public void testRestartBatch() {
 		try {
 			runCliWithUser("-r batchname");
-			Mockito.verify(cliTaskProcessor).doProcessTask("batchname", true);
+			Mockito.verify(cliTaskProcessor).doProcessTask("batchname", true, USER);
 		} catch (PladipusReportableException e) {
 			Assert.fail("Failed restart batch: " + e.getMessage());
 		}
@@ -143,7 +143,7 @@ public class CliTest {
 	public void testStatusBatch() {
 		try {
 			runCliWithUser("-s batchname");
-			Mockito.verify(cliTaskProcessor).doStatusTask("batchname");
+			Mockito.verify(cliTaskProcessor).doStatusTask("batchname", USER);
 		} catch (PladipusReportableException e) {
 			Assert.fail("Failed status: " + e.getMessage());
 		}
@@ -153,7 +153,7 @@ public class CliTest {
 	public void testAbortBatch() {
 		try {
 			runCliWithUser("-a batchname");
-			Mockito.verify(cliTaskProcessor).doAbortTask("batchname");
+			Mockito.verify(cliTaskProcessor).doAbortTask("batchname", USER);
 		} catch (PladipusReportableException e) {
 			Assert.fail("Failed batch abort: " + e.getMessage());
 		}
@@ -163,7 +163,7 @@ public class CliTest {
 	public void testAbortAll() {
 		try {
 			runCliWithUser("-a");
-			Mockito.verify(cliTaskProcessor).doAbortTask(null);
+			Mockito.verify(cliTaskProcessor).doAbortTask(null, USER);
 		} catch (PladipusReportableException e) {
 			Assert.fail("Failed all abort: " + e.getMessage());
 		}
@@ -173,7 +173,7 @@ public class CliTest {
 	public void testAddDefaultWithType() {
 		try {
 			runCliWithUser("--default name --value val -T type");
-			Mockito.verify(cliTaskProcessor).doDefaultTask("name", "val", "type");
+			Mockito.verify(cliTaskProcessor).doDefaultTask("name", "val", "type", USER);
 		} catch (PladipusReportableException e) {
 			Assert.fail("Failed default add: " + e.getMessage());
 		}
@@ -185,7 +185,7 @@ public class CliTest {
 			Mockito.doThrow(new ParseException("no password")).when(cliTaskProcessor).login(USER, null);
 			runCli("-s -u " + USER);
 			Mockito.verify(cliTaskProcessor).login(USER, null);
-			Mockito.verify(cliTaskProcessor, Mockito.never()).doStatusTask(null);
+			Mockito.verify(cliTaskProcessor, Mockito.never()).doStatusTask(null, USER);
 			Mockito.verify(cmdLineIO).printHelp(Matchers.any(Options.class), Matchers.anyString());
 		} catch (ParseException | PladipusReportableException e) {
 			Assert.fail("Exception not handled: " + e.getMessage());
@@ -198,7 +198,7 @@ public class CliTest {
 			Mockito.doThrow(new PladipusReportableException("ex")).when(cliTaskProcessor).login(USER, PASSWORD);
 			runCli("-s -u " + USER + " -P " + PASSWORD);
 			Mockito.verify(cliTaskProcessor).login(USER, PASSWORD);
-			Mockito.verify(cliTaskProcessor, Mockito.never()).doStatusTask(null);
+			Mockito.verify(cliTaskProcessor, Mockito.never()).doStatusTask(null, USER);
 			Mockito.verify(cmdLineIO).printError("ex");
 		} catch (PladipusReportableException | ParseException e) {
 			Assert.fail("Exception not handled: " + e.getMessage());

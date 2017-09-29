@@ -3,7 +3,7 @@ package com.compomics.pladipus.client.gui.fxmlcontrollers;
 import java.util.ResourceBundle;
 
 import com.compomics.pladipus.client.gui.FxmlController;
-import com.compomics.pladipus.client.gui.model.DefaultGui;
+import com.compomics.pladipus.model.core.DefaultOverview;
 import com.compomics.pladipus.client.gui.model.GuiSubstitutions;
 import com.compomics.pladipus.client.gui.model.GlobalParameterGui;
 import com.compomics.pladipus.client.gui.model.PladipusScene;
@@ -118,7 +118,7 @@ public class SubChoiceController extends FxmlController {
 		col1.setText(NAME_COL);
 		col2.setText(VAL_COL);
 		contents.clear();
-		for (DefaultGui def: subs.getDefaults()) {
+		for (DefaultOverview def: subs.getDefaults()) {
 			contents.add(new TableContent(def));
 		}
 	}
@@ -155,7 +155,7 @@ public class SubChoiceController extends FxmlController {
 				valueTable.getSelectionModel().select(newGlob);
 			}
 		} else {
-			DefaultGui def = (DefaultGui) getFromScene(PladipusScene.NEW_DEFAULT);
+			DefaultOverview def = (DefaultOverview) getFromScene(PladipusScene.NEW_DEFAULT);
 			if (def != null) {
 				TableContent newDef = new TableContent(def);
 				contents.add(newDef);
@@ -190,9 +190,9 @@ public class SubChoiceController extends FxmlController {
 			if (obj instanceof GlobalParameterGui) {
 				name = ((GlobalParameterGui)obj).globalNameProperty();
 				tf = ((GlobalParameterGui)obj).getDisplayValue();
-			} else if (obj instanceof DefaultGui) {
-				name = ((DefaultGui)obj).nameProperty();
-				tf = new TextFlow(new Text(((DefaultGui)obj).valueProperty().get()));
+			} else if (obj instanceof DefaultOverview) {
+				name = ((DefaultOverview)obj).nameProperty();
+				tf = new TextFlow(new Text(((DefaultOverview)obj).valueProperty().get()));
 			} else {
 				name = ((StepOutput)obj).stepIdProperty();
 				tf = new TextFlow(new Text(((StepOutput)obj).valueProperty().get()));
@@ -209,8 +209,8 @@ public class SubChoiceController extends FxmlController {
 		public String getFullName() {
 			if (obj instanceof GlobalParameterGui) {
 				return ((GlobalParameterGui)obj).getGlobalFullName();
-			} else if (obj instanceof DefaultGui) {
-				return ((DefaultGui)obj).getFullDefaultName();
+			} else if (obj instanceof DefaultOverview) {
+				return ((DefaultOverview)obj).getFullDefaultName();
 			} 
 			return ((StepOutput)obj).toString();
 		}

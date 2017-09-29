@@ -228,7 +228,7 @@ public class StepParametersController extends FxmlController {
 			if (values.isEmpty()) perRun = true;
 		} else {
 			if (inputParam.hasDefaultValue()) {
-				values = Arrays.asList(inputParam.getDefault().split(","));
+				values = Arrays.asList(inputParam.getDefaultValue().split(","));
 			}
 		}
 		StepParameterGui paramGui = new StepParameterGui(inputParam, values, perRun, subs);

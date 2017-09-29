@@ -1,5 +1,7 @@
 package com.compomics.pladipus.model.parameters;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * Input parameter - a command line argument passed through when running a tool.
  * 
@@ -39,6 +41,7 @@ public class InputParameter {
 	 */
 	private String defaultValue;
 	
+	public InputParameter(){}
 	public InputParameter(String paramName, String description, boolean mandatory, InputType inputType, String defaultValue) {
 		this.paramName = paramName;
 		this.description = description;
@@ -59,24 +62,36 @@ public class InputParameter {
 		this(paramName, description, mandatory, InputType.STRING, "");
 	}
 	
-	public String getDefault() {
+	public String getDefaultValue() {
 		return defaultValue;
+	}
+	public void setDefaultValue(String defaultValue) {
+		this.defaultValue = defaultValue;
 	}
 	
 	public String getParamName() {
 		return paramName;
 	}
+	public void setParamName(String paramName) {
+		this.paramName = paramName;
+	}
 	
 	public String getDescription() {
 		return description;
 	}
-	
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	@JsonIgnore
 	public InputType getInputType() {
 		return inputType;
 	}
 	
 	public boolean isMandatory() {
 		return mandatory;
+	}
+	public void setMandatory(boolean mandatory) {
+		this.mandatory = mandatory;
 	}
 	
 	public boolean isTypeValid(String value) {

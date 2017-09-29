@@ -1,4 +1,9 @@
-package com.compomics.pladipus.client.gui.model;
+package com.compomics.pladipus.model.core;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -8,6 +13,7 @@ import javafx.collections.ObservableList;
 public class WorkflowOverview {
 	private StringProperty name;
 	private String xml;
+	private List<String> headers;
 	private ObservableList<BatchOverview> batches = FXCollections.observableArrayList();
 	
 	public WorkflowOverview() {
@@ -17,6 +23,7 @@ public class WorkflowOverview {
 	public WorkflowOverview(String name, String xml) {
 		this.name = new SimpleStringProperty(name);
 		this.xml = xml;
+		headers = new ArrayList<String>();
 	}
 	
 	public String getName() {
@@ -34,6 +41,13 @@ public class WorkflowOverview {
 	public String getXml() {
 		return xml;
 	}
+	public void setHeaders(List<String> headers) {
+		this.headers = headers;
+	}
+	public List<String> getHeaders() {
+		return headers;
+	}
+	@JsonIgnore
     public ObservableList<BatchOverview> getBatches() {
     	return batches;
     }

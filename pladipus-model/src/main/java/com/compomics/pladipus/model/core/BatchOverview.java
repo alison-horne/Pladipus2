@@ -1,6 +1,5 @@
-package com.compomics.pladipus.client.gui.model;
+package com.compomics.pladipus.model.core;
 
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -11,7 +10,7 @@ import javafx.collections.ObservableList;
 
 public class BatchOverview {
 	StringProperty batchName;
-	SimpleListProperty<RunGui> runs = new SimpleListProperty<RunGui>(FXCollections.observableArrayList());
+	SimpleListProperty<RunOverview> runs = new SimpleListProperty<RunOverview>(FXCollections.observableArrayList());
 	IntegerProperty runSize;
 	
 	public BatchOverview() {
@@ -34,10 +33,10 @@ public class BatchOverview {
 		return batchName;
 	}
 	
-	public ObservableList<RunGui> getRuns() {
+	public ObservableList<RunOverview> getRuns() {
 		return runs;
 	}
-	public void addRun(RunGui run) {
+	public void addRun(RunOverview run) {
 		runs.add(run);
 	}
 	public IntegerProperty runSizeProperty() {

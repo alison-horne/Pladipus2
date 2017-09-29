@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.compomics.pladipus.model.core.DefaultOverview;
 import com.compomics.pladipus.model.core.ToolInformation;
 import com.compomics.pladipus.model.persist.Parameter;
 import com.compomics.pladipus.model.persist.Step;
@@ -33,7 +34,7 @@ public class WorkflowGui {
 	private ObjectProperty<WorkflowGuiStep> selectedStep;
 	private ObservableList<GlobalParameterGui> globals = FXCollections.observableArrayList();
 	private List<GlobalParameterGui> originalGlobals = new ArrayList<GlobalParameterGui>();
-	private ObservableList<DefaultGui> userDefaults;
+	private ObservableList<DefaultOverview> userDefaults;
 	
 	public WorkflowGui(String name) {
 		this.workflowName = name;
@@ -230,7 +231,7 @@ public class WorkflowGui {
 		if (!step.isInvalidSub()) {
 			for (String def: step.getSubDefaults()) {
 				boolean valid = false;
-				for (DefaultGui userDef: userDefaults) {
+				for (DefaultOverview userDef: userDefaults) {
 					if (userDef.getName().equalsIgnoreCase(def)) {
 						valid = true;
 						break;
@@ -415,7 +416,7 @@ public class WorkflowGui {
     	return wf;
     }
 
-	public void setDefaults(ObservableList<DefaultGui> userDefaults) {
+	public void setDefaults(ObservableList<DefaultOverview> userDefaults) {
 		this.userDefaults = userDefaults;
 	}
 	

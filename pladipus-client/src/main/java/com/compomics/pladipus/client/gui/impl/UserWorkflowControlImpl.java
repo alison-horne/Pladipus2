@@ -1,8 +1,7 @@
 package com.compomics.pladipus.client.gui.impl;
 
-import com.compomics.pladipus.client.gui.TestData;
 import com.compomics.pladipus.client.gui.UserWorkflowControl;
-import com.compomics.pladipus.client.gui.model.WorkflowOverview;
+import com.compomics.pladipus.model.core.WorkflowOverview;
 import com.compomics.pladipus.model.persist.Workflow;
 import com.compomics.pladipus.shared.PladipusReportableException;
 
@@ -33,15 +32,9 @@ public class UserWorkflowControlImpl implements UserWorkflowControl {
     	return existing;
     }
 	
-	@Override
-	public void logout() {
-		userWorkflows.clear();
-		loaded = false;
-	}
-	
 	private void loadWorkflows() throws PladipusReportableException {
 		// TODO - get workflows from control
-		userWorkflows.addAll(TestData.getWorkflows("test1"));
+//		userWorkflows.addAll(TestData.getWorkflows("test1"));
 		loaded = true;
 	}
 

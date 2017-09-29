@@ -1,19 +1,19 @@
-package com.compomics.pladipus.client.gui.model;
+package com.compomics.pladipus.model.core;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-public class RunGui {
+public class RunOverview {
 	// TODO status from db - to readable string from properties file...
 	
 	StringProperty name;
 	StringProperty status;
 	
-	public RunGui() {
+	public RunOverview() {
 		this(null, null);
 	}
 	
-	public RunGui(String name, String status) {
+	public RunOverview(String name, String status) {
 		this.name = new SimpleStringProperty(name);
 		this.status = new SimpleStringProperty(status);
 	}

@@ -132,7 +132,7 @@ public class WorkflowValidator implements ValidationChecker<Workflow> {
 		}
 		for (InputParameter mand: mandatory) {
 			if (!stepParamNames.contains(mand.getParamName())) {
-				String defaultValue = mand.getDefault();
+				String defaultValue = mand.getDefaultValue();
 				if (defaultValue != null && !defaultValue.isEmpty()) {
 					Parameter p = new Parameter();
 					p.setName(mand.getParamName());

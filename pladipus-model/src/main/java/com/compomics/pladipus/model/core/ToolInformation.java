@@ -11,9 +11,7 @@ public class ToolInformation {
 	private Set<InputParameter> parameters = new HashSet<InputParameter>();
 	private Set<String> outputs = new HashSet<String>();
 	
-	public ToolInformation(String toolName) {
-		this.toolName = toolName;
-	}
+	public ToolInformation(){}
 	public ToolInformation(String toolName, Set<InputParameter> parameters, Set<String> outputs) {
 		this.toolName = toolName;
 		this.parameters = parameters;

@@ -35,7 +35,9 @@ public class PladipusToolInfoProvider implements ToolInfoProvider {
 			try {
 				Class<?> beanClass = Class.forName(beanDef.getBeanClassName());
 				PladipusToolInfo info = new PladipusToolInfo();
-				info.setInputParams(((Tool) beanClass.newInstance()).getAllToolInputParameters());
+				Tool tool = (Tool)beanClass.newInstance();
+				info.setInputParams(tool.getAllToolInputParameters());
+				info.setOutputs(tool.getOutputSet());
 				builder.put(beanClass.getAnnotation(PladipusTool.class).displayName(), info);
 			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
 				LOGGER.warn("PladipusTool {} information could not be retrieved.  This tool will not be available.",

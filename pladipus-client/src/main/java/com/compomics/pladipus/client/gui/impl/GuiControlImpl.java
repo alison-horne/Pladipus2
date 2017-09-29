@@ -13,8 +13,8 @@ import com.compomics.pladipus.client.gui.PopupControl;
 import com.compomics.pladipus.client.gui.ToolControl;
 import com.compomics.pladipus.client.gui.UserControl;
 import com.compomics.pladipus.client.gui.UserWorkflowControl;
-import com.compomics.pladipus.client.gui.model.DefaultGui;
-import com.compomics.pladipus.client.gui.model.WorkflowOverview;
+import com.compomics.pladipus.model.core.DefaultOverview;
+import com.compomics.pladipus.model.core.WorkflowOverview;
 import com.compomics.pladipus.model.core.ToolInformation;
 import com.compomics.pladipus.model.persist.Workflow;
 import com.compomics.pladipus.shared.PladipusReportableException;
@@ -162,7 +162,7 @@ public class GuiControlImpl implements GuiControl {
 	}
 
 	@Override
-	public ObservableList<DefaultGui> getUserDefaults() {
+	public ObservableList<DefaultOverview> getUserDefaults() {
 		return defaultControl.getUserDefaults();
 	}
 
@@ -172,7 +172,7 @@ public class GuiControlImpl implements GuiControl {
 	}
 	
 	@Override
-	public void addDefault(DefaultGui def) throws PladipusReportableException {
+	public void addDefault(DefaultOverview def) throws PladipusReportableException {
 		defaultControl.addDefault(def);
 	}
 	

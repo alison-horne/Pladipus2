@@ -3,9 +3,9 @@ package com.compomics.pladipus.client.gui.fxmlcontrollers;
 import java.util.ResourceBundle;
 
 import com.compomics.pladipus.client.gui.FxmlController;
-import com.compomics.pladipus.client.gui.model.BatchOverview;
+import com.compomics.pladipus.model.core.BatchOverview;
 import com.compomics.pladipus.client.gui.model.PladipusScene;
-import com.compomics.pladipus.client.gui.model.WorkflowOverview;
+import com.compomics.pladipus.model.core.WorkflowOverview;
 import com.compomics.pladipus.shared.PladipusReportableException;
 
 import javafx.collections.FXCollections;

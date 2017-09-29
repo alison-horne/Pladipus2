@@ -45,6 +45,12 @@ public abstract class Tool implements Callable<Map<String, String>> {
 	public abstract String getJar();
 	public abstract ImmutableSet<String> getErrorStrings();
 	public abstract Map<String, String> getOutputs();
+	public ImmutableSet<String> getOutputSet() {
+		if (getOutputs() != null) {
+			return ImmutableSet.copyOf(getOutputs().keySet());
+		} 
+		return ImmutableSet.of();
+	}
 	public int getDefaultTimeoutSeconds() { return -1;}
 	public Map<String, String> call() {
 		return runTool();

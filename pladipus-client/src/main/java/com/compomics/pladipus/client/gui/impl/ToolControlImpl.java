@@ -1,6 +1,5 @@
 package com.compomics.pladipus.client.gui.impl;
 
-import com.compomics.pladipus.client.gui.TestData;
 import com.compomics.pladipus.client.gui.ToolControl;
 import com.compomics.pladipus.model.core.ToolInformation;
 import com.compomics.pladipus.shared.PladipusReportableException;
@@ -23,7 +22,7 @@ public class ToolControlImpl implements ToolControl {
 
 	private void loadToolList() throws PladipusReportableException {
 		// TODO get tools from controller
-		toolInfoList.addAll(TestData.getTools());
+//		toolInfoList.addAll(TestData.getTools());
 		loaded = true;
 	}
 	

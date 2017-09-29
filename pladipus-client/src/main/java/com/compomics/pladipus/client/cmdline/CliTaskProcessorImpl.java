@@ -47,13 +47,12 @@ public class CliTaskProcessorImpl implements CliTaskProcessor {
 			throw new ParseException(cmdLine.getString("error.password"));
 		}
 		ClientToControlMessage msg = new ClientToControlMessage(ClientTask.LOGIN_USER);
-		msg.setUsername(username);
 		msg.setPassword(password);
-		makeRequest(msg);
+		makeRequest(msg, username);
 	}
 	
 	@Override
-	public void doTemplateTask(String filepath, boolean force) throws PladipusReportableException {
+	public void doTemplateTask(String filepath, boolean force, String username) throws PladipusReportableException {
 		ClientToControlMessage msg;
 		if (force) {
 			msg = new ClientToControlMessage(ClientTask.REPLACE_WORKFLOW);
@@ -61,12 +60,12 @@ public class CliTaskProcessorImpl implements CliTaskProcessor {
 			msg = new ClientToControlMessage(ClientTask.CREATE_WORKFLOW);
 		}
 		msg.setFileContent(batchCsvIO.fileToString(filepath));
-		makeRequest(msg);
+		makeRequest(msg, username);
 		cmdLineIO.printOutput(cmdLine.getString("workflow.updated"));
 	}
 	
 	@Override
-	public void doBatchTask(String filepath, String workflowName, String batchName, boolean force) throws PladipusReportableException {
+	public void doBatchTask(String filepath, String workflowName, String batchName, boolean force, String username) throws PladipusReportableException {
 		ClientToControlMessage msg;
 		if (force) {
 			msg = new ClientToControlMessage(ClientTask.REPLACE_BATCH);
@@ -77,12 +76,12 @@ public class CliTaskProcessorImpl implements CliTaskProcessor {
 		msg.setWorkflowName(workflowName);
 		if ((batchName == null) || batchName.isEmpty()) batchName = batchCsvIO.getFileName(filepath);
 		msg.setBatchName(batchName);
-		makeRequest(msg);
+		makeRequest(msg, username);
 		cmdLineIO.printOutput(cmdLine.getString("batch.updated"));
 	}
 	
 	@Override
-	public void doProcessTask(String batchName, boolean force) throws PladipusReportableException {
+	public void doProcessTask(String batchName, boolean force, String username) throws PladipusReportableException {
 		ClientToControlMessage msg;
 		if (force) {
 			msg = new ClientToControlMessage(ClientTask.RESTART_BATCH);
@@ -90,23 +89,23 @@ public class CliTaskProcessorImpl implements CliTaskProcessor {
 			msg = new ClientToControlMessage(ClientTask.START_BATCH);
 		}
 		msg.setBatchName(batchName);
-		makeRequest(msg);
+		makeRequest(msg, username);
 		cmdLineIO.printOutput(MessageFormat.format(cmdLine.getString("process.success"), (batchName != null && !batchName.isEmpty()) ? batchName : "all"));
 	}
 	
 	@Override
-	public void doStatusTask(String batchName) throws PladipusReportableException {
+	public void doStatusTask(String batchName, String username) throws PladipusReportableException {
 		ClientToControlMessage msg = new ClientToControlMessage(ClientTask.STATUS);
 		msg.setBatchName(batchName);
-		cmdLineIO.printOutput(makeRequest(msg)); //TODO make output prettier at this end?
+		cmdLineIO.printOutput(makeRequest(msg, username)); //TODO make output prettier at this end?
 	}
 	
 	@Override
-	public void doGenerateTask(String filepath, String workflowName, boolean force) throws PladipusReportableException {
+	public void doGenerateTask(String filepath, String workflowName, boolean force, String username) throws PladipusReportableException {
 		batchCsvIO.checkFileValid(filepath, force);
 		ClientToControlMessage msg = new ClientToControlMessage(ClientTask.GENERATE_HEADERS);
 		msg.setWorkflowName(workflowName);
-		String headers = makeRequest(msg); System.out.println(headers);
+		String headers = makeRequest(msg, username);
 		try {
 			batchCsvIO.writeHeaderFile(filepath, jsonMapper.readValue(headers, new TypeReference<List<String>>() {}));
 		} catch (IOException e) {
@@ -116,25 +115,26 @@ public class CliTaskProcessorImpl implements CliTaskProcessor {
 	}
 	
 	@Override
-	public void doDefaultTask(String defaultName, String defaultValue, String defaultType) throws PladipusReportableException {
+	public void doDefaultTask(String defaultName, String defaultValue, String defaultType, String username) throws PladipusReportableException {
 		ClientToControlMessage msg = new ClientToControlMessage(ClientTask.ADD_DEFAULT);
 		msg.setDefaultName(defaultName);
 		msg.setDefaultValue(defaultValue);
 		msg.setDefaultType(defaultType);
-		makeRequest(msg);
+		makeRequest(msg, username);
 		cmdLineIO.printOutput(MessageFormat.format(cmdLine.getString("default.success"), defaultName));
 	}
 	
 	@Override
-	public void doAbortTask(String batchName) throws PladipusReportableException {
+	public void doAbortTask(String batchName, String username) throws PladipusReportableException {
 		// TODO check if sure
 		ClientToControlMessage msg = new ClientToControlMessage(ClientTask.ABORT);
 		msg.setBatchName(batchName);
-		makeRequest(msg);
+		makeRequest(msg, username);
 		cmdLineIO.printOutput(MessageFormat.format(cmdLine.getString("abort.success"), (batchName != null && !batchName.isEmpty()) ? batchName : "all"));
 	}
 	
-	private String makeRequest(ClientToControlMessage msg) throws PladipusReportableException {
+	private String makeRequest(ClientToControlMessage msg, String username) throws PladipusReportableException {
+		if (username != null) msg.setUsername(username);
 		ControlToClientMessage responseMessage = messageSender.makeRequest(msg);
     	checkResponseStatus(responseMessage);
     	return responseMessage.getContent();

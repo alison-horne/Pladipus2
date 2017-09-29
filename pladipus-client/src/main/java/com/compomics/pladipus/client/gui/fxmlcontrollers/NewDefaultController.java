@@ -3,7 +3,7 @@ package com.compomics.pladipus.client.gui.fxmlcontrollers;
 import java.util.ResourceBundle;
 
 import com.compomics.pladipus.client.gui.FxmlController;
-import com.compomics.pladipus.client.gui.model.DefaultGui;
+import com.compomics.pladipus.model.core.DefaultOverview;
 import com.compomics.pladipus.shared.PladipusReportableException;
 
 import javafx.fxml.FXML;
@@ -23,7 +23,7 @@ public class NewDefaultController extends FxmlController {
 	private CheckBox userCheck;
 	@FXML
 	private ResourceBundle resources;
-	private DefaultGui added;
+	private DefaultOverview added;
 	
 	@FXML
 	public void initialize() {
@@ -42,7 +42,7 @@ public class NewDefaultController extends FxmlController {
 		if (name == null || name.isEmpty() || value == null || value.isEmpty()) {
 			error(resources.getString("newdefault.missing"));
 		} else {
-			DefaultGui def = new DefaultGui(name, value, typeBox.getValue(), userCheck.isSelected());
+			DefaultOverview def = new DefaultOverview(name, value, typeBox.getValue(), userCheck.isSelected());
 			try {
 				guiControl.addDefault(def);
 				added = def;

@@ -3,7 +3,7 @@ package com.compomics.pladipus.client.gui.fxmlcontrollers;
 import java.util.ResourceBundle;
 
 import com.compomics.pladipus.client.gui.FxmlController;
-import com.compomics.pladipus.client.gui.model.DefaultGui;
+import com.compomics.pladipus.model.core.DefaultOverview;
 import com.compomics.pladipus.client.gui.model.PladipusScene;
 import com.compomics.pladipus.client.gui.model.ToolColors;
 import com.compomics.pladipus.shared.PladipusReportableException;
@@ -25,15 +25,15 @@ public class UserDefaultsController extends FxmlController {
     @FXML
     private Label headerLabel;
 	@FXML
-	private TableView<DefaultGui> valueTable;
+	private TableView<DefaultOverview> valueTable;
 	@FXML
-	private TableColumn<DefaultGui, String> nameColumn;
+	private TableColumn<DefaultOverview, String> nameColumn;
 	@FXML
-	private TableColumn<DefaultGui, String> valueColumn;
+	private TableColumn<DefaultOverview, String> valueColumn;
 	@FXML
-	private TableColumn<DefaultGui, String> typeColumn;
+	private TableColumn<DefaultOverview, String> typeColumn;
 	@FXML
-	private TableColumn<DefaultGui, Boolean> allUsersColumn;
+	private TableColumn<DefaultOverview, Boolean> allUsersColumn;
 	@FXML
 	private Button okBtn;
 	@FXML
@@ -49,7 +49,7 @@ public class UserDefaultsController extends FxmlController {
 		typeColumn.setCellValueFactory(cellData -> cellData.getValue().typeProperty());
 		allUsersColumn.setCellValueFactory(cellData -> cellData.getValue().globalProperty());
         allUsersColumn.setCellFactory(CheckBoxTableCell.forTableColumn(allUsersColumn));
-        nameColumn.setCellFactory(cellData -> new TableCell<DefaultGui, String>() {
+        nameColumn.setCellFactory(cellData -> new TableCell<DefaultOverview, String>() {
         	@Override
         	protected void updateItem(String item, boolean empty) {
 				super.updateItem(item, empty);
@@ -93,7 +93,7 @@ public class UserDefaultsController extends FxmlController {
 	
 	@FXML
 	public void handleAccept() {
-		DefaultGui selected = valueTable.getSelectionModel().getSelectedItem();
+		DefaultOverview selected = valueTable.getSelectionModel().getSelectedItem();
 		if (selected != null) {
 			subValue = selected.getFullDefaultName();
 			stage.close();
@@ -110,7 +110,7 @@ public class UserDefaultsController extends FxmlController {
 	
 	@FXML
 	public void handleAdd() {
-		DefaultGui def = (DefaultGui) getFromScene(PladipusScene.NEW_DEFAULT);
+		DefaultOverview def = (DefaultOverview) getFromScene(PladipusScene.NEW_DEFAULT);
 		if (def != null) {
 			valueTable.getSelectionModel().select(def);
 		}

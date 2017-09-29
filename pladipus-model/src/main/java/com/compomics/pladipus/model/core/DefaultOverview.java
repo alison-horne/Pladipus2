@@ -1,4 +1,4 @@
-package com.compomics.pladipus.client.gui.model;
+package com.compomics.pladipus.model.core;
 
 import com.compomics.pladipus.model.parameters.Substitution;
 
@@ -7,17 +7,17 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-public class DefaultGui {
+public class DefaultOverview {
 	StringProperty name;
 	StringProperty value;
 	StringProperty type;
 	BooleanProperty global;
 	
-	public DefaultGui() {
+	public DefaultOverview() {
 		this(null, null, null, null);
 	}
 	
-	public DefaultGui(String name, String value, String type, Boolean global) {
+	public DefaultOverview(String name, String value, String type, Boolean global) {
 		if (type != null && type.isEmpty()) type = null;
 		this.name = new SimpleStringProperty(name);
 		this.value = new SimpleStringProperty(value);

@@ -9,4 +9,6 @@ import com.google.common.collect.ImmutableSet;
 public interface ToolInfo {
 	public ImmutableSet<InputParameter> getInputParams();
 	public void setInputParams(ImmutableSet<InputParameter> inputParams);
+	public ImmutableSet<String> getOutputs();
+	public void setOutputs(ImmutableSet<String> outputs);
 }

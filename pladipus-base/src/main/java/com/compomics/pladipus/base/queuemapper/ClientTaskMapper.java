@@ -45,9 +45,9 @@ public class ClientTaskMapper {
 	
 	private ConcurrentMap<String, LoginUser> clientLogins = new ConcurrentHashMap<String, LoginUser>();
 	
-	private User getUser(String clientId) {
+	private User getUser(String clientId, String username) {
 		LoginUser loggedIn = clientLogins.get(clientId);
-		if (loggedIn != null) return loggedIn.getUser();
+		if (loggedIn != null && loggedIn.getUser().getUserName().equalsIgnoreCase(username)) return loggedIn.getUser();
 		throw new IllegalArgumentException();
 	}
 	
@@ -60,34 +60,34 @@ public class ClientTaskMapper {
 		try {
 			switch(msg.getTask()) {
 				case CREATE_WORKFLOW:
-					workflowControl.createWorkflow(msg.getFileContent(), getUser(clientId));
+					workflowControl.createWorkflow(msg.getFileContent(), getUser(clientId, msg.getUsername()));
 					break;
 				case LOGIN_USER:
 					doLogin(msg.getUsername(), msg.getPassword(), clientId);
 					break;
 				case REPLACE_WORKFLOW:
-					workflowControl.replaceWorkflow(msg.getFileContent(), getUser(clientId));
+					workflowControl.replaceWorkflow(msg.getFileContent(), getUser(clientId, msg.getUsername()));
 					break;
 				case START_BATCH:
-					queueControl.process(msg.getBatchName(), getUser(clientId));
+					queueControl.process(msg.getBatchName(), getUser(clientId, msg.getUsername()));
 					break;
 				case ABORT:
-					queueControl.abort(msg.getBatchName(), getUser(clientId));
+					queueControl.abort(msg.getBatchName(), getUser(clientId, msg.getUsername()));
 					break;
 				case ADD_DEFAULT:
-					defaultsControl.addDefault(msg.getDefaultName(), msg.getDefaultValue(), msg.getDefaultType(), getUser(clientId));
+					defaultsControl.addDefault(msg.getDefaultName(), msg.getDefaultValue(), msg.getDefaultType(), getUser(clientId, msg.getUsername()));
 					break;
 				case CREATE_BATCH:
-					batchControl.createBatch(msg.getFileContent(), msg.getWorkflowName(), msg.getBatchName(), getUser(clientId));
+					batchControl.createBatch(msg.getFileContent(), msg.getWorkflowName(), msg.getBatchName(), getUser(clientId, msg.getUsername()));
 					break;
 				case GENERATE_HEADERS:
-					mapOutput(response, batchControl.generateHeaders(msg.getWorkflowName(), getUser(clientId)));
+					mapOutput(response, batchControl.generateHeaders(msg.getWorkflowName(), getUser(clientId, msg.getUsername())));
 					break;
 				case REPLACE_BATCH:
-					batchControl.replaceBatch(msg.getFileContent(), msg.getWorkflowName(), msg.getBatchName(), getUser(clientId));
+					batchControl.replaceBatch(msg.getFileContent(), msg.getWorkflowName(), msg.getBatchName(), getUser(clientId, msg.getUsername()));
 					break;
 				case RESTART_BATCH:
-					queueControl.restart(msg.getBatchName(), getUser(clientId));
+					queueControl.restart(msg.getBatchName(), getUser(clientId, msg.getUsername()));
 					break;
 				case STATUS:
 					// TODO
