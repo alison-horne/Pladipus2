@@ -70,6 +70,15 @@ public class QueueControlImpl implements QueueControl {
 		}
 	}
 	
+	@Transactional(rollbackFor={Exception.class})
+	@Override
+	public void processBatch(Batch batch, User user) throws PladipusReportableException {
+		Map<String, String> defaultsMap = getUserDefaultsMap(user);
+		for (BatchRun batchRun: batch.getRuns()) {
+			new CreateRun(batch.getName(), batchRun, defaultsMap).insertRun();
+		}
+	}
+	
 	@Override
 	public void restart(String batchName, User user) throws PladipusReportableException {
 		// TODO if batchName null/empty, throw exception

@@ -31,7 +31,7 @@ public class UserWorkflowControlImpl implements UserWorkflowControl {
     }
 
 	@Override
-	public void saveWorkflow(Workflow workflow, List<String> headers) {
+	public WorkflowOverview saveWorkflow(Workflow workflow, List<String> headers) {
 		WorkflowOverview wo = getWorkflowOverview(workflow.getName());
 		if (wo == null) {
 			wo = new WorkflowOverview(workflow.getName(), workflow.getTemplateXml());
@@ -40,6 +40,7 @@ public class UserWorkflowControlImpl implements UserWorkflowControl {
 			wo.setXml(workflow.getTemplateXml());
 		}
 		wo.setHeaders(headers);
+		return wo;
 	}
 	
 	@Override

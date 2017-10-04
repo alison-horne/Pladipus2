@@ -1,5 +1,6 @@
 package com.compomics.pladipus.client.gui.impl;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -74,6 +75,33 @@ public class GuiControlImpl implements GuiControl {
 	@Override
 	public File getXmlFile(Stage stage) {
 		return popupControl.fileBrowse(stage, getXmlFilters());
+	}
+	
+	@Override
+	public String saveCsvFile(Stage stage, String name, List<String> headers) throws PladipusReportableException {
+		File file = popupControl.fileSaveBrowse(stage, name, getCsvFilters());
+		if (file != null) {
+			batchCsvIO.writeHeaderFile(file.getAbsolutePath(), headers);
+			if (Desktop.isDesktopSupported()) {
+				try {
+					Desktop.getDesktop().open(file);
+				} catch (IOException e) {
+					// Ignore
+				}
+			}
+			return file.getAbsolutePath();
+		}
+		return null;
+	}
+	
+	@Override
+	public String saveWorkflowXml(Stage stage, String name, Workflow workflow) throws PladipusReportableException {
+		File file = popupControl.fileSaveBrowse(stage, name, getXmlFilters());
+		if (file != null) {
+			batchCsvIO.stringToFile(file.getAbsolutePath(), workflowXMLHelper.objectToXML(workflow));
+			return file.getAbsolutePath();
+		}
+		return null;
 	}
 	
 	@Override
@@ -152,6 +180,11 @@ public class GuiControlImpl implements GuiControl {
 	}
 	
 	@Override
+	public WorkflowOverview getWorkflowOverview(String name) {
+		return userWorkflowControl.getWorkflowOverview(name);
+	}
+	
+	@Override
 	public Workflow getWorkflowFromFilePath(String path) throws PladipusReportableException {
 		return workflowXMLHelper.parseXml(batchCsvIO.fileToString(path));
 	}
@@ -162,14 +195,14 @@ public class GuiControlImpl implements GuiControl {
 	}
 	
 	@Override
-	public void saveWorkflow(Workflow workflow) throws PladipusReportableException {
+	public WorkflowOverview saveWorkflow(Workflow workflow) throws PladipusReportableException {
 		workflow.setTemplateXml(workflowXMLHelper.objectToXML(workflow));
 		ClientToControlMessage msg = new ClientToControlMessage(ClientTask.REPLACE_WORKFLOW);
 		msg.setFileContent(workflow.getTemplateXml());
 		String headerList = sendMessage(msg, 3);
 		ObjectReader reader = jsonMapper.readerFor(List.class);
 		try {
-			userWorkflowControl.saveWorkflow(workflow, reader.readValue(headerList));
+			return userWorkflowControl.saveWorkflow(workflow, reader.readValue(headerList));
 		} catch (IOException e) {
 			throw new PladipusReportableException(resources.getString("popup.noLogin") + "\n" + e.getMessage());
 		}
@@ -196,6 +229,17 @@ public class GuiControlImpl implements GuiControl {
 		defaultControl.addDefault(def);
 	}
 	
+	@Override
+	public void loadBatchFromFile(WorkflowOverview wo, String batchName, String filename, boolean startRun) throws PladipusReportableException {
+		ClientToControlMessage msg = new ClientToControlMessage(ClientTask.REPLACE_BATCH);
+		if (batchName == null || batchName.isEmpty()) batchName = batchCsvIO.getFileName(filename);
+		msg.setBatchName(batchName);
+		msg.setBatchRun(startRun);
+		msg.setWorkflowName(wo.getName());
+		msg.setFileContent(batchCsvIO.fileToString(filename));
+		sendMessage(msg, 3); // TODO get batch info returned, update wo
+	}
+
 	private void initialize() throws PladipusReportableException {
 		ObjectReader reader = jsonMapper.readerFor(GuiSetup.class);
 		try {

@@ -90,10 +90,19 @@ public class WorkflowGui {
 		guiSteps.add(guiStep);
 	}
 	
-	public void initLinks() {
+	public void clearChangedFlag() {
+		changed = false;
+	}
+	
+	public void checkLinksAndValid() {
 		for (WorkflowGuiStep step: guiSteps) {
+			step.checkSubs();
+			checkGlobals(step);
+			checkDefaults(step);
 			checkStepLinks(step);
 		}
+		removeDeadLinks();
+		validIcons();
 	}
 	
 	public void arrangeIcons(double width, double height, double iconSize) {
@@ -170,14 +179,7 @@ public class WorkflowGui {
 	}
 	public void refresh() {
 		wfChanged();
-		for (WorkflowGuiStep step: guiSteps) {
-			step.checkSubs();
-			checkGlobals(step);
-			checkDefaults(step);
-			checkStepLinks(step);
-		}
-		removeDeadLinks();
-		validIcons();
+		checkLinksAndValid();
 	}
 	
 	private void checkStepLinks(WorkflowGuiStep step) {

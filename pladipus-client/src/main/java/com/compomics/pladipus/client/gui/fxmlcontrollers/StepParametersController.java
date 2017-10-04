@@ -248,7 +248,7 @@ public class StepParametersController extends FxmlController {
 			btn.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
 				public void handle(ActionEvent arg0) {
-					nextScene(PladipusScene.PARAM_EDIT, true, param);
+					getFromScene(PladipusScene.PARAM_EDIT, param);
 				}
 			});
 		}

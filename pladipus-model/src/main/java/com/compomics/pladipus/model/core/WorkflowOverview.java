@@ -54,4 +54,10 @@ public class WorkflowOverview {
     public void addBatch(BatchOverview batch) {
     	batches.add(batch);
     }
+    public boolean batchExists(String batchName) {
+    	for (BatchOverview batch: batches) {
+    		if (batch.getBatchName().equalsIgnoreCase(batchName)) return true;
+    	}
+    	return false;
+    }
 }

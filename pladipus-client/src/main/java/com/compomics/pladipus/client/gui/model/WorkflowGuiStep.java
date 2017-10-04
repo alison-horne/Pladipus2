@@ -46,7 +46,6 @@ public class WorkflowGuiStep {
 				stepLinkNoOutputs.add(raStep.getId());
 			}
 		}
-		checkSubs();
 	}
 	
 	public void deleteStep() {

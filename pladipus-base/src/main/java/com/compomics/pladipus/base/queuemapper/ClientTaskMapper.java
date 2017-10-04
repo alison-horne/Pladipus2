@@ -16,6 +16,7 @@ import com.compomics.pladipus.model.core.DefaultOverview;
 import com.compomics.pladipus.model.core.GuiSetup;
 import com.compomics.pladipus.model.core.ToolInformation;
 import com.compomics.pladipus.model.core.WorkflowOverview;
+import com.compomics.pladipus.model.persist.Batch;
 import com.compomics.pladipus.model.persist.Default;
 import com.compomics.pladipus.model.persist.User;
 import com.compomics.pladipus.model.persist.Workflow;
@@ -93,13 +94,19 @@ public class ClientTaskMapper {
 					defaultsControl.addDefault(msg.getDefaultName(), msg.getDefaultValue(), msg.getDefaultType(), getUser(clientId, msg.getUsername()));
 					break;
 				case CREATE_BATCH:
-					batchControl.createBatch(msg.getFileContent(), msg.getWorkflowName(), msg.getBatchName(), getUser(clientId, msg.getUsername()));
+					Batch batch = batchControl.createBatch(msg.getFileContent(), msg.getWorkflowName(), msg.getBatchName(), getUser(clientId, msg.getUsername()));
+					if (msg.getBatchRun() != null && msg.getBatchRun()) {
+						queueControl.processBatch(batch, getUser(clientId, msg.getUsername()));
+					}
 					break;
 				case GENERATE_HEADERS:
 					mapOutput(response, batchControl.generateHeaders(msg.getWorkflowName(), getUser(clientId, msg.getUsername())));
 					break;
 				case REPLACE_BATCH:
-					batchControl.replaceBatch(msg.getFileContent(), msg.getWorkflowName(), msg.getBatchName(), getUser(clientId, msg.getUsername()));
+					Batch repBatch = batchControl.replaceBatch(msg.getFileContent(), msg.getWorkflowName(), msg.getBatchName(), getUser(clientId, msg.getUsername()));
+					if (msg.getBatchRun() != null && msg.getBatchRun()) {
+						queueControl.processBatch(repBatch, getUser(clientId, msg.getUsername()));
+					}
 					break;
 				case RESTART_BATCH:
 					queueControl.restart(msg.getBatchName(), getUser(clientId, msg.getUsername()));

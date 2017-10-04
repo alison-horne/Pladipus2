@@ -57,11 +57,12 @@ public class GuiSubstitutions {
 		}
 		return false;
 	}
-	public Color getStepColor(String stepId) {
+	public Color getValidStepColor(String stepId, String outId) {
 		if (steps != null) {
 			for (WorkflowGuiStep step: steps) {
 				if (step.getStepId().equalsIgnoreCase(stepId)) {
-					if (step.getIcon() != null) return step.getIcon().getColor();
+					if (step.getToolInfo().getOutputs().contains(outId) && // TODO case sensitive...
+							step.getIcon() != null) return step.getIcon().getColor();
 				}
 			}
 		}
@@ -97,7 +98,7 @@ public class GuiSubstitutions {
 						invalidSub();
 					}
 				} else {
-					color = getStepColor(split[0]);
+					color = getValidStepColor(split[0], split[1]);
 					if (color != null) {
 						displayText = subText;
 					} else {

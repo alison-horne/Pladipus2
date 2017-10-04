@@ -50,6 +50,7 @@
             <TextField fx:id="nameField" editable="false"/>
             <Button mnemonicParsing="false" text="%workflow.editNameBtn" onAction="#handleRename"/>
             <Pane HBox.hgrow="SOMETIMES"/>
+            <Button mnemonicParsing="false" text="%workflow.saveXmlBtn" onAction="#handleSaveXml" />
             <Button mnemonicParsing="false" text="%workflow.saveBtn" onAction="#handleSave" />
             <Button mnemonicParsing="false" text="%workflow.cancelBtn" onAction="#handleCancel" />
          </items>

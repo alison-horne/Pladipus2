@@ -116,6 +116,16 @@ public class PopupControlImpl implements PopupControl {
 		}
 		return null;
 	}
+	
+	@Override
+	public File fileSaveBrowse(Stage stage, String name, ExtensionFilter[] filters) {
+		FileChooser chooser = new FileChooser();
+		if (filters != null) {
+			chooser.getExtensionFilters().addAll(filters);
+		}
+		chooser.setInitialFileName(name);
+		return chooser.showSaveDialog(stage);
+	}
 
 	@Override
 	public String getText(Stage stage, String header, String original) {

@@ -14,6 +14,7 @@ import com.compomics.pladipus.client.gui.model.ToolColors;
 import com.compomics.pladipus.client.gui.model.WorkflowGui;
 import com.compomics.pladipus.client.gui.model.WorkflowGuiStep;
 import com.compomics.pladipus.model.core.ToolInformation;
+import com.compomics.pladipus.model.core.WorkflowOverview;
 import com.compomics.pladipus.model.persist.Parameter;
 import com.compomics.pladipus.model.persist.Step;
 import com.compomics.pladipus.model.persist.Workflow;
@@ -142,17 +143,44 @@ public class WorkflowController extends FxmlController {
     		if (workflowGui.isValid()) {
 	    		Workflow wf = workflowGui.toWorkflow();
 	    		try {
-					guiControl.saveWorkflow(wf);
-					close();
+					WorkflowOverview overview = guiControl.saveWorkflow(wf); // TODO run as task
+					workflowGui.clearChangedFlag();
+					if (alert("wfBatchStart")) {
+						loadBatch(overview);
+					} else {
+						close();
+					}
 				} catch (PladipusReportableException e) {
 					error(resources.getString("workflow.saveError") + "\n" + e.getMessage());
 				}
     		} else {
     			error(resources.getString("workflow.saveInvalid"));
     		}
-    	} else {
+    	} else if (alert("wfBatchStart")) {
+    		loadBatch(guiControl.getWorkflowOverview(workflowGui.getWorkflowName()));
+    	}
+    	else {
     		close();
     	}
+    }
+    private void loadBatch(WorkflowOverview wo) {
+    	if (wo.getHeaders() == null) {
+    		error(resources.getString("workflow.batchNoHeaders"));
+    		close();
+    	} else if (wo.getHeaders().size() == 1) {
+    		// TODO...does this even work?  Should allow it.  How are db tables set up to take it?
+    	} else {
+    		nextScene(PladipusScene.BATCH_LOAD, false, wo);
+    	}
+    }
+    @FXML
+    public void handleSaveXml() {
+    	try {
+			guiControl.saveWorkflowXml(stage, workflowGui.getWorkflowName() + ".xml", workflowGui.toWorkflow());
+			infoAlert("workflowXml");
+		} catch (PladipusReportableException e) {
+			error(e.getMessage());
+		}
     }
     @FXML
     public void handleCancel() {
@@ -178,7 +206,7 @@ public class WorkflowController extends FxmlController {
     
     @FXML
     public void handleEditStep() {
-    	nextScene(PladipusScene.STEP_PARAM, true, workflowGui.getSelectedStep(), workflowGui);
+    	getFromScene(PladipusScene.STEP_PARAM, workflowGui.getSelectedStep(), workflowGui);
     }
     
     @FXML
@@ -254,7 +282,7 @@ public class WorkflowController extends FxmlController {
     		showStep(step);
     	}
     	show = true;
-    	workflowGui.initLinks();
+    	workflowGui.checkLinksAndValid();
     }
     
     public void arrangeIcons() {
@@ -350,7 +378,7 @@ public class WorkflowController extends FxmlController {
 		edit.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				nextScene(PladipusScene.STEP_PARAM, true, step, workflowGui);
+				getFromScene(PladipusScene.STEP_PARAM, step, workflowGui);
 			}
 		});
 		return edit;

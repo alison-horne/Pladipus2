@@ -15,7 +15,8 @@ public enum PladipusScene {
 	NEW_DEFAULT("NewDefault", "newdefault", null, true, false),
 	NEW_GLOBAL("NewEditGlobal", "newglobal", null, true, false),
 	STEP_LINK("StepLink", "steplink", null, true, false),
-	REMOVE_LINKS("RemoveLinks", "removelinks", null, true, false);
+	REMOVE_LINKS("RemoveLinks", "removelinks", null, true, false),
+	BATCH_LOAD("BatchLoad", "batchload", null, true, false);
 
     private String fxml;
     private String texts;

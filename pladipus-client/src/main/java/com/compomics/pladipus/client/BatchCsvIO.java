@@ -81,4 +81,12 @@ public class BatchCsvIO {
 			throw new PladipusReportableException(exceptionMessages.getMessage("clierror.fileread", filepath, e.getMessage()));
 		}
 	}
+	
+	public void stringToFile(String filepath, String content) throws PladipusReportableException {
+		try {
+			java.nio.file.Files.write(Paths.get(filepath), content.getBytes());
+		} catch (IOException e) {
+			throw new PladipusReportableException(exceptionMessages.getMessage("clierror.filewrite", filepath, e.getMessage()));
+		}
+	}
 }

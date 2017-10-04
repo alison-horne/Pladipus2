@@ -32,13 +32,17 @@ public class BatchControlImpl implements BatchControl {
 	private BatchService batchService;
 	
 	@Override
-	public void createBatch(String csvString, String workflowName, String batchName, User user) throws PladipusReportableException {
-		batchService.insertBatch(parseBatch(csvString, workflowName, batchName, user));
+	public Batch createBatch(String csvString, String workflowName, String batchName, User user) throws PladipusReportableException {
+		Batch batch = parseBatch(csvString, workflowName, batchName, user);
+		batchService.insertBatch(batch);
+		return batch;
 	}
 
 	@Override
-	public void replaceBatch(String csvString, String workflowName, String batchName, User user) throws PladipusReportableException {
-		batchService.replaceBatch(parseBatch(csvString, workflowName, batchName, user));
+	public Batch replaceBatch(String csvString, String workflowName, String batchName, User user) throws PladipusReportableException {
+		Batch batch = parseBatch(csvString, workflowName, batchName, user);
+		batchService.replaceBatch(batch);
+		return batch;
 	}
 
 	@Override

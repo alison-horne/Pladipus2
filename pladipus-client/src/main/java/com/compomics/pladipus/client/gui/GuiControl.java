@@ -1,6 +1,7 @@
 package com.compomics.pladipus.client.gui;
 
 import java.io.File;
+import java.util.List;
 
 import com.compomics.pladipus.model.core.DefaultOverview;
 import com.compomics.pladipus.model.core.WorkflowOverview;
@@ -26,11 +27,15 @@ public interface GuiControl {
 	public ObservableList<String> getDefaultTypes();
 	public void addDefault(DefaultOverview def) throws PladipusReportableException;
 	public Workflow getWorkflow(String name);
+	public WorkflowOverview getWorkflowOverview(String name);
 	public Workflow getWorkflowFromFilePath(String path) throws PladipusReportableException;
 	public Workflow getWorkflowFromXml(String xml) throws PladipusReportableException;
-	public void saveWorkflow(Workflow workflow) throws PladipusReportableException;
+	public WorkflowOverview saveWorkflow(Workflow workflow) throws PladipusReportableException;
 	public File getCsvFile(Stage stage);
 	public File getXmlFile(Stage stage);
+	public String saveCsvFile(Stage stage, String name, List<String> headers) throws PladipusReportableException;
+	public String saveWorkflowXml(Stage stage, String name, Workflow workflow) throws PladipusReportableException;
 	public String getFileDirPath(Stage stage);
 	public String getText(Stage stage, String header, String original);
+	public void loadBatchFromFile(WorkflowOverview wo, String batchName, String filename, boolean startRun) throws PladipusReportableException;
 }

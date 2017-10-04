@@ -17,4 +17,5 @@ public interface PopupControl {
 	public File fileOrDirectoryBrowse(Stage stage);
 	public String getText(Stage stage, String header, String original);
 	public void showInfo(String text, Stage stage);
+	public File fileSaveBrowse(Stage stage, String name, ExtensionFilter[] filters);
 }

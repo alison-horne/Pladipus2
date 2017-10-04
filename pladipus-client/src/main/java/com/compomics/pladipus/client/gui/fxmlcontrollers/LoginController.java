@@ -43,22 +43,17 @@ public class LoginController extends FxmlController {
     	} else if ((password == null) || password.isEmpty()) {
     		loginError(resources.getString("login.noPassword"));
     	} else {
-			Task<String> loginTask = new Task<String>() {
-	            @Override protected String call() throws Exception {
-	            	try {
-	            		guiControl.login(username, password);
-	            	} catch (PladipusReportableException e) {
-	            		return e.getMessage();
-	            	}
+			Task<Void> loginTask = new Task<Void>() {
+	            @Override protected Void call() throws PladipusReportableException {
+	            	guiControl.login(username, password);
 	                return null;
 	            }
 	        };
 		    loginTask.setOnSucceeded((WorkerStateEvent event) -> {
-		        if (loginTask.getValue() != null) {
-		        	loginError(loginTask.getValue());
-		        } else {
-		        	nextScene(PladipusScene.DASHBOARD, false);
-		        }
+		        nextScene(PladipusScene.DASHBOARD, false);
+		    });
+		    loginTask.setOnFailed((WorkerStateEvent event) -> {
+		    	loginError(loginTask.getException().getMessage());
 		    });
 		    new Thread(loginTask).start();
     	}
