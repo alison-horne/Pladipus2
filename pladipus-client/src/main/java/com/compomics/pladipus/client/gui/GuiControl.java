@@ -16,7 +16,7 @@ public interface GuiControl {
 	public void showError(String errorMsg, Stage stage);
 	public boolean showAlert(String text, Stage stage);
 	public String customAlert(String text, Stage stage, String[] buttons);
-	public void infoAlert(String text, Stage stage);
+	public void infoAlert(String text, Stage stage, boolean wait);
 	public void login(String username, String password) throws PladipusReportableException;
 	public void logout();
 	public String getUserName();
@@ -38,4 +38,5 @@ public interface GuiControl {
 	public String getFileDirPath(Stage stage);
 	public String getText(Stage stage, String header, String original);
 	public void loadBatchFromFile(WorkflowOverview wo, String batchName, String filename, boolean startRun) throws PladipusReportableException;
+	public void loadBatchData(WorkflowOverview wo, String batchName, String content, boolean startRun) throws PladipusReportableException;
 }

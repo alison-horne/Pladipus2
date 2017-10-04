@@ -39,8 +39,8 @@ public abstract class FxmlController {
 	protected boolean alert(String text) {
 		return guiControl.showAlert(text, stage);
 	}
-	protected void infoAlert(String text) {
-		guiControl.infoAlert(text, stage);
+	protected void infoAlert(String text, boolean wait) {
+		guiControl.infoAlert(text, stage, wait);
 	}
 	protected String customAlert(String text, String[] buttons) {
 		return guiControl.customAlert(text, stage, buttons);

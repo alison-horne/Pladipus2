@@ -1,5 +1,7 @@
 package com.compomics.pladipus.client.gui.fxmlcontrollers;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -25,6 +27,8 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
+import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -168,7 +172,23 @@ public class WorkflowController extends FxmlController {
     		error(resources.getString("workflow.batchNoHeaders"));
     		close();
     	} else if (wo.getHeaders().size() == 1) {
-    		// TODO...does this even work?  Should allow it.  How are db tables set up to take it?
+    		String header = wo.getHeaders().get(0);
+    		String batchName = DateTimeFormatter.ofPattern("yyyyMMddHHmmss").format(LocalDateTime.now());
+    		Task<Void> task = new Task<Void>() {
+				@Override
+				protected Void call() throws Exception {
+					guiControl.loadBatchData(wo, batchName, header + "\nr1", true);
+					return null;
+				}    			
+    		};
+		    task.setOnSucceeded((WorkerStateEvent event) -> {
+		    	infoAlert("singleRun", true);
+		        close();
+		    });
+		    task.setOnFailed((WorkerStateEvent event) -> {
+		    	error(task.getException().getMessage());
+		    });
+    		new Thread(task).start();
     	} else {
     		nextScene(PladipusScene.BATCH_LOAD, false, wo);
     	}
@@ -177,7 +197,7 @@ public class WorkflowController extends FxmlController {
     public void handleSaveXml() {
     	try {
 			guiControl.saveWorkflowXml(stage, workflowGui.getWorkflowName() + ".xml", workflowGui.toWorkflow());
-			infoAlert("workflowXml");
+			infoAlert("workflowXml", false);
 		} catch (PladipusReportableException e) {
 			error(e.getMessage());
 		}
@@ -286,7 +306,7 @@ public class WorkflowController extends FxmlController {
     }
     
     public void arrangeIcons() {
-    	infoAlert("workflowEdit");
+    	infoAlert("workflowEdit", false);
     	workflowGui.arrangeIcons(canvasPane.getBoundsInLocal().getWidth(), canvasPane.getBoundsInLocal().getHeight(), getIconSize());
     }
     

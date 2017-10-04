@@ -79,13 +79,17 @@ public class PopupControlImpl implements PopupControl {
     }
     
     @Override
-    public void showInfo(String text, Stage stage) {
+    public void showInfo(String text, Stage stage, boolean wait) {
     	Alert alert = new Alert(AlertType.INFORMATION);
     	alert.initOwner(stage);
     	alert.setContentText(getContent(text));
     	alert.setTitle(stage.getTitle());
     	alert.setHeaderText(getHeader(text));
-    	alert.show();
+    	if (wait) {
+    		alert.showAndWait();
+    	} else {
+    		alert.show();
+    	}
     }
 
 	@Override

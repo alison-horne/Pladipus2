@@ -131,8 +131,8 @@ public class GuiControlImpl implements GuiControl {
 	}
 	
 	@Override
-	public void infoAlert(String text, Stage stage) {
-		popupControl.showInfo(text, stage);
+	public void infoAlert(String text, Stage stage, boolean wait) {
+		popupControl.showInfo(text, stage, wait);
 	}
 
 	@Override
@@ -231,12 +231,17 @@ public class GuiControlImpl implements GuiControl {
 	
 	@Override
 	public void loadBatchFromFile(WorkflowOverview wo, String batchName, String filename, boolean startRun) throws PladipusReportableException {
-		ClientToControlMessage msg = new ClientToControlMessage(ClientTask.REPLACE_BATCH);
 		if (batchName == null || batchName.isEmpty()) batchName = batchCsvIO.getFileName(filename);
+		loadBatchData(wo, batchName, batchCsvIO.fileToString(filename), startRun);
+	}
+	
+	@Override
+	public void loadBatchData(WorkflowOverview wo, String batchName, String content, boolean startRun) throws PladipusReportableException {
+		ClientToControlMessage msg = new ClientToControlMessage(ClientTask.REPLACE_BATCH);
 		msg.setBatchName(batchName);
 		msg.setBatchRun(startRun);
 		msg.setWorkflowName(wo.getName());
-		msg.setFileContent(batchCsvIO.fileToString(filename));
+		msg.setFileContent(content);
 		sendMessage(msg, 3); // TODO get batch info returned, update wo
 	}
 
