@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.stage.Screen?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="${screen.visualBounds.height*0.8}" prefWidth="${screen.visualBounds.width*0.8}" xmlns="http://javafx.com/javafx/8.0.102" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.compomics.pladipus.client.gui.fxmlcontrollers.BatchManualController">
+    <fx:define>
+  	  <Screen fx:factory="getPrimary" fx:id="screen" />
+   </fx:define>
+   <children>
+      <GridPane AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints percentHeight="10.0" vgrow="SOMETIMES" />
+          <RowConstraints percentHeight="10.0" vgrow="SOMETIMES" />
+          <RowConstraints percentHeight="70.0" vgrow="SOMETIMES" />
+          <RowConstraints percentHeight="10.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+         	<Label text="%batchmanual.header" GridPane.halignment="CENTER" />
+            <HBox spacing="20.0" GridPane.rowIndex="1">
+            <padding><Insets left="30.0" right="30.0" /></padding>
+               <children>
+                  <Button fx:id="addRowBtn" mnemonicParsing="false" onAction="#handleAddRow" text="%batchmanual.addRowBtn" />
+                  <Button fx:id="delRowBtn" mnemonicParsing="false" onAction="#handleDeleteRow" text="%batchmanual.delRowBtn" />
+                  <Pane HBox.hgrow="SOMETIMES"/>
+                  <Button fx:id="insertSubBtn" mnemonicParsing="false" onAction="#handleInsertSub" text="%batchmanual.insertSubBtn" />
+                  <Button fx:id="browseBtn" mnemonicParsing="false" onAction="#handleBrowse" text="%batchmanual.insertFileBtn" />
+               </children>
+            </HBox>
+            <ScrollPane fitToWidth="true" GridPane.rowIndex="2">
+               <content>
+                  <TableView fx:id = "tableView" >
+                     <columnResizePolicy>
+                        <TableView fx:constant="UNCONSTRAINED_RESIZE_POLICY" />
+                     </columnResizePolicy>
+                  </TableView>
+               </content></ScrollPane>
+            <HBox spacing="20.0" GridPane.rowIndex="3">
+            <padding><Insets top="20.0" bottom="20.0" /></padding>
+               <children>
+               	  <Pane HBox.hgrow="SOMETIMES"/>
+               	  <Label fx:id="validatingLbl" />
+                  <Button fx:id="saveBtn" mnemonicParsing="false" text="%batchmanual.saveBtn" onAction="#handleTableToString"/>
+                  <Button fx:id="cancelBtn" mnemonicParsing="false" text="%batchmanual.cancelBtn" onAction="#handleCancel"/>
+                  <Pane HBox.hgrow="SOMETIMES"/>
+               </children>
+            </HBox>
+         </children>
+      </GridPane>
+   </children>
+</AnchorPane>

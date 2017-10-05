@@ -20,6 +20,7 @@ import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -35,6 +36,8 @@ public class SubChoiceController extends FxmlController {
 	private String subValue;
     @FXML
     private ResourceBundle resources;
+    @FXML
+    private Label headerLbl;
 	@FXML
 	private Button addSubBtn;
 	@FXML
@@ -51,6 +54,7 @@ public class SubChoiceController extends FxmlController {
 	private RadioButton radioDefault;
 	private ObservableList<TableContent> contents = FXCollections.observableArrayList();
 	private ToggleGroup toggle;
+	private boolean allowNewGlobals = true;
 	private String ADD_DEFAULT_BTN, ADD_GLOBAL_BTN, NAME_COL, VAL_COL, STEPNAME_COL, STEPVAL_COL;
 	
 	@FXML
@@ -92,8 +96,12 @@ public class SubChoiceController extends FxmlController {
 	}
 	
 	private void setupGlobal() {
-		addSubBtn.setText(ADD_GLOBAL_BTN);
-		addSubBtnActive(true);
+		if (allowNewGlobals) {
+			addSubBtn.setText(ADD_GLOBAL_BTN);
+			addSubBtnActive(true);
+		} else {
+			addSubBtnActive(false);
+		}
 		col1.setText(NAME_COL);
 		col2.setText(VAL_COL);
 		contents.clear();
@@ -124,8 +132,24 @@ public class SubChoiceController extends FxmlController {
 	}
 	
 	@Override
-	public void setup(Object obj) {
-		subs = (GuiSubstitutions) obj;
+	public void setup(Object... obj) {
+		subs = (GuiSubstitutions) obj[0];
+		if (obj.length > 1) {
+			allowNewGlobals = (boolean) obj[1];
+		}
+		if (!allowNewGlobals && (subs.getGlobals() == null || subs.getGlobals().isEmpty())) {
+			radioGlobal.setDisable(true);
+			radioGlobal.setVisible(false);
+		}
+		if (subs.getStepOutputs() == null || subs.getStepOutputs().isEmpty()) {
+			radioStep.setDisable(true);
+			radioStep.setVisible(false);
+		}
+		radioDefault.setSelected(true);
+		if (radioStep.isDisabled() && radioGlobal.isDisabled()) {
+			radioDefault.setVisible(false);
+			headerLbl.setText(resources.getString("subchoice.defaultOnlyHeader"));
+		}
 	}
 	
 	@FXML

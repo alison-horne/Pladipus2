@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
 import com.compomics.pladipus.client.gui.FxmlController;
+import com.compomics.pladipus.client.gui.model.PladipusScene;
 import com.compomics.pladipus.model.core.WorkflowOverview;
 import com.compomics.pladipus.shared.PladipusReportableException;
 
@@ -25,6 +26,8 @@ public class BatchLoadController extends FxmlController {
 	@FXML
 	private Label workflowNameLabel;
 	@FXML
+	private Label submitLbl;
+	@FXML
 	private TextField batchNameField;
 	@FXML
 	private CheckBox chkBox;
@@ -33,10 +36,13 @@ public class BatchLoadController extends FxmlController {
 	@FXML
 	private Button startBtn;
 	@FXML
+	private Button cancelBtn;
+	@FXML
 	private ResourceBundle resources;
 	private WorkflowOverview wfo;
 	private String START_BTN, LOAD_BTN;
 	private String filename;
+	private String content;
 	
     @FXML
     public void initialize() {
@@ -60,6 +66,7 @@ public class BatchLoadController extends FxmlController {
     
     private void setFileName(String filename) {
     	this.filename = filename;
+    	content = null;
     	setLoadText(filename);
     }
     
@@ -95,8 +102,11 @@ public class BatchLoadController extends FxmlController {
     
     @FXML
     public void handleFromTable() {
-    	// TODO create table, and return content as CSV String for sending to base. Maybe list of comma-separated...
-    	setFromTable();
+    	String fromTable = (String) getFromScene(PladipusScene.BATCH_MANUAL, wfo, content);
+    	if (fromTable != null) {
+    		content = fromTable;
+    		setFromTable();
+    	}
     }
     
     @FXML
@@ -128,12 +138,25 @@ public class BatchLoadController extends FxmlController {
     
     @FXML
     public void handleStart() {
-    	boolean loadOnly = chkBox.isSelected(); //TODO show to user it is sending...
+    	boolean loadOnly = chkBox.isSelected();
+		String batchName = batchNameField.getText();
+		if (batchName == null || batchName.isEmpty()) batchName = getDefaultBatchName();
+		batchNameField.setText(batchName);
+		if (wfo.batchExists(batchName) && !alert("replaceBatch")) {
+			return;
+		}
+		submitLbl.setText(resources.getString("batchload.loadingLbl"));
+		startBtn.setDisable(true);
+		cancelBtn.setDisable(true);
     	Task<Void> task = new Task<Void>() {
 			@Override
 			protected Void call() throws Exception {
 				if (filename != null) {
 					guiControl.loadBatchFromFile(wfo, batchNameField.getText(), filename, !loadOnly);
+				} else if (content != null) {
+					guiControl.loadBatchData(wfo, batchNameField.getText(), content, !loadOnly);
+				} else {
+					throw new PladipusReportableException(resources.getString("batchload.noSelected"));
 				}
 				return null;
 			}
@@ -142,6 +165,9 @@ public class BatchLoadController extends FxmlController {
 	        close();
 	    });
 	    task.setOnFailed((WorkerStateEvent event) -> {
+	    	submitLbl.setText("");
+	    	startBtn.setDisable(false);
+	    	cancelBtn.setDisable(false);
 	    	error(task.getException().getMessage());
 	    });
     	new Thread(task).start();

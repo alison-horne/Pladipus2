@@ -2,9 +2,13 @@ package com.compomics.pladipus.client.gui.model;
 
 import java.util.Iterator;
 
+import org.springframework.util.StringUtils;
+
 import com.compomics.pladipus.model.parameters.Substitution;
 
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -31,7 +35,29 @@ public class EditDisplayParameter {
 	private HBox textStrip;
 	private Node focusNode;
 	private GuiSubstitutions subs;
+	private ObjectProperty<HBox> textStripProperty;
+	private ObjectProperty<EditDisplayParameter> selectedCell;
+	private boolean header = false;
 
+	public EditDisplayParameter(String initValue, GuiSubstitutions subs, ObjectProperty<EditDisplayParameter> selectedCell) {
+		this(initValue, subs, selectedCell, false);
+	}
+	public EditDisplayParameter(String initValue, GuiSubstitutions subs, ObjectProperty<EditDisplayParameter> selectedCell, boolean header) {
+		this.subs = subs;
+		this.selectedCell = selectedCell;
+		initTextStrip(initValue);
+		textStripProperty = new SimpleObjectProperty<HBox>(textStrip);
+		this.header = header;
+	}
+	
+	public ObjectProperty<HBox> textStripProperty() {
+		return textStripProperty;
+	}
+	
+	public GuiSubstitutions getSubs() {
+		return subs;
+	}
+	
 	public EditDisplayParameter(String initValue, GuiSubstitutions subs, String insertButtonText, String browseButtonText) {
 		this.subs = subs;
 		box = new HBox();
@@ -50,6 +76,17 @@ public class EditDisplayParameter {
 		HBox.setMargin(insertBtn, new Insets(5,5,5,5));
 		HBox.setMargin(browseBtn, new Insets(5,5,5,5));
 		HBox.setMargin(chkBox, new Insets(5,5,5,5));
+	}
+	
+	public boolean isValid() {
+		for (Node node: textStrip.getChildren()) {
+			if (node instanceof ExpandField) {
+				if (!((ExpandField) node).isValid()) return false;
+			} else {
+				if (!((SubsText) node).isValid()) return false;
+			}
+		}
+		return true;
 	}
 	
 	public String getValue() {
@@ -184,9 +221,17 @@ public class EditDisplayParameter {
 			@Override
 			public void handle(MouseEvent event) {
 				setLastNodeFocus();
+				setSelectedCell();
+				event.consume();
 			}       	
         });
 		return textStrip;
+	}
+	
+	private void setSelectedCell() {
+		if (selectedCell != null) {
+			selectedCell.set(header? null : this);
+		}
 	}
 	
 	private void setLastNodeFocus() {
@@ -208,6 +253,19 @@ public class EditDisplayParameter {
 		}
 		public void setCaret() {
 			setPosCaret(pos.pos);
+		}
+		public boolean isValid() {
+			if (getText().contains(Substitution.getPrefix())) {
+				if (!validSubEnds(getText())) return false;
+		        int subStart = getText().indexOf(Substitution.getPrefix());
+		        int subEnd = -Substitution.getEnd().length();
+		        while (subStart > -1) {
+		        	subEnd = getText().indexOf(Substitution.getEnd(), subStart);
+		        	if (!subs.new DisplaySubstitution(getText().substring(subStart + Substitution.getPrefix().length(), subEnd)).isValidSub()) return false;
+		        	subStart = getText().indexOf(Substitution.getPrefix(), subEnd);
+		        }
+			}
+			return true;
 		}
 		public void setPosCaret(int posn) {
 			pos.pos = posn;
@@ -274,6 +332,11 @@ public class EditDisplayParameter {
 		
 		public String getFullText() {
 			return displaySub.getFullText();
+		}
+		
+		public boolean isValid() {
+			if (displaySub != null) return displaySub.isValidSub();
+			return false;
 		}
 		
 		SubsText(String text) {
@@ -348,5 +411,19 @@ public class EditDisplayParameter {
 			previous.requestFocus();
 			previous.setPosCaret(caretPos);
 		}
+	}
+	
+	private boolean validSubEnds(String valueString) {
+		int startCount = StringUtils.countOccurrencesOf(valueString, Substitution.getPrefix());
+		int endCount = StringUtils.countOccurrencesOf(valueString, Substitution.getEnd());
+		if (startCount != endCount) return false;
+		int subStart = 0;
+		int subEnd = 0;
+        for (int i = 0; i < startCount; i++) {
+        	subStart = valueString.indexOf(Substitution.getPrefix(), subEnd);
+        	subEnd = valueString.indexOf(Substitution.getEnd(), subStart);
+        	if (subStart < 0 || subEnd < 0) return false;
+        }
+        return true;
 	}
 }
