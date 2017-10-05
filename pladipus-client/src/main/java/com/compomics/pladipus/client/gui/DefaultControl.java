@@ -9,4 +9,5 @@ public interface DefaultControl {
 	public void addDefault(DefaultOverview defGui) throws PladipusReportableException;
 	public ObservableList<DefaultOverview> getUserDefaults();
 	public ObservableList<String> getDefaultTypes();
+	public void clear();
 }

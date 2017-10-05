@@ -19,6 +19,11 @@ public class UserWorkflowControlImpl implements UserWorkflowControl {
 	}
 	
 	@Override
+	public void clear() {
+		userWorkflows.clear();
+	}
+	
+	@Override
 	public WorkflowOverview getWorkflowOverview(String name) {
     	WorkflowOverview existing = null;
     	for (WorkflowOverview wf : userWorkflows) {

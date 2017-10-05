@@ -25,20 +25,19 @@
    <top>
       <MenuBar BorderPane.alignment="CENTER">
         <menus>
-          <Menu mnemonicParsing="false" text="File">
+        	<Menu mnemonicParsing="true" text="%workflow.menuFile">
+        		<items>
+              		<MenuItem mnemonicParsing="true" text="%workflow.optionSaveXml" onAction="#handleSaveXml"/>
+              		<MenuItem mnemonicParsing="true" text="%workflow.optionSaveWorkflow" onAction="#handleSave"/>
+              		<MenuItem mnemonicParsing="true" text="%workflow.optionClose" onAction="#handleCancel"/>
+           		</items>
+        	</Menu>
+          <Menu mnemonicParsing="true" text="%workflow.menuDefaults">
             <items>
-              <MenuItem mnemonicParsing="false" text="Close" />
+              <MenuItem mnemonicParsing="true" text="%workflow.optionDefaults" onAction="#handleShowDefaults"/>
             </items>
           </Menu>
-          <Menu mnemonicParsing="false" text="Edit">
-            <items>
-              <MenuItem mnemonicParsing="false" text="Delete" />
-            </items>
-          </Menu>
-          <Menu mnemonicParsing="false" text="Help">
-            <items>
-              <MenuItem mnemonicParsing="false" text="About" />
-            </items>
+          <Menu mnemonicParsing="true" text="%workflow.menuHelp" onAction="#handleHelp">
           </Menu>
         </menus>
       </MenuBar>
@@ -48,11 +47,12 @@
          <items>
             <Label text="%workflow.nameLabel" />
             <TextField fx:id="nameField" editable="false"/>
-            <Button mnemonicParsing="false" text="%workflow.editNameBtn" onAction="#handleRename"/>
+            <Button fx:id="renameBtn" mnemonicParsing="false" text="%workflow.editNameBtn" onAction="#handleRename"/>
             <Pane HBox.hgrow="SOMETIMES"/>
-            <Button mnemonicParsing="false" text="%workflow.saveXmlBtn" onAction="#handleSaveXml" />
-            <Button mnemonicParsing="false" text="%workflow.saveBtn" onAction="#handleSave" />
-            <Button mnemonicParsing="false" text="%workflow.cancelBtn" onAction="#handleCancel" />
+            <Label fx:id="savingLbl" />
+            <Button fx:id="saveXmlBtn" mnemonicParsing="false" text="%workflow.saveXmlBtn" onAction="#handleSaveXml" />
+            <Button fx:id="saveBtn" mnemonicParsing="false" text="%workflow.saveBtn" onAction="#handleSave" />
+            <Button fx:id="cancelBtn" mnemonicParsing="false" text="%workflow.cancelBtn" onAction="#handleCancel" />
          </items>
       </ToolBar>
    </bottom>

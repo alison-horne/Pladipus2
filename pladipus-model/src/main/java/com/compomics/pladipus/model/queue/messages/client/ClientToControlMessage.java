@@ -10,6 +10,7 @@ public class ClientToControlMessage {
 	private String defaultName;
 	private String defaultValue;
 	private String defaultType;
+	private Boolean defaultGlobal;
 	private Boolean batchRun;
 	
 	public ClientToControlMessage() {}
@@ -68,6 +69,12 @@ public class ClientToControlMessage {
 	}
 	public void setDefaultType(String defaultType) {
 		this.defaultType = defaultType;
+	}
+	public Boolean getDefaultGlobal() {
+		return defaultGlobal;
+	}
+	public void setDefaultGlobal(boolean defaultGlobal) {
+		this.defaultGlobal = defaultGlobal;
 	}
 	public Boolean getBatchRun() {
 		return batchRun;

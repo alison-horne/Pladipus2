@@ -144,6 +144,9 @@ public class GuiControlImpl implements GuiControl {
 	@Override
 	public void logout() {
 		userControl.logout();
+		defaultControl.clear();
+		toolControl.clear();
+		userWorkflowControl.clear();
 	}
 	
 	@Override
@@ -226,6 +229,12 @@ public class GuiControlImpl implements GuiControl {
 	
 	@Override
 	public void addDefault(DefaultOverview def) throws PladipusReportableException {
+		ClientToControlMessage msg = new ClientToControlMessage(ClientTask.ADD_DEFAULT);
+		msg.setDefaultName(def.getName());
+		msg.setDefaultValue(def.getValue());
+		msg.setDefaultType(def.getType());
+		msg.setDefaultGlobal(def.getGlobal());
+		sendMessage(msg, 3);
 		defaultControl.addDefault(def);
 	}
 	

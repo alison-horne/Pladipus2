@@ -17,6 +17,11 @@ public class ToolControlImpl implements ToolControl {
 	}
 	
 	@Override
+	public void clear() {
+		toolInfoList.clear();
+	}
+	
+	@Override
 	public ToolInformation getToolInfo(String name) {
 		try {
 			for (ToolInformation tool: getToolInfoList()) {

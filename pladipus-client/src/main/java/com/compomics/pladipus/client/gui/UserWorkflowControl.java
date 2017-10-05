@@ -14,4 +14,5 @@ public interface UserWorkflowControl {
 	public WorkflowOverview getWorkflowOverview(String name);
 	public WorkflowOverview saveWorkflow(Workflow workflow, List<String> headers) throws PladipusReportableException;
 	public void addWorkflow(WorkflowOverview workflow);
+	public void clear();
 }

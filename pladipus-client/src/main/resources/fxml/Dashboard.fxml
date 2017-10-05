@@ -46,12 +46,10 @@
           </Menu>
           <Menu mnemonicParsing="true" text="%dashboard.menuUser">
             <items>
-              <MenuItem mnemonicParsing="false" text="Delete" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="%dashboard.menuHelp">
             <items>
-              <MenuItem mnemonicParsing="true" text="About" />
             </items>
           </Menu>
         </menus>

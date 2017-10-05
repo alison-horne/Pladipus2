@@ -91,7 +91,9 @@ public class ClientTaskMapper {
 					queueControl.abort(msg.getBatchName(), getUser(clientId, msg.getUsername()));
 					break;
 				case ADD_DEFAULT:
-					defaultsControl.addDefault(msg.getDefaultName(), msg.getDefaultValue(), msg.getDefaultType(), getUser(clientId, msg.getUsername()));
+					User user = getUser(clientId, msg.getUsername());
+					if (msg.getDefaultGlobal() != null && msg.getDefaultGlobal()) user = null;
+					defaultsControl.addDefault(msg.getDefaultName(), msg.getDefaultValue(), msg.getDefaultType(), user);
 					break;
 				case CREATE_BATCH:
 					Batch batch = batchControl.createBatch(msg.getFileContent(), msg.getWorkflowName(), msg.getBatchName(), getUser(clientId, msg.getUsername()));

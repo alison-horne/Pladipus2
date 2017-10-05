@@ -13,8 +13,17 @@ public class DefaultControlImpl implements DefaultControl {
 	
 	@Override
 	public void addDefault(DefaultOverview defGui) throws PladipusReportableException {
-		// TODO Save to control...
-		addDefaultToLists(defGui);
+		userDefaults.add(defGui);
+		String type = defGui.getType();
+		if (type != null && !type.isEmpty() && !defaultTypes.contains(type)) {
+			defaultTypes.add(type);
+		}
+	}
+	
+	@Override
+	public void clear() {
+		userDefaults.clear();
+		defaultTypes.clear();
 	}
 
 	@Override
@@ -26,13 +35,4 @@ public class DefaultControlImpl implements DefaultControl {
 	public ObservableList<String> getDefaultTypes() {
 		return defaultTypes;
 	}
-	
-	private void addDefaultToLists(DefaultOverview def) {
-		userDefaults.add(def);
-		String type = def.getType();
-		if (type != null && !type.isEmpty() && !defaultTypes.contains(type)) {
-			defaultTypes.add(type);
-		}
-	}
-
 }

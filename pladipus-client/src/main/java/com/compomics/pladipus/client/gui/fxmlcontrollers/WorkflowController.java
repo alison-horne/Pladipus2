@@ -46,6 +46,7 @@ import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.stage.WindowEvent;
 
@@ -76,6 +77,10 @@ public class WorkflowController extends FxmlController {
     private Button deleteStepBtn;
     @FXML
     private Button editStepBtn;
+    @FXML
+    private Label savingLbl;
+    @FXML
+    private Button renameBtn, saveXmlBtn, saveBtn, cancelBtn;
     @FXML
     private TextField nameField;
     private double iconSizeScale = 1.0;
@@ -139,34 +144,58 @@ public class WorkflowController extends FxmlController {
 		}
     }
     @FXML
-    public void handleSave() { // TODO option to start run from save
+    public void handleSave() {
     	if (workflowGui.changesMade()) {
     		if (guiControl.getWorkflow(workflowGui.getWorkflowName()) != null) {
     			// TODO update...what happens to existing runs when updating workflow in db? Do we need warning here?
     		}
     		if (workflowGui.isValid()) {
 	    		Workflow wf = workflowGui.toWorkflow();
-	    		try {
-					WorkflowOverview overview = guiControl.saveWorkflow(wf); // TODO run as task
-					workflowGui.clearChangedFlag();
-					if (alert("wfBatchStart")) {
-						loadBatch(overview);
-					} else {
-						close();
+	    		savingLook(true);
+	    		Task<WorkflowOverview> saveTask = new Task<WorkflowOverview>() {
+					@Override
+					protected WorkflowOverview call() throws Exception {
+						return guiControl.saveWorkflow(wf);
 					}
-				} catch (PladipusReportableException e) {
-					error(resources.getString("workflow.saveError") + "\n" + e.getMessage());
-				}
+	    		};
+			    saveTask.setOnSucceeded((WorkerStateEvent event) -> {
+			    	workflowGui.clearChangedFlag();
+			    	doLoadBatch(saveTask.getValue());
+			    });
+			    saveTask.setOnFailed((WorkerStateEvent event) -> {
+			    	savingLook(false);
+			    	error(resources.getString("workflow.saveError") + "\n" + saveTask.getException().getMessage());
+			    });
+			    new Thread(saveTask).start();
     		} else {
     			error(resources.getString("workflow.saveInvalid"));
     		}
-    	} else if (alert("wfBatchStart")) {
-    		loadBatch(guiControl.getWorkflowOverview(workflowGui.getWorkflowName()));
-    	}
-    	else {
-    		close();
+    	} else {
+    		doLoadBatch(guiControl.getWorkflowOverview(workflowGui.getWorkflowName()));
     	}
     }
+    
+    private void savingLook(boolean saving) {
+    	renameBtn.setDisable(saving);
+    	saveXmlBtn.setDisable(saving);
+    	saveBtn.setDisable(saving);
+    	cancelBtn.setDisable(saving);
+    	if (saving) {
+    		savingLbl.setTextFill(Color.RED);
+    		savingLbl.setText(resources.getString("workflow.savingLabel"));
+    	} else {
+    		savingLbl.setText("");
+    	}
+    }
+
+	private void doLoadBatch(WorkflowOverview wo) {
+		if (alert("wfBatchStart")) {
+			loadBatch(wo);
+		} else {
+			close();
+		}
+	}
+
     private void loadBatch(WorkflowOverview wo) {
     	if (wo.getHeaders() == null) {
     		error(resources.getString("workflow.batchNoHeaders"));
@@ -186,6 +215,7 @@ public class WorkflowController extends FxmlController {
 		        close();
 		    });
 		    task.setOnFailed((WorkerStateEvent event) -> {
+		    	savingLook(false);
 		    	error(task.getException().getMessage());
 		    });
     		new Thread(task).start();
@@ -227,6 +257,16 @@ public class WorkflowController extends FxmlController {
     @FXML
     public void handleEditStep() {
     	getFromScene(PladipusScene.STEP_PARAM, workflowGui.getSelectedStep(), workflowGui);
+    }
+    
+    @FXML
+    public void handleShowDefaults() {
+    	nextScene(PladipusScene.USER_DEFAULTS, true, false);
+    }
+    
+    @FXML
+    public void handleHelp() {
+    	// TODO
     }
     
     @FXML
