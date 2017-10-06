@@ -39,4 +39,5 @@ public interface GuiControl {
 	public String getText(Stage stage, String header, String original);
 	public void loadBatchFromFile(WorkflowOverview wo, String batchName, String filename, boolean startRun) throws PladipusReportableException;
 	public void loadBatchData(WorkflowOverview wo, String batchName, String content, boolean startRun) throws PladipusReportableException;
+	public void createUser(String username, String email, String password) throws PladipusReportableException;
 }

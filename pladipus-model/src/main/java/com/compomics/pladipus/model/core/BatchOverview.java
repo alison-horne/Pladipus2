@@ -1,5 +1,7 @@
 package com.compomics.pladipus.model.core;
 
+import java.util.List;
+
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -10,15 +12,18 @@ import javafx.collections.ObservableList;
 
 public class BatchOverview {
 	StringProperty batchName;
-	SimpleListProperty<RunOverview> runs = new SimpleListProperty<RunOverview>(FXCollections.observableArrayList());
+	long id;
+	SimpleListProperty<BatchRunOverview> runs;
 	IntegerProperty runSize;
 	
 	public BatchOverview() {
-		this(null);
+		this(null, -1);
 	}
 	
-	public BatchOverview(String batchName) {
+	public BatchOverview(String batchName, long id) {
 		this.batchName = new SimpleStringProperty(batchName);
+		this.id = id;
+		this.runs = new SimpleListProperty<BatchRunOverview>(FXCollections.observableArrayList());
 		this.runSize = new SimpleIntegerProperty();
 		runSize.bind(runs.sizeProperty());
 	}
@@ -32,11 +37,21 @@ public class BatchOverview {
 	public StringProperty batchNameProperty() {
 		return batchName;
 	}
-	
-	public ObservableList<RunOverview> getRuns() {
-		return runs;
+	public long getId() {
+		return id;
 	}
-	public void addRun(RunOverview run) {
+	public void setId(long id) {
+		this.id = id;
+	}
+	
+	public ObservableList<BatchRunOverview> getRuns() {
+		return runs.get();
+	}
+	public void setRuns(List<BatchRunOverview> runs) {
+		this.runs.clear();
+		if (runs != null) this.runs.addAll(runs);
+	}
+	public void addRun(BatchRunOverview run) {
 		runs.add(run);
 	}
 	public IntegerProperty runSizeProperty() {

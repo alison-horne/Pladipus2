@@ -40,6 +40,15 @@ public class UserControlImpl implements UserControl {
 	}
 	
 	@Override
+	public void createUser(String username, String email, String password) throws PladipusReportableException {
+		ClientToControlMessage msg = new ClientToControlMessage(ClientTask.CREATE_USER);
+		msg.setUsername(username);
+		msg.setPassword(password);
+		msg.setEmail(email);
+		sendMessage(msg);
+	}
+	
+	@Override
 	public void logout() {
 		this.username = null;
 	}

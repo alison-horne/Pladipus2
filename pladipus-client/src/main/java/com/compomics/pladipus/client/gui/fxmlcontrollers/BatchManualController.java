@@ -171,9 +171,11 @@ public class BatchManualController extends FxmlController {
     
     @FXML
     public void handleTableToString() {
-    	validatingLbl.setText(resources.getString("batchmanual.validating"));
-    	disableAllButtons(true);
-    	new Thread(validateTask()).start();
+    	if (!tableView.getItems().isEmpty()) {
+	    	validatingLbl.setText(resources.getString("batchmanual.validating"));
+	    	disableAllButtons(true);
+	    	new Thread(validateTask()).start();
+    	}
     }
     
     @FXML

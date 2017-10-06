@@ -3,6 +3,7 @@ package com.compomics.pladipus.client.gui.model;
 public enum PladipusScene {
 	SETUP("Setup", "setup", null, true, true),
 	LOGIN("Login", "login", null, true, true),
+	NEW_USER("NewUser", "newuser", null, true, false),
 	DASHBOARD("Dashboard", "dashboard", null, true, true),
 	NEW_WORKFLOW("NewWorkflow", "newworkflow", null, true, false),
 	EDIT_WORKFLOW("EditWorkflow", "editworkflow", null, true, false),

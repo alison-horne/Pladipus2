@@ -47,7 +47,7 @@ public class BatchCsvParser implements CsvParser<Batch, Workflow> {
 		    	BatchRun run = new BatchRun();
 		    	run.setName(record.get(RUN_ID_HEADER));
 		    	for (Entry<String, Long> global: getBatchGlobalParameters(workflow).entrySet()) {
-		    		for (String value : record.get(global.getKey()).split(",")) {
+		    		for (String value : record.get(global.getKey()).split(",")) { // TODO validate substitutions, check at least one record
 		    			run.addGlobalValue(global.getValue(), value);
 		    		}
 		    	}

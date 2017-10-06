@@ -81,6 +81,9 @@ public class ClientTaskMapper {
 				case LOGIN_USER:
 					doLogin(msg.getUsername(), msg.getPassword(), clientId);
 					break;
+				case CREATE_USER:
+					userControl.createUser(msg.getUsername(), msg.getEmail(), msg.getPassword());
+					break;
 				case REPLACE_WORKFLOW:
 					mapOutput(response, batchControl.generateHeadersFromWorkflow(workflowControl.replaceWorkflow(msg.getFileContent(), getUser(clientId, msg.getUsername()))));
 					break;

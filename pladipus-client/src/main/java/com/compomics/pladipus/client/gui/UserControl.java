@@ -7,4 +7,5 @@ public interface UserControl {
 	public String getLoggedInUsername();
 	public void login(String username, String password) throws PladipusReportableException;
 	public void logout();
+	public void createUser(String username, String email, String password) throws PladipusReportableException;
 }

@@ -142,6 +142,11 @@ public class GuiControlImpl implements GuiControl {
 	}
 	
 	@Override
+	public void createUser(String username, String email, String password) throws PladipusReportableException {
+		userControl.createUser(username, email, password);
+	}
+	
+	@Override
 	public void logout() {
 		userControl.logout();
 		defaultControl.clear();

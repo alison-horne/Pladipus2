@@ -71,7 +71,7 @@ public class LoginController extends FxmlController {
     
     @FXML
     public void handleCreate() {
-    	// TODO
+    	nextScene(PladipusScene.NEW_USER, true);
     }
     
     @FXML

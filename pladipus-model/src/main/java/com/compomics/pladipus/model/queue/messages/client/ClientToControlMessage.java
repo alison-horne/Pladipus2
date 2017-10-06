@@ -3,6 +3,7 @@ package com.compomics.pladipus.model.queue.messages.client;
 public class ClientToControlMessage {
 	private ClientTask task;
 	private String username;
+	private String email;
 	private String password;
 	private String fileContent;
 	private String batchName;
@@ -27,6 +28,12 @@ public class ClientToControlMessage {
 	}
 	public void setUsername(String username) {
 		this.username = username;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
 	}
 	public String getPassword() {
 		return password;
