@@ -221,7 +221,6 @@ public class EditDisplayParameter {
 			@Override
 			public void handle(MouseEvent event) {
 				setLastNodeFocus();
-				setSelectedCell();
 				event.consume();
 			}       	
         });
@@ -305,6 +304,7 @@ public class EditDisplayParameter {
                     if (newValue.booleanValue()) {
                         focusNode = (Node) ((ReadOnlyProperty<Boolean>) observable).getBean();
                         pos.pos = getText().length();
+                        setSelectedCell();
                     } else {
                     	pos.pos = getCaretPosition();
                     }
@@ -374,6 +374,7 @@ public class EditDisplayParameter {
                     if (newValue.booleanValue()) {
                         setStyle("-fx-border-color:red");
                         focusNode = (Node) ((ReadOnlyProperty<Boolean>) observable).getBean();
+                        setSelectedCell();
                     } else {
                         setStyle("-fx-border-color:transparent");
                     }

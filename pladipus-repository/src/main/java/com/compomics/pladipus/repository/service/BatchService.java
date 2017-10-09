@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.compomics.pladipus.model.persist.Batch;
 import com.compomics.pladipus.model.persist.User;
+import com.compomics.pladipus.model.persist.Workflow;
 import com.compomics.pladipus.shared.PladipusReportableException;
 
 public interface BatchService {
@@ -11,4 +12,5 @@ public interface BatchService {
 	public void replaceBatch(Batch batch) throws PladipusReportableException;
 	public Batch getActiveNamedBatch(String batchName, User user) throws PladipusReportableException;
 	public List<Batch> getAllActiveBatchesForUser(User user) throws PladipusReportableException;
+	public List<Batch> getAllActiveBatchesForWorkflow(Workflow workflow) throws PladipusReportableException;
 }

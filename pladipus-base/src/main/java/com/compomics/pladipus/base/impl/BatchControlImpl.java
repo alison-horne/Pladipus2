@@ -1,5 +1,6 @@
 package com.compomics.pladipus.base.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +9,10 @@ import org.springframework.context.annotation.Lazy;
 import com.compomics.pladipus.base.BatchControl;
 import com.compomics.pladipus.base.WorkflowControl;
 import com.compomics.pladipus.base.helper.CsvParser;
+import com.compomics.pladipus.model.core.BatchOverview;
+import com.compomics.pladipus.model.core.BatchRunOverview;
 import com.compomics.pladipus.model.persist.Batch;
+import com.compomics.pladipus.model.persist.BatchRun;
 import com.compomics.pladipus.model.persist.User;
 import com.compomics.pladipus.model.persist.Workflow;
 import com.compomics.pladipus.repository.service.BatchService;
@@ -72,5 +76,21 @@ public class BatchControlImpl implements BatchControl {
 		Batch batch = batchCsvParser.parseCSV(csvString, workflow);
 		batch.setName(batchName);
 		return batch;
+	}
+
+	@Override
+	public List<BatchOverview> getBatchOverviewsForWorkflow(Workflow workflow) throws PladipusReportableException {
+		List<BatchOverview> batchOverviews = new ArrayList<BatchOverview>();
+		List<Batch> batches = batchService.getAllActiveBatchesForWorkflow(workflow);
+		if (batches != null) {
+			for (Batch batch: batches) {
+				BatchOverview bo = new BatchOverview(batch.getName(), batch.getId());
+				for (BatchRun run: batch.getRuns()) {
+					bo.addRun(new BatchRunOverview(run.getName(), run.getId()));
+				}
+				batchOverviews.add(bo);
+			}
+		}
+		return batchOverviews;
 	}
 }

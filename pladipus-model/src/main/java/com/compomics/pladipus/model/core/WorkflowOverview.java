@@ -3,8 +3,6 @@ package com.compomics.pladipus.model.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -14,7 +12,7 @@ public class WorkflowOverview {
 	private StringProperty name;
 	private String xml;
 	private List<String> headers;
-	private ObservableList<BatchOverview> batches = FXCollections.observableArrayList();
+	private ObservableList<BatchOverview> batches;
 	
 	public WorkflowOverview() {
 		this(null, null);
@@ -24,6 +22,7 @@ public class WorkflowOverview {
 		this.name = new SimpleStringProperty(name);
 		this.xml = xml;
 		headers = new ArrayList<String>();
+		this.batches = FXCollections.observableArrayList();
 	}
 	
 	public String getName() {
@@ -47,17 +46,30 @@ public class WorkflowOverview {
 	public List<String> getHeaders() {
 		return headers;
 	}
-	@JsonIgnore
-    public ObservableList<BatchOverview> getBatches() {
-    	return batches;
-    }
-    public void addBatch(BatchOverview batch) {
-    	batches.add(batch);
-    }
+	public ObservableList<BatchOverview> getBatches() {
+		return batches;
+	}
+	public void setBatches(List<BatchOverview> batches) {
+		this.batches.clear();
+		if (batches != null) this.batches.addAll(batches);
+	}
+	public void addBatch(BatchOverview batch) {
+		batches.add(batch);
+	}
     public boolean batchExists(String batchName) {
     	for (BatchOverview batch: batches) {
     		if (batch.getBatchName().equalsIgnoreCase(batchName)) return true;
     	}
     	return false;
     }
+
+	public void addReplaceBatch(BatchOverview bo) {
+		for (BatchOverview batch: batches) {
+			if (batch.getBatchName().equalsIgnoreCase(bo.getBatchName())) {
+				batches.remove(batch);
+				break;
+			}
+		}
+		batches.add(bo);
+	}
 }

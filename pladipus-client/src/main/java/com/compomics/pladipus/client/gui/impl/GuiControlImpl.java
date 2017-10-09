@@ -16,6 +16,7 @@ import com.compomics.pladipus.client.gui.ToolControl;
 import com.compomics.pladipus.client.gui.UserControl;
 import com.compomics.pladipus.client.gui.UserWorkflowControl;
 import com.compomics.pladipus.client.queue.MessageSender;
+import com.compomics.pladipus.model.core.BatchOverview;
 import com.compomics.pladipus.model.core.DefaultOverview;
 import com.compomics.pladipus.model.core.GuiSetup;
 import com.compomics.pladipus.model.core.WorkflowOverview;
@@ -256,7 +257,14 @@ public class GuiControlImpl implements GuiControl {
 		msg.setBatchRun(startRun);
 		msg.setWorkflowName(wo.getName());
 		msg.setFileContent(content);
-		sendMessage(msg, 3); // TODO get batch info returned, update wo
+		String batch = sendMessage(msg, 3);
+		ObjectReader reader = jsonMapper.readerFor(BatchOverview.class);
+		try {
+			wo.addReplaceBatch(reader.readValue(batch));
+		} catch (IOException e) {
+			throw new PladipusReportableException(resources.getString("popup.noLogin") + "\n" + e.getMessage());
+		}
+		
 	}
 
 	private void initialize() throws PladipusReportableException {

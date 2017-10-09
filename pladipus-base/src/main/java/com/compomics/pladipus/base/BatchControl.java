@@ -2,6 +2,7 @@ package com.compomics.pladipus.base;
 
 import java.util.List;
 
+import com.compomics.pladipus.model.core.BatchOverview;
 import com.compomics.pladipus.model.persist.Batch;
 import com.compomics.pladipus.model.persist.User;
 import com.compomics.pladipus.model.persist.Workflow;
@@ -12,4 +13,5 @@ public interface BatchControl {
 	public Batch replaceBatch(String csvString, String workflowName, String batchName, User user) throws PladipusReportableException;
 	public List<String> generateHeaders(String workflowName, User user) throws PladipusReportableException;
 	public List<String> generateHeadersFromWorkflow(Workflow workflow) throws PladipusReportableException;
+	public List<BatchOverview> getBatchOverviewsForWorkflow(Workflow workflow) throws PladipusReportableException;
 }

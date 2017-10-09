@@ -12,11 +12,14 @@ import com.compomics.pladipus.base.QueueControl;
 import com.compomics.pladipus.base.ToolControl;
 import com.compomics.pladipus.base.UserControl;
 import com.compomics.pladipus.base.WorkflowControl;
+import com.compomics.pladipus.model.core.BatchOverview;
+import com.compomics.pladipus.model.core.BatchRunOverview;
 import com.compomics.pladipus.model.core.DefaultOverview;
 import com.compomics.pladipus.model.core.GuiSetup;
 import com.compomics.pladipus.model.core.ToolInformation;
 import com.compomics.pladipus.model.core.WorkflowOverview;
 import com.compomics.pladipus.model.persist.Batch;
+import com.compomics.pladipus.model.persist.BatchRun;
 import com.compomics.pladipus.model.persist.Default;
 import com.compomics.pladipus.model.persist.User;
 import com.compomics.pladipus.model.persist.Workflow;
@@ -103,6 +106,7 @@ public class ClientTaskMapper {
 					if (msg.getBatchRun() != null && msg.getBatchRun()) {
 						queueControl.processBatch(batch, getUser(clientId, msg.getUsername()));
 					}
+					mapOutput(response, batchToOverview(batch));
 					break;
 				case GENERATE_HEADERS:
 					mapOutput(response, batchControl.generateHeaders(msg.getWorkflowName(), getUser(clientId, msg.getUsername())));
@@ -112,6 +116,7 @@ public class ClientTaskMapper {
 					if (msg.getBatchRun() != null && msg.getBatchRun()) {
 						queueControl.processBatch(repBatch, getUser(clientId, msg.getUsername()));
 					}
+					mapOutput(response, batchToOverview(repBatch));
 					break;
 				case RESTART_BATCH:
 					queueControl.restart(msg.getBatchName(), getUser(clientId, msg.getUsername()));
@@ -156,9 +161,18 @@ public class ClientTaskMapper {
 		for (Workflow wf: workflowControl.getActiveWorkflows(user.getUser())) {
 			WorkflowOverview wo = new WorkflowOverview(wf.getName(), wf.getTemplateXml());
 			wo.setHeaders(batchControl.generateHeadersFromWorkflow(wf));
+			wo.setBatches(batchControl.getBatchOverviewsForWorkflow(wf));
 			setup.addWorkflow(wo);
 		}
 		user.setSetup(setup);
 		return setup;
+	}
+	
+	private BatchOverview batchToOverview(Batch batch) {
+		BatchOverview bo = new BatchOverview(batch.getName(), batch.getId());
+		for (BatchRun run: batch.getRuns()) {
+			bo.addRun(new BatchRunOverview(run.getName(), run.getId()));
+		}
+		return bo;
 	}
 }
