@@ -18,7 +18,10 @@ public enum PladipusScene {
 	STEP_LINK("StepLink", "steplink", null, true, false),
 	REMOVE_LINKS("RemoveLinks", "removelinks", null, true, false),
 	BATCH_LOAD("BatchLoad", "batchload", null, true, false),
-	BATCH_MANUAL("BatchManual", "batchmanual", null, true, false);
+	BATCH_MANUAL("BatchManual", "batchmanual", null, true, false),
+	BATCH_VIEW("BatchView", "batchview", null, true, false),
+	WORKER("Worker", "worker", null, true, false),
+	BATCH_PARAMS("BatchParam", "batchparam", null, true, false);
 
     private String fxml;
     private String texts;

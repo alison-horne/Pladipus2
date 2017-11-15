@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
+import com.compomics.pladipus.base.BatchControl;
 import com.compomics.pladipus.base.WorkflowControl;
 import com.compomics.pladipus.base.helper.ValidationChecker;
 import com.compomics.pladipus.model.persist.Workflow;
@@ -18,6 +19,10 @@ public class WorkflowControlImpl implements WorkflowControl {
 	@Autowired
 	@Lazy
 	private WorkflowService workflowService;
+	
+	@Autowired
+	@Lazy
+	private BatchControl batchControl;
 	
 	@Autowired
 	private ValidationChecker<Workflow> workflowValidator;
@@ -36,6 +41,15 @@ public class WorkflowControlImpl implements WorkflowControl {
 		Workflow workflow = parseAndValidate(content, user);
 		workflowService.replaceWorkflow(workflow);
 		return workflow;
+	}
+	
+	@Override
+	public void deactivateWorkflow(String name, User user) throws PladipusReportableException {
+		Workflow workflow = getNamedWorkflow(name, user);
+		if (workflow != null) {
+			batchControl.deactivateWorkflowBatches(workflow);
+			workflowService.deactivateWorkflow(workflow);
+		}		
 	}
 	
 	@Override

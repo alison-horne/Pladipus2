@@ -8,55 +8,51 @@ public class GuiSetup {
 	private Set<DefaultOverview> userDefaults;
 	private Set<WorkflowOverview> workflows;
 	
-	public GuiSetup(){}
+	public GuiSetup(){
+		this(null, null, null);
+	}
 	public GuiSetup(Set<ToolInformation> tools, Set<DefaultOverview> userDefaults, Set<WorkflowOverview> workflows) {
-		this.tools = tools;
-		this.userDefaults = userDefaults;
-		this.workflows = workflows;
+		this.tools = new HashSet<ToolInformation>();
+		this.userDefaults = new HashSet<DefaultOverview>();
+		this.workflows = new HashSet<WorkflowOverview>();
+		setTools(tools);
+		setUserDefaults(userDefaults);
+		setWorkflows(workflows);
 	}
 	public void setTools(Set<ToolInformation> tools) {
-		this.tools = tools;
+		this.tools.clear();
+		if (tools != null) {
+			this.tools.addAll(tools);
+		}
 	}
 	public Set<ToolInformation> getTools() {
-		initSets();
 		return tools;
 	}
 	public void addTool(ToolInformation tool) {
-		initSets();
 		tools.add(tool);
 	}
 	public void setUserDefaults(Set<DefaultOverview> userDefaults) {
-		this.userDefaults = userDefaults;
+		this.userDefaults.clear();
+		if (userDefaults != null) {
+			this.userDefaults.addAll(userDefaults);
+		}
 	}
 	public Set<DefaultOverview> getUserDefaults() {
-		initSets();
 		return userDefaults;
 	}
 	public void addDefault(DefaultOverview def) {
-		initSets();
 		userDefaults.add(def);
 	}
 	public void setWorkflows(Set<WorkflowOverview> workflows) {
-		this.workflows = workflows;
+		this.workflows.clear();
+		if (workflows != null) {
+			this.workflows.addAll(workflows);
+		}
 	}
 	public Set<WorkflowOverview> getWorkflows() {
-		initSets();
 		return workflows;
 	}
 	public void addWorkflow(WorkflowOverview wf) {
-		initSets();
 		workflows.add(wf);
-	}
-	
-	private void initSets() {
-		if (tools == null) {
-			tools = new HashSet<ToolInformation>();
-		}
-		if (userDefaults == null) {
-			userDefaults = new HashSet<DefaultOverview>();
-		}
-		if (workflows == null) {
-			workflows = new HashSet<WorkflowOverview>();
-		}
 	}
 }

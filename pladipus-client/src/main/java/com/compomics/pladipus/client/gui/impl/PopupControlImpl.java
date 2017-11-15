@@ -11,6 +11,7 @@ import com.compomics.pladipus.client.gui.PopupControl;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
@@ -80,11 +81,16 @@ public class PopupControlImpl implements PopupControl {
     
     @Override
     public void showInfo(String text, Stage stage, boolean wait) {
+    	showInfo(getHeader(text), getContent(text), stage, wait);
+    }
+    
+    @Override
+    public void showInfo(String header, String content, Stage stage, boolean wait) {
     	Alert alert = new Alert(AlertType.INFORMATION);
     	alert.initOwner(stage);
-    	alert.setContentText(getContent(text));
+    	alert.setContentText(content);
     	alert.setTitle(stage.getTitle());
-    	alert.setHeaderText(getHeader(text));
+    	alert.setHeaderText(header);
     	if (wait) {
     		alert.showAndWait();
     	} else {
@@ -140,6 +146,22 @@ public class PopupControlImpl implements PopupControl {
 		Optional<String> result = dialog.showAndWait();
 		if (result.isPresent()) {
 			return result.get();
+		}
+		return null;
+	}
+	
+	@Override
+	public <T>T choiceDialog(Stage stage, String text, List<T> list) {
+		ChoiceDialog<T> dialog = new ChoiceDialog<>();
+		dialog.getItems().addAll(list);
+		dialog.initOwner(stage);
+		dialog.setTitle(stage.getTitle());
+		dialog.setHeaderText(getHeader(text));
+		dialog.setContentText(getContent(text));
+
+		Optional<T> result = dialog.showAndWait();
+		if (result.isPresent()){
+		   	return result.get();
 		}
 		return null;
 	}

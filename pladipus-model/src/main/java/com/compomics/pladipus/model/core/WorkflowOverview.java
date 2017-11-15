@@ -72,4 +72,14 @@ public class WorkflowOverview {
 		}
 		batches.add(bo);
 	}
+	
+	public boolean removeBatch(BatchOverview batch) {
+		for (BatchOverview bo: batches) {
+			if (bo.getId() == batch.getId()) {
+				batches.remove(batch);
+				return true;
+			}
+		}
+		return false;
+	}
 }

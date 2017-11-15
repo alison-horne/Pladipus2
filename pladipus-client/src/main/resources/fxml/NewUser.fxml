@@ -32,12 +32,11 @@
             <HBox spacing="10" GridPane.columnSpan="2" GridPane.rowIndex="6" GridPane.valignment="CENTER">
                <children>
                	  <Pane HBox.hgrow="SOMETIMES" />
-                  <Button fx:id="saveBtn" mnemonicParsing="false" text="%newuser.saveBtn" onAction="#handleSave"/>
-                  <Button fx:id="cancelBtn" mnemonicParsing="false" text="%newuser.cancelBtn" onAction="#handleCancel"/>
+                  <Button mnemonicParsing="false" text="%newuser.saveBtn" onAction="#handleSave"/>
+                  <Button mnemonicParsing="false" text="%newuser.cancelBtn" onAction="#handleCancel"/>
                   <Pane HBox.hgrow="SOMETIMES" />
                </children>
             </HBox>
-            <Label fx:id="savingLbl" GridPane.columnSpan="2" GridPane.rowIndex="5"/>
             <Label text="%newuser.header" GridPane.columnSpan="2" />
             <Label text="%newuser.name" GridPane.rowIndex="1" />
             <Label text="%newuser.email" GridPane.rowIndex="2" />

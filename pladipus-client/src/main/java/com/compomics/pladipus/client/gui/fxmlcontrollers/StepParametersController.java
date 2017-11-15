@@ -179,7 +179,10 @@ public class StepParametersController extends FxmlController {
 	}
 	
 	private void applyChanges() {
-		if (newStepName != null) step.setStepId(newStepName);
+		if (newStepName != null) {
+			workflowGui.updateIdLinks(step.getStepId(), newStepName);
+			step.setStepId(newStepName);
+		}
 		for (StepParameterGui param: allParams) {
 			if (param.valueChanged()) {
 				if (param.isPerRun()) {

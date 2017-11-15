@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.compomics.pladipus.model.core.ToolInformation;
 import com.compomics.pladipus.model.parameters.InputParameter;
@@ -88,6 +91,14 @@ public class WorkflowGuiStep {
 		allIds.addAll(stepLinkNoOutputs);
 		allIds.addAll(subStepOutputs.keySet());
 		return allIds;
+	}
+	public void updateIdLink(String oldStepId, String newStepId) {
+		if (stepLinkNoOutputs.remove(oldStepId)) stepLinkNoOutputs.add(newStepId);
+		for (List<String> values: parameters.values()) {
+			for (ListIterator<String> iter = values.listIterator(); iter.hasNext();){
+				iter.set(iter.next().replaceAll(Pattern.quote(Substitution.getPrefix() + oldStepId + "."), Matcher.quoteReplacement(Substitution.getPrefix() + newStepId + ".")));
+			}
+		}
 	}
 	
 	public void checkSubs() {

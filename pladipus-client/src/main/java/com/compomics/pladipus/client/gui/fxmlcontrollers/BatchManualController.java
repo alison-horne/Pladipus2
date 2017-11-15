@@ -19,12 +19,9 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -40,10 +37,6 @@ public class BatchManualController extends FxmlController {
 	private Button insertSubBtn;
 	@FXML
 	private Button browseBtn;
-	@FXML
-	private Button saveBtn, cancelBtn, addRowBtn, delRowBtn;
-	@FXML
-	private Label validatingLbl;
 	@FXML
 	private ResourceBundle resources;
 	
@@ -76,15 +69,6 @@ public class BatchManualController extends FxmlController {
     private void disableSubButtons(boolean disable) {
     	insertSubBtn.setDisable(disable);
     	browseBtn.setDisable(disable);
-    }
-    private void disableAllButtons(boolean disable) {
-    	saveBtn.setDisable(disable);
-    	cancelBtn.setDisable(disable);
-    	addRowBtn.setDisable(disable);
-    	delRowBtn.setDisable(disable);
-    	if (disable || (selectedCell.get() != null)) {
-    		disableSubButtons(disable);
-    	}
     }
     
     private void addRow(String[] initValues) {
@@ -172,9 +156,29 @@ public class BatchManualController extends FxmlController {
     @FXML
     public void handleTableToString() {
     	if (!tableView.getItems().isEmpty()) {
-	    	validatingLbl.setText(resources.getString("batchmanual.validating"));
-	    	disableAllButtons(true);
-	    	new Thread(validateTask()).start();
+	    	LoadingTask<Void> validateTask = new LoadingTask<Void>(resources.getString("batchmanual.validating"), null) {
+				@Override
+				public Void doTask() throws Exception {
+					idList.clear();
+					StringBuilder builder = new StringBuilder();
+			    	builder.append(getHeaderString());
+			    	for (List<EditDisplayParameter> row: tableView.getItems()) {
+			    		builder.append("\n");
+			    		builder.append(validateRow(row));
+			    	}
+			    	csvString = builder.toString();
+					return null;
+				}
+				@Override
+				public void onSuccess() {
+					close();
+				}
+				@Override
+				public void onFail() {
+					csvString = null;
+				}
+	    	};
+	    	validateTask.run();
     	}
     }
     
@@ -236,33 +240,6 @@ public class BatchManualController extends FxmlController {
 	@Override
 	public Object returnObject() {
 		return csvString;
-	}
-	
-	private Task<Void> validateTask() {
-		Task<Void> validateTask = new Task<Void>() {
-			@Override
-			protected Void call() throws PladipusReportableException {
-				idList.clear();
-				StringBuilder builder = new StringBuilder();
-		    	builder.append(getHeaderString());
-		    	for (List<EditDisplayParameter> row: tableView.getItems()) {
-		    		builder.append("\n");
-		    		builder.append(validateRow(row));
-		    	}
-		    	csvString = builder.toString();
-				return null;
-			}
-		};
-	    validateTask.setOnSucceeded((WorkerStateEvent event) -> {
-	        close();
-	    });
-	    validateTask.setOnFailed((WorkerStateEvent event) -> {
-	    	disableAllButtons(false);
-	    	validatingLbl.setText("");
-	    	csvString = null;
-	    	error(validateTask.getException().getMessage());
-	    });
-	    return validateTask;
 	}
 	
 	private String getHeaderString() {

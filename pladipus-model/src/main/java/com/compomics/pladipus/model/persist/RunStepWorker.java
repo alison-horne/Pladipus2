@@ -66,7 +66,7 @@ public class RunStepWorker {
 		this.end = end;
 	}
 	
-	@Column(name="error", nullable=true)
+	@Column(name="error", nullable=true, length=1000)
 	public String getError() {
 		return error;
 	}

@@ -10,12 +10,11 @@ import com.compomics.pladipus.base.BatchControl;
 import com.compomics.pladipus.base.WorkflowControl;
 import com.compomics.pladipus.base.helper.CsvParser;
 import com.compomics.pladipus.model.core.BatchOverview;
-import com.compomics.pladipus.model.core.BatchRunOverview;
 import com.compomics.pladipus.model.persist.Batch;
-import com.compomics.pladipus.model.persist.BatchRun;
 import com.compomics.pladipus.model.persist.User;
 import com.compomics.pladipus.model.persist.Workflow;
 import com.compomics.pladipus.repository.service.BatchService;
+import com.compomics.pladipus.repository.service.RunService;
 import com.compomics.pladipus.shared.PladipusMessages;
 import com.compomics.pladipus.shared.PladipusReportableException;
 
@@ -34,6 +33,10 @@ public class BatchControlImpl implements BatchControl {
 	@Autowired
 	@Lazy
 	private BatchService batchService;
+	
+	@Autowired
+	@Lazy
+	private RunService runService;
 	
 	@Override
 	public Batch createBatch(String csvString, String workflowName, String batchName, User user) throws PladipusReportableException {
@@ -84,13 +87,29 @@ public class BatchControlImpl implements BatchControl {
 		List<Batch> batches = batchService.getAllActiveBatchesForWorkflow(workflow);
 		if (batches != null) {
 			for (Batch batch: batches) {
-				BatchOverview bo = new BatchOverview(batch.getName(), batch.getId());
-				for (BatchRun run: batch.getRuns()) {
-					bo.addRun(new BatchRunOverview(run.getName(), run.getId()));
-				}
-				batchOverviews.add(bo);
+				batchOverviews.add(batch.getBatchOverview());
 			}
 		}
 		return batchOverviews;
+	}
+	
+	@Override
+	public void deactivateWorkflowBatches(Workflow workflow) throws PladipusReportableException {
+		for (Batch batch: batchService.getAllActiveBatchesForWorkflow(workflow)) {
+			deactivateBatch(batch);
+		}
+	}
+	
+	@Override
+	public void deactivateBatch(Long id) throws PladipusReportableException {
+		Batch batch = batchService.getBatchWithId(id);
+		if (batch != null) {
+			deactivateBatch(batch);
+		}
+	}
+	
+	private void deactivateBatch(Batch batch) throws PladipusReportableException {
+		runService.abortBatchRuns(batch, true);
+		batchService.deactivateBatch(batch);
 	}
 }

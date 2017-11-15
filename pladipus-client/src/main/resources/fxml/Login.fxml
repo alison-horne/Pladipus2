@@ -44,8 +44,7 @@
                   <PasswordField fx:id="passwordField" GridPane.columnIndex="1" GridPane.rowIndex="1" onKeyPressed="#enterListener"/>                  
                </children>
             </GridPane>
-            <Label fx:id="loginWaitLabel" text="" GridPane.halignment="CENTER" GridPane.rowIndex="2"/>
-            <Button fx:id="loginButton" mnemonicParsing="false" onAction="#handleLogin" text="%login.login" GridPane.halignment="CENTER" GridPane.rowIndex="3"/>
+            <Button mnemonicParsing="false" onAction="#handleLogin" text="%login.login" GridPane.halignment="CENTER" GridPane.rowIndex="3"/>
             <Hyperlink onAction="#handleCreate" text="%login.create" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
             <Hyperlink onAction="#handleForgot" text="%login.forgot" GridPane.halignment="CENTER" GridPane.rowIndex="5" />
          </children>

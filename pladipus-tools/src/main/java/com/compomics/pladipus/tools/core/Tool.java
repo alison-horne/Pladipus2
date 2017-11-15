@@ -70,7 +70,7 @@ public abstract class Tool implements Callable<Map<String, String>> {
 		return false;
 	}
 	
-	private Map<String, String> getReturnOutput() {
+	private Map<String, String> getReturnOutput() { // TODO multivalued output - return comma-separated list
 		Map<String, String> outputMap = new HashMap<String, String>();
 		if (errorString != null) {			
 			outputMap.put(ERROR, errorString);

@@ -4,13 +4,7 @@ import java.util.ResourceBundle;
 
 import com.compomics.pladipus.client.gui.FxmlController;
 import com.compomics.pladipus.client.gui.model.PladipusScene;
-import com.compomics.pladipus.shared.PladipusReportableException;
-
-import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -22,10 +16,6 @@ public class LoginController extends FxmlController {
 	private TextField usernameField;
 	@FXML
 	private PasswordField passwordField;
-	@FXML
-	private Button loginButton;
-	@FXML
-	private Label loginWaitLabel;
     @FXML
     private ResourceBundle resources;
 	
@@ -34,39 +24,27 @@ public class LoginController extends FxmlController {
     
     @FXML
     public void handleLogin() {
-    	activeBtn(false);
     	String username = usernameField.getText();
     	String password = passwordField.getText();
     	
     	if ((username == null) || username.isEmpty()) {
-    		loginError(resources.getString("login.noUsername"));
+    		error(resources.getString("login.noUsername"));
     	} else if ((password == null) || password.isEmpty()) {
-    		loginError(resources.getString("login.noPassword"));
+    		error(resources.getString("login.noPassword"));
     	} else {
-			Task<Void> loginTask = new Task<Void>() {
-	            @Override protected Void call() throws PladipusReportableException {
-	            	guiControl.login(username, password);
-	                return null;
-	            }
-	        };
-		    loginTask.setOnSucceeded((WorkerStateEvent event) -> {
-		        nextScene(PladipusScene.DASHBOARD, false);
-		    });
-		    loginTask.setOnFailed((WorkerStateEvent event) -> {
-		    	loginError(loginTask.getException().getMessage());
-		    });
-		    new Thread(loginTask).start();
+    		LoadingTask<Void> loginTask = new LoadingTask<Void>(resources.getString("login.wait"), null) {
+				@Override
+				public Void doTask() throws Exception {
+					guiControl.login(username, password);
+					return null;
+				}
+				@Override
+				public void onSuccess() {
+					nextScene(PladipusScene.DASHBOARD, false);
+				}
+    		};
+    		loginTask.run();
     	}
-    }
-    
-    private void loginError(String errorMsg) {
-    	error(errorMsg);
-    	activeBtn(true);
-    }
-    
-    private void activeBtn(boolean active) {
-    	loginWaitLabel.setText(active ? "" : resources.getString("login.wait"));
-    	loginButton.setDisable(!active);
     }
     
     @FXML

@@ -22,6 +22,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.compomics.pladipus.model.core.RunStepOverview;
+import com.compomics.pladipus.model.core.WorkerRunOverview;
+
 @Table(name="run_steps")
 @Entity(name="run_steps")
 @NamedQuery(name="RunStep.findByStatus", query="SELECT r FROM run_steps r WHERE r.status = :status")
@@ -184,5 +187,20 @@ public class RunStep {
 	}
 	public void setDependents(Set<RunStep> steps) {
 		dependents.addAll(steps);
+	}
+	
+	@Transient
+	public RunStepOverview getRunStepOverview() {
+		RunStepOverview rso = new RunStepOverview(stepIdentifier, toolName, status, runStepId);
+		for (RunStepWorker worker: workers) {
+			WorkerRunOverview wro = new WorkerRunOverview(worker.getWorkerId(), (worker.getEnd() == null), worker.getError());
+			if (worker.getEnd() != null && (worker.getError() == null || worker.getError().isEmpty())) {
+				for (RunStepOutput output: outputs) {
+					wro.addOutput(output.getOutputId(), output.getOutputValue());
+				}
+			}
+			rso.addWorker(wro);
+		}
+		return rso;
 	}
 }

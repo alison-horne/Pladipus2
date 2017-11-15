@@ -12,6 +12,7 @@ import com.compomics.pladipus.shared.PladipusReportableException;
 public interface WorkflowControl {
 	public void createWorkflow(String filecontent, User user) throws PladipusReportableException;
 	public Workflow replaceWorkflow(String filecontent, User user) throws PladipusReportableException;
+	public void deactivateWorkflow(String name, User user) throws PladipusReportableException;
 	public Workflow getNamedWorkflow(String name, User user) throws PladipusReportableException;
 	public List<Workflow> getActiveWorkflows(User user) throws PladipusReportableException;
 }

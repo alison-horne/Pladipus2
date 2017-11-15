@@ -1,40 +1,56 @@
 package com.compomics.pladipus.model.core;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.compomics.pladipus.model.persist.RunStatus;
 
 public class RunOverview {
-	// TODO status from db - to readable string from properties file...
 	
-	StringProperty name;
-	StringProperty status;
+	long id;
+	long batchRunId;
+	RunStatus status;
+	List<RunStepOverview> steps;
 	
 	public RunOverview() {
-		this(null, null);
+		this(-1, -1, null);
 	}
 	
-	public RunOverview(String name, String status) {
-		this.name = new SimpleStringProperty(name);
-		this.status = new SimpleStringProperty(status);
+	public RunOverview(long id, long batchRunId, RunStatus status) {
+		this.id = id;
+		this.batchRunId = batchRunId;
+		this.status = status;
+		steps = new ArrayList<RunStepOverview>();
 	}
 	
-	public String getName() {
-		return name.get();
+	public long getId() {
+		return id;
 	}
-	public void setName(String name) {
-		this.name.set(name);
+	public void setId(long id) {
+		this.id = id;
 	}
-	public StringProperty nameProperty() {
-		return name;
+	public long getBatchRunId() {
+		return batchRunId;
 	}
-	
-	public String getStatus() {
-		return status.get();
+	public void setBatchRunId(long batchRunId) {
+		this.batchRunId = batchRunId;
 	}
-	public void setStatus(String status) {
-		this.status.set(status);
-	}
-	public StringProperty statusProperty() {
+	public RunStatus getStatus() {
 		return status;
+	}
+	public void setStatus(RunStatus status) {
+		this.status = status;
+	}
+	public List<RunStepOverview> getSteps() {
+		return steps;
+	}
+	public void setSteps(List<RunStepOverview> steps) {
+		this.steps.clear();
+		if (steps != null) {
+			this.steps = steps;
+		}
+	}
+	public void addStep(RunStepOverview rso) {
+		steps.add(rso);
 	}
 }

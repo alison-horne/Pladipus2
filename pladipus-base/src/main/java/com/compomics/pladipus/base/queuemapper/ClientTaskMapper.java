@@ -12,14 +12,11 @@ import com.compomics.pladipus.base.QueueControl;
 import com.compomics.pladipus.base.ToolControl;
 import com.compomics.pladipus.base.UserControl;
 import com.compomics.pladipus.base.WorkflowControl;
-import com.compomics.pladipus.model.core.BatchOverview;
-import com.compomics.pladipus.model.core.BatchRunOverview;
 import com.compomics.pladipus.model.core.DefaultOverview;
 import com.compomics.pladipus.model.core.GuiSetup;
 import com.compomics.pladipus.model.core.ToolInformation;
 import com.compomics.pladipus.model.core.WorkflowOverview;
 import com.compomics.pladipus.model.persist.Batch;
-import com.compomics.pladipus.model.persist.BatchRun;
 import com.compomics.pladipus.model.persist.Default;
 import com.compomics.pladipus.model.persist.User;
 import com.compomics.pladipus.model.persist.Workflow;
@@ -90,23 +87,38 @@ public class ClientTaskMapper {
 				case REPLACE_WORKFLOW:
 					mapOutput(response, batchControl.generateHeadersFromWorkflow(workflowControl.replaceWorkflow(msg.getFileContent(), getUser(clientId, msg.getUsername()))));
 					break;
+				case DELETE:
+					User user = getUser(clientId, msg.getUsername());
+					if (msg.getWorkflowName() != null) {
+						workflowControl.deactivateWorkflow(msg.getWorkflowName(), user);
+					} else if (msg.getBatchId() != null) {
+						batchControl.deactivateBatch(msg.getBatchId());
+					}
+					break;
 				case START_BATCH:
 					queueControl.process(msg.getBatchName(), getUser(clientId, msg.getUsername()));
 					break;
 				case ABORT:
-					queueControl.abort(msg.getBatchName(), getUser(clientId, msg.getUsername()));
+					User us = getUser(clientId, msg.getUsername());
+					if (msg.getBatchRunId() != null) {
+						queueControl.abortBatchRun(msg.getBatchRunId());
+					} else if (msg.getBatchId() != null) {
+						queueControl.abortBatch(msg.getBatchId());
+					} else {
+						queueControl.abort(msg.getBatchName(), us);
+					}
 					break;
 				case ADD_DEFAULT:
-					User user = getUser(clientId, msg.getUsername());
-					if (msg.getDefaultGlobal() != null && msg.getDefaultGlobal()) user = null;
-					defaultsControl.addDefault(msg.getDefaultName(), msg.getDefaultValue(), msg.getDefaultType(), user);
+					User u = getUser(clientId, msg.getUsername());
+					if (msg.getDefaultGlobal() != null && msg.getDefaultGlobal()) u = null;
+					defaultsControl.addDefault(msg.getDefaultName(), msg.getDefaultValue(), msg.getDefaultType(), u);
 					break;
 				case CREATE_BATCH:
 					Batch batch = batchControl.createBatch(msg.getFileContent(), msg.getWorkflowName(), msg.getBatchName(), getUser(clientId, msg.getUsername()));
 					if (msg.getBatchRun() != null && msg.getBatchRun()) {
 						queueControl.processBatch(batch, getUser(clientId, msg.getUsername()));
 					}
-					mapOutput(response, batchToOverview(batch));
+					mapOutput(response, batch.getBatchOverview());
 					break;
 				case GENERATE_HEADERS:
 					mapOutput(response, batchControl.generateHeaders(msg.getWorkflowName(), getUser(clientId, msg.getUsername())));
@@ -116,13 +128,21 @@ public class ClientTaskMapper {
 					if (msg.getBatchRun() != null && msg.getBatchRun()) {
 						queueControl.processBatch(repBatch, getUser(clientId, msg.getUsername()));
 					}
-					mapOutput(response, batchToOverview(repBatch));
+					mapOutput(response, repBatch.getBatchOverview());
 					break;
 				case RESTART_BATCH:
-					queueControl.restart(msg.getBatchName(), getUser(clientId, msg.getUsername()));
+					if (msg.getBatchRunId() != null) {
+						queueControl.restartBatchRun(msg.getBatchRunId(), msg.getBatchId(), getUser(clientId, msg.getUsername()));
+					} else if (msg.getBatchId() != null) {
+						queueControl.restartBatch(msg.getBatchId(), getUser(clientId, msg.getUsername()));
+					} else {
+						queueControl.restart(msg.getBatchName(), getUser(clientId, msg.getUsername()));
+					}
 					break;
 				case STATUS:
-					// TODO
+					if (msg.getBatchId() != null && getUser(clientId, msg.getUsername()) != null) {
+						mapOutput(response, queueControl.batchStatus(msg.getBatchId()));
+					}
 					break;
 				case GUI_SETUP:
 					mapOutput(response, getGuiSetup(getLoginUser(clientId, msg.getUsername())));
@@ -136,6 +156,9 @@ public class ClientTaskMapper {
 			response.setStatus(ClientTaskStatus.ERROR);
 		} catch (IllegalArgumentException e) {
 			response.setStatus(ClientTaskStatus.NO_LOGIN); 
+		} catch (Exception e) {
+			response.setStatus(ClientTaskStatus.ERROR);
+			response.setErrorMsg(exceptionMessages.getMessage("db.errorGetQuery", e.getMessage()));
 		}
 		return response;
 	}
@@ -166,13 +189,5 @@ public class ClientTaskMapper {
 		}
 		user.setSetup(setup);
 		return setup;
-	}
-	
-	private BatchOverview batchToOverview(Batch batch) {
-		BatchOverview bo = new BatchOverview(batch.getName(), batch.getId());
-		for (BatchRun run: batch.getRuns()) {
-			bo.addRun(new BatchRunOverview(run.getName(), run.getId()));
-		}
-		return bo;
 	}
 }

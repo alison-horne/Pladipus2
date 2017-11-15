@@ -90,6 +90,14 @@ public class WorkflowGui {
 		guiSteps.add(guiStep);
 	}
 	
+	public void updateIdLinks(String oldStepId, String newStepId) {
+		if (oldStepId != null && newStepId != null && !oldStepId.equals(newStepId)) {
+			for (WorkflowGuiStep step: guiSteps) {
+				step.updateIdLink(oldStepId, newStepId);
+			}
+		}
+	}
+	
 	public void clearChangedFlag() {
 		changed = false;
 	}

@@ -81,11 +81,12 @@ public class ReadyTaskScheduler {
 				message.setToolname(step.getToolName());
 				message.setJobId(step.getRunStepId());
 				String runIdentifier = runService.getRunIdentifier(step);
+				long timestamp = runService.getRunTimestamp(step);
 				for (RunStepParameter parameter : step.getParameters()) {
 					message.addParameter(parameter.getParamName(), runService.doStepSubstitutions(parameter.getParamValue(), step.getRun().getRunId()));
 				}
 				message.addParameter(MessageSelector.JMX_IDENTIFIER.name(), runIdentifier);
-				workerProducer.sendMessage(jsonMapper.writeValueAsString(message), step.getFailedWorkers(), runIdentifier);
+				workerProducer.sendMessage(jsonMapper.writeValueAsString(message), step.getFailedWorkers(), runIdentifier, timestamp);
 				runService.updateStepStatus(step, RunStatus.QUEUED);
 			}
 		}
@@ -93,7 +94,7 @@ public class ReadyTaskScheduler {
     
     private void abortRuns() throws PladipusReportableException, JsonProcessingException {
     	for (Run run: runService.getAbortedRuns()) {
-    		workerQueueController.removeMessagesByIdentifier(run.getRunIdentifier());
+    		workerQueueController.removeMessagesByIdentifier(run.getRunIdentifier(), run.getTimestamp());
     		runService.updateRunStatus(run, RunStatus.CANCELLED);
     		String workerId = null;
     		for (RunStep step: run.getRunSteps()) {

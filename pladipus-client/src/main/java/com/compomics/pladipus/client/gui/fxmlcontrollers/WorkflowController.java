@@ -27,8 +27,6 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
-import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -46,7 +44,6 @@ import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.stage.WindowEvent;
 
@@ -77,10 +74,6 @@ public class WorkflowController extends FxmlController {
     private Button deleteStepBtn;
     @FXML
     private Button editStepBtn;
-    @FXML
-    private Label savingLbl;
-    @FXML
-    private Button renameBtn, saveXmlBtn, saveBtn, cancelBtn;
     @FXML
     private TextField nameField;
     private double iconSizeScale = 1.0;
@@ -151,22 +144,18 @@ public class WorkflowController extends FxmlController {
     		}
     		if (workflowGui.isValid()) {
 	    		Workflow wf = workflowGui.toWorkflow();
-	    		savingLook(true);
-	    		Task<WorkflowOverview> saveTask = new Task<WorkflowOverview>() {
+	    		LoadingTask<WorkflowOverview> saveTask = new LoadingTask<WorkflowOverview>(resources.getString("workflow.savingLabel"), resources.getString("workflow.saveError")) {
 					@Override
-					protected WorkflowOverview call() throws Exception {
+					public WorkflowOverview doTask() throws Exception {
 						return guiControl.saveWorkflow(wf);
 					}
+					@Override
+					public void onSuccess() {
+						workflowGui.clearChangedFlag();
+						doLoadBatch(returned);
+					}
 	    		};
-			    saveTask.setOnSucceeded((WorkerStateEvent event) -> {
-			    	workflowGui.clearChangedFlag();
-			    	doLoadBatch(saveTask.getValue());
-			    });
-			    saveTask.setOnFailed((WorkerStateEvent event) -> {
-			    	savingLook(false);
-			    	error(resources.getString("workflow.saveError") + "\n" + saveTask.getException().getMessage());
-			    });
-			    new Thread(saveTask).start();
+			    saveTask.run();
     		} else {
     			error(resources.getString("workflow.saveInvalid"));
     		}
@@ -175,19 +164,6 @@ public class WorkflowController extends FxmlController {
     	}
     }
     
-    private void savingLook(boolean saving) {
-    	renameBtn.setDisable(saving);
-    	saveXmlBtn.setDisable(saving);
-    	saveBtn.setDisable(saving);
-    	cancelBtn.setDisable(saving);
-    	if (saving) {
-    		savingLbl.setTextFill(Color.RED);
-    		savingLbl.setText(resources.getString("workflow.savingLabel"));
-    	} else {
-    		savingLbl.setText("");
-    	}
-    }
-
 	private void doLoadBatch(WorkflowOverview wo) {
 		if (alert("wfBatchStart")) {
 			loadBatch(wo);
@@ -203,22 +179,19 @@ public class WorkflowController extends FxmlController {
     	} else if (wo.getHeaders().size() == 1) {
     		String header = wo.getHeaders().get(0);
     		String batchName = DateTimeFormatter.ofPattern("yyyyMMddHHmmss").format(LocalDateTime.now());
-    		Task<Void> task = new Task<Void>() {
+    		LoadingTask<Void> singleTask = new LoadingTask<Void>(resources.getString("workflow.singleRunSave"), null) {
 				@Override
-				protected Void call() throws Exception {
+				public Void doTask() throws Exception {
 					guiControl.loadBatchData(wo, batchName, header + "\nr1", true);
 					return null;
-				}    			
+				}
+				@Override
+				public void onSuccess() {
+			    	infoAlert("singleRun", true);
+			        close();
+				}
     		};
-		    task.setOnSucceeded((WorkerStateEvent event) -> {
-		    	infoAlert("singleRun", true);
-		        close();
-		    });
-		    task.setOnFailed((WorkerStateEvent event) -> {
-		    	savingLook(false);
-		    	error(task.getException().getMessage());
-		    });
-    		new Thread(task).start();
+    		singleTask.run();
     	} else {
     		nextScene(PladipusScene.BATCH_LOAD, false, wo);
     	}

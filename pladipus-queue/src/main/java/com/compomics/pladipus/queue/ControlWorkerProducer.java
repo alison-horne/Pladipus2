@@ -16,7 +16,7 @@ public class ControlWorkerProducer {
 	@Autowired
 	private JmsTemplate toWorkersTemplate;
 
-	public void sendMessage(final String txt, final String failedWorkers, final String runIdentifier) {
+	public void sendMessage(final String txt, final String failedWorkers, final String runIdentifier, final long timestamp) {
 		toWorkersTemplate.send(new MessageCreator() {
 			@Override
 			public Message createMessage(Session session) throws JMSException {
@@ -27,6 +27,7 @@ public class ControlWorkerProducer {
 				}
 				msg.setStringProperty(MessageSelector.FAILED_WORKERS.name(), (failedWorkers != null) ? failedWorkers : "");
 				msg.setStringProperty(MessageSelector.JMX_IDENTIFIER.name(), runIdentifier);
+				msg.setLongProperty(MessageSelector.STATUS_TIMESTAMP.name(), timestamp);
 				return msg;
 			}	
 		});

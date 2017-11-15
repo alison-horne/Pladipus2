@@ -1,5 +1,8 @@
 package com.compomics.pladipus.repository.service.impl;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,8 +12,10 @@ import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.compomics.pladipus.model.core.RunOverview;
 import com.compomics.pladipus.model.parameters.Substitution;
 import com.compomics.pladipus.model.persist.Batch;
+import com.compomics.pladipus.model.persist.BatchRun;
 import com.compomics.pladipus.model.persist.Run;
 import com.compomics.pladipus.model.persist.RunStatus;
 import com.compomics.pladipus.model.persist.RunStep;
@@ -84,6 +89,7 @@ public class RunServiceImpl implements RunService {
 	@Transactional(rollbackFor={Exception.class})
 	public void updateRunStatus(Run run, RunStatus status) throws PladipusReportableException {
 		run.setStatus(status);
+		run.setTimestamp(Long.parseLong(DateTimeFormatter.ofPattern("yyyyMMddHHmmss").format(LocalDateTime.now())));
 		if (status.equals(RunStatus.CANCELLED)) {
 			for (RunStep step: run.getRunSteps()) {
 				if (step.getStatus().compareTo(RunStatus.ON_WORKER) < 0) {
@@ -155,16 +161,48 @@ public class RunServiceImpl implements RunService {
 	public String getRunIdentifier(RunStep step) throws PladipusReportableException {
 		return runRepo.findById(step.getRun().getRunId()).getRunIdentifier();
 	}
+	
+	@Override
+	public long getRunTimestamp(RunStep step) throws PladipusReportableException {
+		return runRepo.findById(step.getRun().getRunId()).getTimestamp();
+	}
+	
+	@Override
+	public void abortBatchRun(BatchRun batchRun, boolean deactivate) throws PladipusReportableException {
+		Run run = runRepo.findActiveRunForBatchRun(batchRun);
+		if (run != null) {
+			if (!isRunFinished(run)) {
+				updateRunStatus(run, RunStatus.ABORT);
+			}
+			if (deactivate) {
+				run.setActive(false);
+				runRepo.merge(run);
+			}
+		}
+	}
 
 	@Override
-	public void abortBatchRuns(Batch batch) throws PladipusReportableException {
+	public void abortBatchRuns(Batch batch, boolean deactivate) throws PladipusReportableException {
 		for (Run run: runRepo.findRunsByBatch(batch)) {
 			if (!isRunFinished(run)) {
 				updateRunStatus(run, RunStatus.ABORT);
 			}
+			if (deactivate) {
+				run.setActive(false);
+				runRepo.merge(run);
+			}
 		}
 	}
 	
+	@Override
+	public List<RunOverview> getRunOverviewsForBatch(Batch batch) throws PladipusReportableException {
+		List<RunOverview> runOverviewList = new ArrayList<RunOverview>();
+		for (Run run: runRepo.findRunsByBatch(batch)) {
+			runOverviewList.add(run.getRunOverview());
+		}
+		return runOverviewList;
+	}
+
 	private boolean isRunFinished(Run run) {
 		RunStatus status = run.getStatus();
 		return status.equals(RunStatus.COMPLETE) || status.equals(RunStatus.ERROR) || status.equals(RunStatus.CANCELLED);
@@ -199,5 +237,10 @@ public class RunServiceImpl implements RunService {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public boolean activeRunsExist(Batch batch) throws PladipusReportableException {
+		return !runRepo.findRunsByBatch(batch).isEmpty();
 	}
 }

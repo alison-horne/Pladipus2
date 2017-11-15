@@ -14,4 +14,6 @@ public interface BatchControl {
 	public List<String> generateHeaders(String workflowName, User user) throws PladipusReportableException;
 	public List<String> generateHeadersFromWorkflow(Workflow workflow) throws PladipusReportableException;
 	public List<BatchOverview> getBatchOverviewsForWorkflow(Workflow workflow) throws PladipusReportableException;
+	public void deactivateBatch(Long id) throws PladipusReportableException;
+	public void deactivateWorkflowBatches(Workflow workflow) throws PladipusReportableException;
 }

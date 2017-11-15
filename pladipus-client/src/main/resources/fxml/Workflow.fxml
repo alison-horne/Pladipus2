@@ -47,12 +47,11 @@
          <items>
             <Label text="%workflow.nameLabel" />
             <TextField fx:id="nameField" editable="false"/>
-            <Button fx:id="renameBtn" mnemonicParsing="false" text="%workflow.editNameBtn" onAction="#handleRename"/>
-            <Pane HBox.hgrow="SOMETIMES"/>
-            <Label fx:id="savingLbl" />
-            <Button fx:id="saveXmlBtn" mnemonicParsing="false" text="%workflow.saveXmlBtn" onAction="#handleSaveXml" />
-            <Button fx:id="saveBtn" mnemonicParsing="false" text="%workflow.saveBtn" onAction="#handleSave" />
-            <Button fx:id="cancelBtn" mnemonicParsing="false" text="%workflow.cancelBtn" onAction="#handleCancel" />
+            <Button mnemonicParsing="false" text="%workflow.editNameBtn" onAction="#handleRename"/>
+            <Pane HBox.hgrow="SOMETIMES"/> 
+            <Button mnemonicParsing="false" text="%workflow.saveXmlBtn" onAction="#handleSaveXml" />
+            <Button mnemonicParsing="false" text="%workflow.saveBtn" onAction="#handleSave" />
+            <Button mnemonicParsing="false" text="%workflow.cancelBtn" onAction="#handleCancel" />
          </items>
       </ToolBar>
    </bottom>

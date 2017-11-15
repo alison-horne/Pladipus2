@@ -59,9 +59,8 @@
             <padding><Insets top="15" bottom="15" /></padding>
                <children>
               	 <Pane HBox.hgrow="SOMETIMES"/>
-              	  <Label fx:id="submitLbl" />
                   <Button fx:id="startBtn" mnemonicParsing="false" onAction="#handleStart" />
-                  <Button fx:id="cancelBtn" mnemonicParsing="false" text="%batchload.cancelBtn" onAction="#handleCancel"/>
+                  <Button mnemonicParsing="false" text="%batchload.cancelBtn" onAction="#handleCancel"/>
                   <Pane HBox.hgrow="SOMETIMES"/>
                </children>
             </HBox>

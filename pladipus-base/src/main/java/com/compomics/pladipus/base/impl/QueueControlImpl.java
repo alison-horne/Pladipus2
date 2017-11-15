@@ -1,5 +1,7 @@
 package com.compomics.pladipus.base.impl;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,6 +17,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.compomics.pladipus.base.QueueControl;
+import com.compomics.pladipus.model.core.RunOverview;
 import com.compomics.pladipus.model.core.TaskStatus;
 import com.compomics.pladipus.model.parameters.Substitution;
 import com.compomics.pladipus.model.persist.Batch;
@@ -55,10 +58,14 @@ public class QueueControlImpl implements QueueControl {
 	@Transactional(rollbackFor={Exception.class})
 	@Override
 	public void process(String batchName, User user) throws PladipusReportableException {
-		// TODO What to do with batches already in progress/completed?  Stop/cancel?  Run again?  Ignore?
 		List<Batch> batches = getActiveBatches(batchName, user);
 		if (batches.isEmpty()) {
 			throw new PladipusReportableException(exceptionMessages.getMessage("batch.noBatch"));
+		}
+		for (Batch batch: batches) {
+			if (runService.activeRunsExist(batch)) {
+				throw new PladipusReportableException(exceptionMessages.getMessage("batch.runExists"));
+			}
 		}
 		
 		Map<String, String> defaultsMap = getUserDefaultsMap(user);
@@ -73,29 +80,100 @@ public class QueueControlImpl implements QueueControl {
 	@Transactional(rollbackFor={Exception.class})
 	@Override
 	public void processBatch(Batch batch, User user) throws PladipusReportableException {
+		if (runService.activeRunsExist(batch)) {
+			throw new PladipusReportableException(exceptionMessages.getMessage("batch.runExists"));
+		}
 		Map<String, String> defaultsMap = getUserDefaultsMap(user);
 		for (BatchRun batchRun: batch.getRuns()) {
 			new CreateRun(batch.getName(), batchRun, defaultsMap).insertRun();
 		}
 	}
 	
+	@Transactional(rollbackFor={Exception.class})
 	@Override
 	public void restart(String batchName, User user) throws PladipusReportableException {
-		// TODO if batchName null/empty, throw exception
-		// Create new run.  End any currently running old ones?
+		List<Batch> batches = getActiveBatches(batchName, user);
+		if (batches.isEmpty()) {
+			throw new PladipusReportableException(exceptionMessages.getMessage("batch.noBatch"));
+		}
+		for (Batch batch: batches) {
+			runService.abortBatchRuns(batch, true);
+			processBatch(batch, user);
+		}
+	}
+	
+	@Transactional(rollbackFor={Exception.class})
+	@Override
+	public void restartBatch(long batchId, User user) throws PladipusReportableException {
+		Batch batch = batchService.getBatchWithId(batchId);
+		if (batch == null) {
+			throw new PladipusReportableException(exceptionMessages.getMessage("db.noBatchId", batchId));
+		}
+		runService.abortBatchRuns(batch, true);
+		processBatch(batch, user);
+	}
+	
+	@Transactional(rollbackFor={Exception.class})
+	@Override
+	public void restartBatchRun(long batchRunId, long batchId, User user) throws PladipusReportableException {
+		BatchRun run = batchService.getBatchRunWithId(batchRunId);
+		if (run == null) {
+			throw new PladipusReportableException(exceptionMessages.getMessage("db.noBatchRunId", batchRunId));
+		}
+		runService.abortBatchRun(run, true);
+		Batch batch = batchService.getBatchWithId(batchId);
+		if (batch != null) {
+			for (BatchRun r: batch.getRuns()) {
+				if (r.getId() == batchRunId) {
+					new CreateRun(batch.getName(), r, getUserDefaultsMap(user)).insertRun();
+					return;
+				}
+			}
+		}
+		throw new PladipusReportableException(exceptionMessages.getMessage("db.noBatchRunIdMatch", batchId, batchRunId));
 	}
 
+	@Transactional(rollbackFor={Exception.class})
+	@Override
+	public void abort(String batchName, User user) throws PladipusReportableException {
+		for (Batch batch: getActiveBatches(batchName, user)) {
+			runService.abortBatchRuns(batch, false);
+		}
+	}
+
+	@Transactional(rollbackFor={Exception.class})
+	@Override
+	public void abortBatch(long batchId) throws PladipusReportableException {
+		Batch batch = batchService.getBatchWithId(batchId);
+		if (batch == null) {
+			throw new PladipusReportableException(exceptionMessages.getMessage("db.noBatchId", batchId));
+		}
+		runService.abortBatchRuns(batch, false);
+	}
+	
+	@Transactional(rollbackFor={Exception.class})
+	@Override
+	public void abortBatchRun(long batchRunId) throws PladipusReportableException {
+		BatchRun run = batchService.getBatchRunWithId(batchRunId);
+		if (run == null) {
+			throw new PladipusReportableException(exceptionMessages.getMessage("db.noBatchRunId", batchRunId));
+		}
+		runService.abortBatchRun(run, false);
+	}
+	
 	@Override
 	public TaskStatus status(String batchName, User user) throws PladipusReportableException {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	
 	@Override
-	public void abort(String batchName, User user) throws PladipusReportableException {
-		for (Batch batch: getActiveBatches(batchName, user)) {
-			runService.abortBatchRuns(batch);
+	public List<RunOverview> batchStatus(long batchId) throws PladipusReportableException {
+		Batch batch = batchService.getBatchWithId(batchId);
+		if (batch == null) {
+			throw new PladipusReportableException(exceptionMessages.getMessage("db.noBatchId", batchId));
 		}
+		return runService.getRunOverviewsForBatch(batch);
 	}
 	
 	private List<Batch> getActiveBatches(String batchName, User user) throws PladipusReportableException {
@@ -141,6 +219,7 @@ public class QueueControlImpl implements QueueControl {
 		
 		private void setupRun() {
 			run.setStatus(RunStatus.READY);
+			run.setTimestamp(Long.parseLong(DateTimeFormatter.ofPattern("yyyyMMddHHmmss").format(LocalDateTime.now())));
 			run.setBatchRun(batchRun);
 			run.setRunIdentifier(batchName + "_" + batchRun.getName());
 			setupGlobalParameterMap();

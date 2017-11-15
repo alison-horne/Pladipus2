@@ -20,6 +20,7 @@ public class BatchGlobalValue {
     private Long paramId;
     private BatchRun run;
     private String value;
+    private String header;
 
     @Id
     @Column(name="workflow_global_id")
@@ -48,7 +49,16 @@ public class BatchGlobalValue {
     	this.value = value; 
     }
     
-    public BatchGlobalValue(Long paramId, String value) {
+    @Column(name="header", nullable=false)
+    public String getHeader() {
+    	return header;
+    }
+    public void setHeader(String header) {
+    	this.header = header;
+    }
+    
+    public BatchGlobalValue(Long paramId, String header, String value) {
+    	setHeader(header);
     	setValue(value);
     	setParamId(paramId);
     }

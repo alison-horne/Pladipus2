@@ -12,8 +12,6 @@ import com.compomics.pladipus.shared.PladipusReportableException;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -26,8 +24,6 @@ public class BatchLoadController extends FxmlController {
 	@FXML
 	private Label workflowNameLabel;
 	@FXML
-	private Label submitLbl;
-	@FXML
 	private TextField batchNameField;
 	@FXML
 	private CheckBox chkBox;
@@ -35,8 +31,6 @@ public class BatchLoadController extends FxmlController {
 	private TextArea loadingText;
 	@FXML
 	private Button startBtn;
-	@FXML
-	private Button cancelBtn;
 	@FXML
 	private ResourceBundle resources;
 	private WorkflowOverview wfo;
@@ -145,12 +139,13 @@ public class BatchLoadController extends FxmlController {
 		if (wfo.batchExists(batchName) && !alert("replaceBatch")) {
 			return;
 		}
-		submitLbl.setText(resources.getString("batchload.loadingLbl"));
-		startBtn.setDisable(true);
-		cancelBtn.setDisable(true);
-    	Task<Void> task = new Task<Void>() {
+		LoadingTask<Void> batchTask = new LoadingTask<Void>(resources.getString("batchload.loadingLbl"), null) {
 			@Override
-			protected Void call() throws Exception {
+			public void onSuccess() {
+				close();
+			}
+			@Override
+			public Void doTask() throws Exception {
 				if (filename != null) {
 					guiControl.loadBatchFromFile(wfo, batchNameField.getText(), filename, !loadOnly);
 				} else if (content != null) {
@@ -160,16 +155,7 @@ public class BatchLoadController extends FxmlController {
 				}
 				return null;
 			}
-    	};
-	    task.setOnSucceeded((WorkerStateEvent event) -> {
-	        close();
-	    });
-	    task.setOnFailed((WorkerStateEvent event) -> {
-	    	submitLbl.setText("");
-	    	startBtn.setDisable(false);
-	    	cancelBtn.setDisable(false);
-	    	error(task.getException().getMessage());
-	    });
-    	new Thread(task).start();
+		};
+		batchTask.run();
     }
 }

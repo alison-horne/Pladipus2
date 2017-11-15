@@ -40,12 +40,17 @@ public class QueueMessageControllerImpl implements QueueMessageController {
 	}
 
 	@Override
-	public void removeMessagesByIdentifier(String identifier) throws PladipusReportableException {
+	public void removeMessagesByIdentifier(String identifier, long timestamp) throws PladipusReportableException {
 		QueueViewMBean queueViewMBean = getMBean();
 		if (queueViewMBean != null)	{
 			try {
-				queueViewMBean.removeMatchingMessages(MessageSelector.JMX_IDENTIFIER.name() + "='" + identifier + "'");
+				String selector = MessageSelector.JMX_IDENTIFIER.name() + "='" + identifier + "'";
+				if (timestamp > 0) {
+					selector += " AND " + MessageSelector.STATUS_TIMESTAMP + " < " + timestamp;
+				}
+				queueViewMBean.removeMatchingMessages(selector);
 			} catch (Exception e) {
+				// TODO on exception try to restart ActiveMQ.  Need keep-alive check on connection?  Regular log of queue sizes perhaps?
 				throw new PladipusReportableException(exceptionMessages.getMessage("queue.removeFail", queueName, identifier));
 			}
 		} else {

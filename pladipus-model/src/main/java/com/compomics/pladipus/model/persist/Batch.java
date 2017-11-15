@@ -16,10 +16,14 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import com.compomics.pladipus.model.core.BatchOverview;
 
 @Table(name="batches")  
 @Entity(name="batches")
 @NamedQueries({
+	@NamedQuery(name="Batch.findById", query="SELECT b FROM batches b WHERE b.id = :id"),
 	@NamedQuery(name="Batch.findNamedActive", query="SELECT b FROM batches b WHERE b.name = :name AND b.workflow = :workflow AND b.active = true"),
 	@NamedQuery(name="Batch.findActiveForWorkflows", query="SELECT b FROM batches b WHERE b.active = true AND b.workflow IN :workflows"),
 	@NamedQuery(name="Batch.findNamedActiveForWorkflows", query="SELECT b FROM batches b WHERE b.name = :name AND b.active = true AND b.workflow IN :workflows")
@@ -79,5 +83,14 @@ public class Batch {
     public void addRun(BatchRun run) {
     	run.setBatch(this);
     	runs.add(run);
+    }
+    
+    @Transient
+    public BatchOverview getBatchOverview() {
+    	BatchOverview bo = new BatchOverview(name, id);
+    	for (BatchRun run: runs) {
+    		bo.addRun(run.getBatchRunOverview());
+    	}
+    	return bo;
     }
 }

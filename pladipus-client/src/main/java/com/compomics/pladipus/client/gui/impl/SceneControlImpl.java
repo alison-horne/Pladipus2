@@ -147,7 +147,7 @@ public class SceneControlImpl implements SceneControl {
 	        FxmlController controller = loader.getController();
 	        controller.setGuiControl(guiControl);
 	        controller.setSceneControl(this);
-	        controller.setStage(stage);
+	        controller.setStage(stage, PLADIPUS_ICON);
 	        
 	        Scene newScene = new Scene(layout);
 	        if (scene.getCss() != null) {

@@ -19,6 +19,7 @@ import com.compomics.pladipus.client.queue.MessageSender;
 import com.compomics.pladipus.model.core.BatchOverview;
 import com.compomics.pladipus.model.core.DefaultOverview;
 import com.compomics.pladipus.model.core.GuiSetup;
+import com.compomics.pladipus.model.core.RunOverview;
 import com.compomics.pladipus.model.core.WorkflowOverview;
 import com.compomics.pladipus.model.core.ToolInformation;
 import com.compomics.pladipus.model.persist.Workflow;
@@ -27,6 +28,7 @@ import com.compomics.pladipus.model.queue.messages.client.ClientToControlMessage
 import com.compomics.pladipus.model.queue.messages.client.ControlToClientMessage;
 import com.compomics.pladipus.shared.PladipusReportableException;
 import com.compomics.pladipus.shared.XMLHelper;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 
@@ -135,6 +137,11 @@ public class GuiControlImpl implements GuiControl {
 	public void infoAlert(String text, Stage stage, boolean wait) {
 		popupControl.showInfo(text, stage, wait);
 	}
+	
+	@Override
+	public void infoAlert(String header, String content, Stage stage, boolean wait) {
+		popupControl.showInfo(header, content, stage, wait);
+	}
 
 	@Override
 	public void login(String username, String password) throws PladipusReportableException {
@@ -161,7 +168,7 @@ public class GuiControlImpl implements GuiControl {
 	}
 	
 	@Override
-	public ObservableList<WorkflowOverview> getUserWorkflows() throws PladipusReportableException {
+	public ObservableList<WorkflowOverview> getUserWorkflows() {
 		return userWorkflowControl.getUserWorkflows();
 	}
 	
@@ -222,6 +229,26 @@ public class GuiControlImpl implements GuiControl {
 		if (original == null) original = "";
 		return popupControl.getText(stage, header, original);
 	}
+	
+	@Override
+	public WorkflowOverview choiceWorkflow(Stage stage) {
+		if (getUserWorkflows().isEmpty()) {
+			return null;
+		} else if (getUserWorkflows().size() == 1) {
+			return getUserWorkflows().get(0);
+		}
+		return popupControl.choiceDialog(stage, "workflowChoice", getUserWorkflows());
+	}
+	
+	@Override
+	public BatchOverview choiceBatch(WorkflowOverview workflow, Stage stage) {
+		if (workflow.getBatches().isEmpty()) {
+			return null;
+		} else if (workflow.getBatches().size() == 1) {
+			return workflow.getBatches().get(0);
+		}
+		return popupControl.choiceDialog(stage, "batchChoice", workflow.getBatches());
+	}
 
 	@Override
 	public ObservableList<DefaultOverview> getUserDefaults() {
@@ -231,6 +258,51 @@ public class GuiControlImpl implements GuiControl {
 	@Override
 	public ObservableList<String> getDefaultTypes() {
 		return defaultControl.getDefaultTypes();
+	}
+	
+	@Override
+	public void deleteWorkflow(WorkflowOverview workflow) throws PladipusReportableException {
+		ClientToControlMessage msg = new ClientToControlMessage(ClientTask.DELETE);
+		msg.setWorkflowName(workflow.getName());
+		sendMessage(msg, 3);
+		userWorkflowControl.removeWorkflow(workflow);
+	}
+	
+	@Override
+	public void deleteBatch(BatchOverview batch) throws PladipusReportableException {
+		ClientToControlMessage msg = new ClientToControlMessage(ClientTask.DELETE);
+		msg.setBatchId(batch.getId());
+		sendMessage(msg, 3);
+		userWorkflowControl.removeBatch(batch);
+	}
+	
+	@Override
+	public void runBatch(long id) throws PladipusReportableException {
+		ClientToControlMessage msg = new ClientToControlMessage(ClientTask.RESTART_BATCH);
+		msg.setBatchId(id);
+		sendMessage(msg, 1);
+	}
+	
+	@Override
+	public void runBatchRun(long id, long batchId) throws PladipusReportableException {
+		ClientToControlMessage msg = new ClientToControlMessage(ClientTask.RESTART_BATCH);
+		msg.setBatchRunId(id);
+		msg.setBatchId(batchId);
+		sendMessage(msg, 1);
+	}
+	
+	@Override
+	public void abortBatch(long id) throws PladipusReportableException {
+		ClientToControlMessage msg = new ClientToControlMessage(ClientTask.ABORT);
+		msg.setBatchId(id);
+		sendMessage(msg, 3);
+	}
+	
+	@Override
+	public void abortBatchRun(long id) throws PladipusReportableException {
+		ClientToControlMessage msg = new ClientToControlMessage(ClientTask.ABORT);
+		msg.setBatchRunId(id);
+		sendMessage(msg, 3);
 	}
 	
 	@Override
@@ -257,14 +329,26 @@ public class GuiControlImpl implements GuiControl {
 		msg.setBatchRun(startRun);
 		msg.setWorkflowName(wo.getName());
 		msg.setFileContent(content);
-		String batch = sendMessage(msg, 3);
+		String batch = sendMessage(msg, 1);
 		ObjectReader reader = jsonMapper.readerFor(BatchOverview.class);
 		try {
 			wo.addReplaceBatch(reader.readValue(batch));
 		} catch (IOException e) {
 			throw new PladipusReportableException(resources.getString("popup.noLogin") + "\n" + e.getMessage());
-		}
-		
+		}	
+	}
+	
+	@Override
+	public List<RunOverview> getBatchStatus(BatchOverview batch) throws PladipusReportableException {
+		ClientToControlMessage msg = new ClientToControlMessage(ClientTask.STATUS);
+		msg.setBatchId(batch.getId());
+		String runOverviews = sendMessage(msg, 3);
+		ObjectReader reader = jsonMapper.readerFor(new TypeReference<List<RunOverview>>(){});
+		try {
+			return reader.readValue(runOverviews);
+		} catch (IOException e) {
+			throw new PladipusReportableException(resources.getString("popup.noLogin") + "\n" + e.getMessage());
+		}	
 	}
 
 	private void initialize() throws PladipusReportableException {
@@ -296,6 +380,7 @@ public class GuiControlImpl implements GuiControl {
 					return response.getContent();
 				case TIMEOUT:
 					retries--;
+					break;
 				case NO_LOGIN:
 					throw new PladipusReportableException(resources.getString("popup.noLogin"));
 				default:

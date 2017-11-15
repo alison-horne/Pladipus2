@@ -34,8 +34,8 @@
             <HBox spacing="20.0" GridPane.rowIndex="1">
             <padding><Insets left="30.0" right="30.0" /></padding>
                <children>
-                  <Button fx:id="addRowBtn" mnemonicParsing="false" onAction="#handleAddRow" text="%batchmanual.addRowBtn" />
-                  <Button fx:id="delRowBtn" mnemonicParsing="false" onAction="#handleDeleteRow" text="%batchmanual.delRowBtn" />
+                  <Button mnemonicParsing="false" onAction="#handleAddRow" text="%batchmanual.addRowBtn" />
+                  <Button mnemonicParsing="false" onAction="#handleDeleteRow" text="%batchmanual.delRowBtn" />
                   <Pane HBox.hgrow="SOMETIMES"/>
                   <Button fx:id="insertSubBtn" mnemonicParsing="false" onAction="#handleInsertSub" text="%batchmanual.insertSubBtn" />
                   <Button fx:id="browseBtn" mnemonicParsing="false" onAction="#handleBrowse" text="%batchmanual.insertFileBtn" />
@@ -53,9 +53,8 @@
             <padding><Insets top="20.0" bottom="20.0" /></padding>
                <children>
                	  <Pane HBox.hgrow="SOMETIMES"/>
-               	  <Label fx:id="validatingLbl" />
-                  <Button fx:id="saveBtn" mnemonicParsing="false" text="%batchmanual.saveBtn" onAction="#handleTableToString"/>
-                  <Button fx:id="cancelBtn" mnemonicParsing="false" text="%batchmanual.cancelBtn" onAction="#handleCancel"/>
+                  <Button mnemonicParsing="false" text="%batchmanual.saveBtn" onAction="#handleTableToString"/>
+                  <Button mnemonicParsing="false" text="%batchmanual.cancelBtn" onAction="#handleCancel"/>
                   <Pane HBox.hgrow="SOMETIMES"/>
                </children>
             </HBox>

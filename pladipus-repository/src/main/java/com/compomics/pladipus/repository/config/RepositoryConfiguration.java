@@ -23,12 +23,14 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.compomics.pladipus.repository.helpers.impl.BasicEncryptor;
 import com.compomics.pladipus.repository.persist.BatchRepository;
+import com.compomics.pladipus.repository.persist.BatchRunRepository;
 import com.compomics.pladipus.repository.persist.DefaultRepository;
 import com.compomics.pladipus.repository.persist.RunRepository;
 import com.compomics.pladipus.repository.persist.RunStepRepository;
 import com.compomics.pladipus.repository.persist.UserRepository;
 import com.compomics.pladipus.repository.persist.WorkflowRepository;
 import com.compomics.pladipus.repository.persist.impl.BatchRepositoryImpl;
+import com.compomics.pladipus.repository.persist.impl.BatchRunRepositoryImpl;
 import com.compomics.pladipus.repository.persist.impl.DefaultRepositoryImpl;
 import com.compomics.pladipus.repository.persist.impl.RunRepositoryImpl;
 import com.compomics.pladipus.repository.persist.impl.RunStepRepositoryImpl;
@@ -179,6 +181,12 @@ public class RepositoryConfiguration {
 	@Bean
 	public BatchService batchService() {
 		return new BatchServiceImpl();
+	}
+	
+	@Lazy
+	@Bean
+	public BatchRunRepository batchRunRepo() {
+		return new BatchRunRepositoryImpl();
 	}
 	
 	@Lazy

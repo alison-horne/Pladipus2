@@ -13,6 +13,8 @@ public class ClientToControlMessage {
 	private String defaultType;
 	private Boolean defaultGlobal;
 	private Boolean batchRun;
+	private Long batchId;
+	private Long batchRunId;
 	
 	public ClientToControlMessage() {}
 	
@@ -88,5 +90,17 @@ public class ClientToControlMessage {
 	}
 	public void setBatchRun(boolean batchRun) {
 		this.batchRun = batchRun;
+	}
+	public Long getBatchId() {
+		return batchId;
+	}
+	public void setBatchId(long batchId) {
+		this.batchId = batchId;
+	}
+	public Long getBatchRunId() {
+		return batchRunId;
+	}
+	public void setBatchRunId(long batchRunId) {
+		this.batchRunId = batchRunId;
 	}
 }
